@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<title>Concept engineering</title>
+<title>Concept engineer</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="w3.css">
@@ -13,17 +13,60 @@ body, html {height: 100%}
   min-height: 100%;
   background-position: center;
   background-size: cover;
+  
 }
+.w3-quarter img{margin-bottom: -6px}
+.w3-quarter img:hover{opacity: 0.6; transition: 0.3s}
 </style>
 <body>
+  <!-- Sidebar work/menu -->
+<nav class="w3-sidebar w3-bar-block w3-black w3-animate-left w3-top w3-text-light-grey w3-large" style="z-index:3;width:50%;font-weight:bold;display:none;left:0;" id="mySidebarWork">
+  <a href="javascript:void()" onclick="w3_closeWork()" class="w3-bar-item w3-button w3-center w3-padding-32">CLOSE</a> 
+  <div class="w3-row w3-hide-small">
+    <div class="w3-half w3-quarter">
+      <img src="img/hand reach1.png" style="width:100%" onclick="onClick(this)" alt="Hand clearance 95th%-ile, wireless charger accessibility<br>(Lynk&Co 2016)">
+    </div>
+    <div class="w3-half w3-quarter">
+      <img src="img/handreach2.jpg" style="width:100%" onclick="onClick(this)" alt="Hand clearance 95th%-ile <br>(Lynk&Co 2016)">
+    </div>
+    <video width=340 controls>
+      <source src="img/busschaffor.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</nav>
+
+  <!-- Sidebar personal/menu -->
+  <nav class="w3-sidebar w3-bar-block w3-black w3-animate-left w3-top w3-text-light-grey w3-large" style="z-index:3;width:50%;font-weight:bold;display:none;left:0;" id="mySidebarPrivate">
+    <a href="javascript:void()" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-32">CLOSE</a> 
+    <div class="w3-row">
+      <div class="w3-half w3-quarter">
+        <img src="img/bugatti.png" style="width:100%" onclick="onClick(this)" alt="Bugatti ext mesh model<br>(2014)">
+        <video width=340 controls>
+          <source src="img/missiondrone2.0.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+      <div class="w3-half w3-quarter">
+        <img src="img/fixie.png" style="width:100%" onclick="onClick(this)" alt="Fixie bike <br>(2014)">
+
+      </div>
+    </div>
+  </nav>
+
+
+
+
+
+
 <div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
   <div class="w3-display-topleft w3-padding-large w3-xlarge">
-    <mark>Hanoi based, multi-disciplinary engineer. <br>
-    Human-centred design, human factors <br>and ergonomics specialist.
+    <mark>Hanoi based product developer / Multi-disciplinary engineer. <br>
+    Human-centred design, human factors and ergonomics specialist.
   </mark>
 </div>
-  
-  <!-- First Grid: Logo & About -->
+
+  <!-- First Grid: Logo & BG  cursor: pointer-->
   <div class="w3-row">
     <div class="w3-half w3-transparent w3-container w3-center" style="height:700px">
       <div class="w3-padding-64">
@@ -41,55 +84,50 @@ body, html {height: 100%}
   </div>
 <!-- Second Grid: Work & Resume -->
 <div class="w3-row">
-  <div class="w3-half w3-light-grey w3-center" style="min-height:1600px" id="work">
+  <div class="w3-half w3-light-grey w3-center" style="min-height:900px" id="work">
     <div class="w3-padding-64">
       <h2>My Work</h2>
       <p>Some of my latest projects.</p>
     </div>
     <div class="w3-row w3-hide-small">
-      <div class="w3-half">
+      <div class="w3-half w3-quarter">
         <img src="img/cevt.png" style="width:50%"><br><br><br><br>
         <img src="img/lynco.png" style="width:50%">
       </div>
-      <div class="w3-half">
+      <div class="w3-half w3-quarter">
         <img src="img/geelylogo.png" style="width:50%"><br><br>
         <img src="img/volvologo.jpg" style="width:25%">
       </div>
     </div>
     <br><br><br><br>
+    
+    <!-- Top menu on small screens -->
+    <div class="w3-container w3-white w3-xlarge w3-padding-16">
+      <span class="w3-left w3-padding">Work projects</span>
+      <a href="javascript:void(0)" class="w3-left w3-button w3-white" onclick="w3_openWork()">&#9776;</a>
+    </div>
+    <!-- Top menu on small screens -->
+    <div class="w3-container w3-white w3-xlarge w3-padding-16">
+      <span class="w3-left w3-padding">Personal projects</span>
+      <a href="javascript:void(0)" class="w3-left w3-button w3-white" onclick="w3_openPrivate()">&#9776;</a>
+    </div>
+    
+    
     <div class="w3-row w3-hide-small">
       <div class="w3-half">
-        <img src="img/hand reach1.png" style="width:100%">
+        
       </div>
-      <div class="w3-half">
-        <img src="img/handreach2.jpg" style="width:100%">
-      </div>
-    </div>
-    <div class="w3-row">
-      <div class="w3-half">
-        <img src="img/bugatti.png" style="width:100%">
-        <video width=340 controls>
-          <source src="img/missiondrone2.0.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-      </div>
-      <div class="w3-half">
-        <img src="img/fixie.png" style="width:100%">
-        <video width=340 controls>
-          <source src="img/busschaffor.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-      </div>
-    </div>
-    <div class="w3-row w3-hide-small">
-      <div class="w3-half">
-
-      </div>
-    </div>
-    <br>
-    <p>Just call me awesome.</p>
+    </div>   
   </div>
-  <div class="w3-half w3-indigo w3-container" style="min-height:1600px">
+    <!-- Modal for full size images on click-->
+    <div id="modal01" class="w3-modal w3-black" style="padding-top:0" onclick="this.style.display='none'">
+      <span class="w3-button w3-black w3-xlarge w3-display-topright">&times;</span>
+      <div class="w3-modal-content w3-animate-zoom w3-center w3-transparent w3-padding-64">
+        <img id="img01" class="w3-image">
+        <p id="caption"></p>
+      </div>
+    </div>
+  <div class="w3-half w3-indigo w3-container" style="min-height:900px">
     <div class="w3-padding-64 w3-center">
       <h2>Resume</h2>
       <p>A draft from my CV</p>
@@ -117,7 +155,7 @@ body, html {height: 100%}
           </tr>
           <tr class="w3-white">
             <td>2015</td>
-            <td>CEVT AB - Packaging engineer - Interior Compartment</td>
+            <td>CEVT AB - Packaging engineer - Interior</td>
             <td>Gothenburg, Sweden</td>
           </tr>
           <tr>
@@ -141,10 +179,44 @@ body, html {height: 100%}
   </div>
 </div>
   <div class="w3-display-bottomleft w3-padding-large">
-   
     Powered by <a href="https://0sevn.github.io/" target="_blank">Armin</a>
   </div>
 </div>
+<div class="w3-black w3-center w3-padding-24">
+  <p>Just call me awesome.</p>
+</div>
+
+<!-- botten -->
+<script>
+  // Script to open and close sidebar
+  function w3_openWork() {
+    document.getElementById("mySidebarWork").style.display = "block";
+    document.getElementById("myOverlayWork").style.display = "block";
+  }
+  
+  function w3_closeWork() {
+    document.getElementById("mySidebarWork").style.display = "none";
+    document.getElementById("myOverlayWork").style.display = "none";
+  }
+  function w3_openPrivate() {
+    document.getElementById("mySidebarPrivate").style.display = "block";
+    document.getElementById("myOverlayPrivate").style.display = "block";
+  }
+  
+  function w3_closePrivate() {
+    document.getElementById("mySidebarPrivate").style.display = "none";
+    document.getElementById("myOverlayPrivate").style.display = "none";
+  }
+  
+  // Modal Image Gallery
+  function onClick(element) {
+    document.getElementById("img01").src = element.src;
+    document.getElementById("modal01").style.display = "block";
+    var captionText = document.getElementById("caption");
+    captionText.innerHTML = element.alt;
+  }
+  
+  </script>
   </body>
   
   
