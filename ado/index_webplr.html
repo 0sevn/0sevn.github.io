@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+
+  <meta charset="UTF-8">
+  
+<link rel="apple-touch-icon" type="image/png" href="https://cpwebassets.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png">
+<meta name="apple-mobile-web-app-title" content="CodePen">
+
+<link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico">
+
+<link rel="mask-icon" type="" href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111">
+
+
+  <title>CodePen - audio player without volume-control functionality</title>
+  
+  
+  
+  
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+  letter-spacing: -0.5px;
+}
+button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    outline: none;
+    width: 40px;
+    height: 40px;
+    float: left;
+}
+#audio-player-container {
+  --seek-before-width: 0%;
+    --volume-before-width: 100%;
+    --buffered-width: 0%;
+    position: relative;
+    margin: 100px 2.5% auto 2.5%;
+    width: 95%;
+    max-width: 500px;
+    height: 132px;
+    background: #fff;
+}
+#audio-player-container::before {
+    position: absolute;
+    content: '';
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    left: -2px;
+    top: -2px;
+    background: linear-gradient(to left, #007db5, #ff8a00);
+    z-index: -1;
+}
+p {
+    position: absolute;
+    top: -18px;
+    right: 5%;
+    padding: 0 5px;
+    margin: 0;
+    font-size: 28px;
+    background: #fff;
+}
+#play-icon {
+    margin: 20px 2.5% 10px 2.5%;
+}
+path {
+    stroke: #007db5;
+}
+.time {
+    display: inline-block;
+    width: 37px;
+    text-align: center;
+    font-size: 20px;
+    margin: 28.5px 0 18.5px 0;
+    float: left;
+}
+output {
+    display: inline-block;
+    width: 32px;
+    text-align: center;
+    font-size: 20px;
+    margin: 10px 2.5% 0 5%;
+    float: left;
+    clear: left;
+}
+#volume-slider {
+    margin: 10px 2.5%;
+    width: 58%;
+}
+#volume-slider::-webkit-slider-runnable-track {
+    background: rgba(0, 125, 181, 0.6);
+}
+#volume-slider::-moz-range-track {
+    background: rgba(0, 125, 181, 0.6);
+}
+#volume-slider::-ms-fill-upper {
+    background: rgba(0, 125, 181, 0.6);
+}
+#volume-slider::before {
+    width: var(--volume-before-width);
+}
+#mute-icon {
+    margin: 0 2.5%;
+}
+input[type="range"] {
+    position: relative;
+    -webkit-appearance: none;
+    width: 48%;
+    margin: 0;
+    padding: 0;
+    height: 19px;
+    margin: 30px 2.5% 20px 2.5%;
+    float: left;
+    outline: none;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 3px;
+    cursor: pointer;
+    background: linear-gradient(to right, rgba(0, 125, 181, 0.6) var(--buffered-width), rgba(0, 125, 181, 0.2) var(--buffered-width));
+}
+input[type="range"]::before {
+    position: absolute;
+    content: "";
+    top: 8px;
+    left: 0;
+    width: var(--seek-before-width);
+    height: 3px;
+    background-color: #007db5;
+    cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+    position: relative;
+    -webkit-appearance: none;
+    box-sizing: content-box;
+    border: 1px solid #007db5;
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    background-color: #fff;
+    cursor: pointer;
+    margin: -7px 0 0 0;
+}
+input[type="range"]:active::-webkit-slider-thumb {
+    transform: scale(1.2);
+    background: #007db5;
+}
+input[type="range"]::-moz-range-track {
+    width: 100%;
+    height: 3px;
+    cursor: pointer;
+    background: linear-gradient(to right, rgba(0, 125, 181, 0.6) var(--buffered-width), rgba(0, 125, 181, 0.2) var(--buffered-width));
+}
+input[type="range"]::-moz-range-progress {
+    background-color: #007db5;
+}
+input[type="range"]::-moz-focus-outer {
+    border: 0;
+}
+input[type="range"]::-moz-range-thumb {
+    box-sizing: content-box;
+    border: 1px solid #007db5;
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    background-color: #fff;
+    cursor: pointer;
+}
+input[type="range"]:active::-moz-range-thumb {
+    transform: scale(1.2);
+    background: #007db5;
+}
+input[type="range"]::-ms-track {
+    width: 100%;
+    height: 3px;
+    cursor: pointer;
+    background: transparent;
+    border: solid transparent;
+    color: transparent;
+}
+input[type="range"]::-ms-fill-lower {
+    background-color: #007db5;
+}
+input[type="range"]::-ms-fill-upper {
+    background: linear-gradient(to right, rgba(0, 125, 181, 0.6) var(--buffered-width), rgba(0, 125, 181, 0.2) var(--buffered-width));
+}
+input[type="range"]::-ms-thumb {
+    box-sizing: content-box;
+    border: 1px solid #007db5;
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    background-color: #fff;
+    cursor: pointer;
+}
+input[type="range"]:active::-ms-thumb {
+    transform: scale(1.2);
+    background: #007db5;
+}
+</style>
+
+  
+  
+  
+  <script>
+  if (document.location.search.match(/type=embed/gi)) {
+    window.parent.postMessage("resize", "*");
+  }
+</script>
+
+
+</head>
+
+<body translate="no">
+  <div id="audio-player-container" style="--buffered-width:38.4615%;">
+  <audio src="https://assets.codepen.io/4358584/Anitek_-_Komorebi.mp3" preload="metadata" loop=""></audio>
+  <p>audio player ish</p>
+  <button id="play-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: 100%; transform: translate3d(0px, 0px, 0px);"><defs><clipPath id="__lottie_element_3"><rect width="50" height="50" x="0" y="0"></rect></clipPath><filter id="__lottie_element_5" filterUnits="objectBoundingBox" x="0%" y="0%" width="100%" height="100%"><feComponentTransfer in="SourceGraphic"><feFuncA type="table" tableValues="1.0 0.0"></feFuncA></feComponentTransfer></filter><mask id="__lottie_element_4" mask-type="alpha"><g filter="url(#__lottie_element_5)"><rect width="50" height="50" x="0" y="0" fill="#ffffff" opacity="0"></rect><g style="display: none;"><g><path></path><path stroke-linecap="butt" stroke-linejoin="miter" fill-opacity="0" stroke-miterlimit="4"></path></g></g></g></mask><filter id="__lottie_element_15" filterUnits="objectBoundingBox" x="0%" y="0%" width="100%" height="100%"><feComponentTransfer in="SourceGraphic"><feFuncA type="table" tableValues="1.0 0.0"></feFuncA></feComponentTransfer></filter><mask id="__lottie_element_14" mask-type="alpha"><g filter="url(#__lottie_element_15)"><rect width="50" height="50" x="0" y="0" fill="#ffffff" opacity="0"></rect><g transform="matrix(1,0,0,1,25,25)" opacity="1" style="display: block;"><g opacity="1" transform="matrix(1,0,0,1,0,0)"><path fill="rgb(39,179,99)" fill-opacity="1" d=" M-7.375,-12.5 C-7.375,-12.5 -7.375,12.875 -7.375,12.875 C-7.375,12.875 13.75,0 13.75,0 C13.75,0 -7.375,-12.5 -7.375,-12.5z"></path><path stroke-linecap="butt" stroke-linejoin="miter" fill-opacity="0" stroke-miterlimit="4" stroke="rgb(63,80,181)" stroke-opacity="1" stroke-width="0" d=" M-7.375,-12.5 C-7.375,-12.5 -7.375,12.875 -7.375,12.875 C-7.375,12.875 13.75,0 13.75,0 C13.75,0 -7.375,-12.5 -7.375,-12.5z"></path></g></g></g></mask></defs><g clip-path="url(#__lottie_element_3)"><g transform="matrix(1,0,0,1,0,0)" opacity="1" style="display: block;"><g opacity="1" transform="matrix(1,0,0,1,26.304000854492188,25)"><path stroke-linecap="butt" stroke-linejoin="miter" fill-opacity="0" stroke-miterlimit="10" stroke="rgb(0,0,0)" stroke-opacity="1" stroke-width="2" d=" M-15.303999900817871,-18.009000778198242 C-15.303999900817871,-18.009000778198242 15.303999900817871,0 15.303999900817871,0 C15.303999900817871,0 -15.303999900817871,18.009000778198242 -15.303999900817871,18.009000778198242 C-15.303999900817871,18.009000778198242 -15.303999900817871,-18.009000778198242 -15.303999900817871,-18.009000778198242z"></path></g></g><g mask="url(#__lottie_element_14)" style="display: none;"><g><g><path stroke-linecap="butt" stroke-linejoin="miter" fill-opacity="0" stroke-miterlimit="10"></path></g></g></g><g style="display: none;"><g><path stroke-linecap="butt" stroke-linejoin="miter" fill-opacity="0" stroke-miterlimit="10"></path></g></g><g mask="url(#__lottie_element_4)" style="display: none;"><g><g><path stroke-linecap="butt" stroke-linejoin="miter" fill-opacity="0" stroke-miterlimit="10"></path></g></g></g></g></svg></button>
+  <span id="current-time" class="time">0:00</span>
+  <input type="range" id="seek-slider" max="169" value="0">
+  <span id="duration" class="time">2:49</span>
+  <output id="volume-output">100</output>
+  <input type="range" id="volume-slider" max="100" value="100">
+  <button id="mute-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: 100%; transform: translate3d(0px, 0px, 0px);"><defs><clipPath id="__lottie_element_24"><rect width="50" height="50" x="0" y="0"></rect></clipPath></defs><g clip-path="url(#__lottie_element_24)"><g transform="matrix(1,0,0,1,0,0)" opacity="1" style="display: block;"><g opacity="1" transform="matrix(1,0,0,1,5.5,25)"><path stroke-linecap="butt" stroke-linejoin="round" fill-opacity="0" stroke="rgb(0,0,0)" stroke-opacity="1" stroke-width="2.08" d=" M4.5,8 C4.5,8 -2.5,8 -2.5,8 C-3.6029999256134033,8 -4.5,7.1020002365112305 -4.5,6 C-4.5,6 -4.5,-6 -4.5,-6 C-4.5,-7.1020002365112305 -3.6029999256134033,-8 -2.5,-8 C-2.5,-8 4.5,-8 4.5,-8"></path></g><g opacity="1" transform="matrix(1,0,0,1,17.5,25.0939998626709)"><path stroke-linecap="butt" stroke-linejoin="round" fill-opacity="0" stroke="rgb(0,0,0)" stroke-opacity="1" stroke-width="1.98" d=" M-7.895999908447266,7.335000038146973 C-8.244000434875488,7.033999919891357 -8.5,6.296999931335449 -8.5,5.659999847412109 C-8.5,5.659999847412109 -8.5,-5.8480000495910645 -8.5,-5.8480000495910645 C-8.5,-6.485000133514404 -8.244000434875488,-7.235000133514404 -7.895999908447266,-7.535999774932861 C-7.895999908447266,-7.535999774932861 4.77400016784668,-20.16900062561035 4.77400016784668,-20.16900062561035 C6.40500020980835,-21.825000762939453 8.5,-21.19700050354004 8.5,-18.76799964904785 C8.5,-18.76799964904785 8.5,-0.19200000166893005 8.5,-0.19200000166893005 C8.5,-0.19200000166893005 8.5,18.22100067138672 8.5,18.22100067138672 C8.5,20.833999633789062 6.604000091552734,21.823999404907227 4.715000152587891,19.9060001373291 C4.715000152587891,19.9060001373291 -7.895999908447266,7.335000038146973 -7.895999908447266,7.335000038146973z"></path></g></g><g style="display: none;"><g><path stroke-linecap="round" stroke-linejoin="miter" fill-opacity="0" stroke-miterlimit="10"></path></g><g><path stroke-linecap="round" stroke-linejoin="miter" fill-opacity="0" stroke-miterlimit="10"></path></g></g><g style="display: none;"><g><path stroke-linecap="round" stroke-linejoin="miter" fill-opacity="0" stroke-miterlimit="10"></path></g><g><path stroke-linecap="round" stroke-linejoin="miter" fill-opacity="0" stroke-miterlimit="10"></path></g></g><g transform="matrix(1,0,0,1,1.75,0)" opacity="1" style="display: block;"><g opacity="1" transform="matrix(1,0,0,1,32.84400177001953,25)"><path stroke-linecap="round" stroke-linejoin="round" fill-opacity="0" stroke="rgb(0,0,0)" stroke-opacity="1" stroke-width="2" d=" M-2.1559998989105225,-5.583000183105469 C0.3230000138282776,-4.935999870300293 2.1559998989105225,-2.680999994277954 2.1559998989105225,-0.0010000000474974513 C2.1559998989105225,2.678999900817871 0.3230000138282776,4.934999942779541 -2.1559998989105225,5.583000183105469"></path></g></g><g style="display: none;"><g><path stroke-linecap="round" stroke-linejoin="round" fill-opacity="0"></path></g></g></g></svg></button>
+</div>
+    <script src="https://cpwebassets.codepen.io/assets/common/stopExecutionOnTimeout-8216c69d01441f36c0ea791ae2d4469f0f8ff5326f00ae2d00e4bb7d20e24edb.js"></script>
+
+  
+      <script id="rendered-js" type="module">
+/** Implementation of the presentation of the audio player */
+import lottieWeb from 'https://cdn.skypack.dev/lottie-web';
+
+const playIconContainer = document.getElementById('play-icon');
+const audioPlayerContainer = document.getElementById('audio-player-container');
+const seekSlider = document.getElementById('seek-slider');
+const volumeSlider = document.getElementById('volume-slider');
+const muteIconContainer = document.getElementById('mute-icon');
+let playState = 'play';
+let muteState = 'unmute';
+
+const playAnimation = lottieWeb.loadAnimation({
+  container: playIconContainer,
+  path: 'https://maxst.icons8.com/vue-static/landings/animated-icons/icons/pause/pause.json',
+  renderer: 'svg',
+  loop: false,
+  autoplay: false,
+  name: "Play Animation" });
+
+
+const muteAnimation = lottieWeb.loadAnimation({
+  container: muteIconContainer,
+  path: 'https://maxst.icons8.com/vue-static/landings/animated-icons/icons/mute/mute.json',
+  renderer: 'svg',
+  loop: false,
+  autoplay: false,
+  name: "Mute Animation" });
+
+
+playAnimation.goToAndStop(14, true);
+
+playIconContainer.addEventListener('click', () => {
+  if (playState === 'play') {
+    audio.play();
+    playAnimation.playSegments([14, 27], true);
+    requestAnimationFrame(whilePlaying);
+    playState = 'pause';
+  } else {
+    audio.pause();
+    playAnimation.playSegments([0, 14], true);
+    cancelAnimationFrame(raf);
+    playState = 'play';
+  }
+});
+
+muteIconContainer.addEventListener('click', () => {
+  if (muteState === 'unmute') {
+    muteAnimation.playSegments([0, 15], true);
+    muteState = 'mute';
+  } else {
+    muteAnimation.playSegments([15, 25], true);
+    muteState = 'unmute';
+  }
+});
+
+const showRangeProgress = rangeInput => {
+  if (rangeInput === seekSlider) audioPlayerContainer.style.setProperty('--seek-before-width', rangeInput.value / rangeInput.max * 100 + '%');else
+  audioPlayerContainer.style.setProperty('--volume-before-width', rangeInput.value / rangeInput.max * 100 + '%');
+};
+
+seekSlider.addEventListener('input', e => {
+  showRangeProgress(e.target);
+});
+volumeSlider.addEventListener('input', e => {
+  showRangeProgress(e.target);
+});
+
+
+
+
+
+/** Implementation of the functionality of the audio player */
+
+const audio = document.querySelector('audio');
+const durationContainer = document.getElementById('duration');
+const currentTimeContainer = document.getElementById('current-time');
+let raf = null;
+
+const calculateTime = secs => {
+  const minutes = Math.floor(secs / 60);
+  const seconds = Math.floor(secs % 60);
+  const returnedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
+  return `${minutes}:${returnedSeconds}`;
+};
+
+const displayDuration = () => {
+  durationContainer.textContent = calculateTime(audio.duration);
+};
+
+const setSliderMax = () => {
+  seekSlider.max = Math.floor(audio.duration);
+};
+
+const displayBufferedAmount = () => {
+  const bufferedAmount = Math.floor(audio.buffered.end(audio.buffered.length - 1));
+  audioPlayerContainer.style.setProperty('--buffered-width', `${bufferedAmount / seekSlider.max * 100}%`);
+};
+
+const whilePlaying = () => {
+  seekSlider.value = Math.floor(audio.currentTime);
+  currentTimeContainer.textContent = calculateTime(seekSlider.value);
+  audioPlayerContainer.style.setProperty('--seek-before-width', `${seekSlider.value / seekSlider.max * 100}%`);
+  raf = requestAnimationFrame(whilePlaying);
+};
+
+if (audio.readyState > 0) {
+  displayDuration();
+  setSliderMax();
+  displayBufferedAmount();
+} else {
+  audio.addEventListener('loadedmetadata', () => {
+    displayDuration();
+    setSliderMax();
+    displayBufferedAmount();
+  });
+}
+
+audio.addEventListener('progress', displayBufferedAmount);
+
+seekSlider.addEventListener('input', () => {
+  currentTimeContainer.textContent = calculateTime(seekSlider.value);
+  if (!audio.paused) {
+    cancelAnimationFrame(raf);
+  }
+});
+
+seekSlider.addEventListener('change', () => {
+  audio.currentTime = seekSlider.value;
+  if (!audio.paused) {
+    requestAnimationFrame(whilePlaying);
+  }
+});
+//# sourceURL=pen.js
+    </script>
+
+  
+
+  <script src="https://cpwebassets.codepen.io/assets/editor/iframe/iframeRefreshCSS-4793b73c6332f7f14a9b6bba5d5e62748e9d1bd0b5c52d7af6376f3d1c625d7e.js"></script>
+
+
+
+ 
+</body></html>

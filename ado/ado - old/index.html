@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+
+  <meta charset="UTF-8">
+  
+<link rel="apple-touch-icon" type="image/png" href="https://cpwebassets.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png" />
+<meta name="apple-mobile-web-app-title" content="CodePen">
+
+<link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
+
+<link rel="mask-icon" type="" href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111" />
+
+
+  <title>CodePen - Radio Player</title>
+  
+  
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css'>
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/mediaelement@2.17.0/src/css/mediaelementplayer.css'>
+<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css'>
+  
+<style>
+html, body{height:100%;}
+#icerik{
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin: 0 auto -50px;
+  background-color:#000;
+  background-size:contain;
+  background-position:center center;
+  background-repeat:no-repeat;
+}
+
+#player{
+  height:50px;
+  color:#FFF;
+  background:#333;
+}
+
+#player.online{
+    border-top:4px solid #006CFE;
+}
+
+#player.offline{
+    border-top:4px solid #D9534F;
+}
+
+#player #info{
+  width:47%;
+  float:left;
+}
+
+#player #info #kapak{
+  width:54px;
+  height:54px;
+  margin-top:-8px;
+  background:#AAA;
+  border:3px solid #FFF;
+  box-shadow:0 0 10px rgba(0,0,0,0.5);
+  float:left;
+}
+#player #info #kapak img{
+  width:100%;
+  height:100%;
+}
+
+#player #info .radyo{
+  color:#FFF;
+  margin:2px 0 0 15px;
+  display:inline-block;
+}
+
+#player.online #info .radyo{
+  -webkit-animation: glowOn .5s infinite alternate;
+}
+
+#player.offline #info .radyo{
+  -webkit-animation: glowOff .5s infinite alternate;
+}
+
+#player #info .sarki{
+  font-size:12px;
+  margin:2px 0 0 15px;
+  display:inline-block;
+}
+
+#player #info .sarki strong{
+  color:#999;
+}
+
+#player #info .list, #player #info .request{
+  width:32px;
+  height:32px;
+  margin:-14px 1px 0 0;
+  text-align:center;
+  color:#999;
+  text-shadow:0 0 0px #000;
+  font-size:16px;
+  line-height:2.2;
+  float:right;
+}
+#player #info .request i{
+  width:100%;
+  height:100%;
+  display:block;
+  line-height:1.9;
+}
+
+
+#player.online #controls:hover, #player.online #info .list:hover, #player.online #info .request:hover, #player.online #right .refresh:hover, #player.online #right .mute:hover, #player.online #social li:hover, #player.online #social li:hover > a{
+  cursor:pointer;
+  background:#006CFE;
+  color:#FFF;
+}
+
+#player.offline #controls:hover, #player.offline #info .list:hover, #player.offline #info .request:hover, #player.offline #right .refresh:hover, #player.offline #right .mute:hover, #player.offline #social li:hover, #player.offline #social li:hover > a{
+  cursor:pointer;
+  background:#D9534F;
+  color:#FFF;
+}
+
+#player #controls{
+  width:50px;
+  height:46px;
+  position:absolute;
+  left:50%;
+  margin-left:-25px;
+  background:#006CFE;
+  text-align:center;
+  font-size:24px;
+  line-height:2.2;
+}
+
+#player.online #controls{
+  background:#006CFE;
+}
+
+#player.offline #controls{
+  background:#D9534F;
+}
+
+#player #right .refresh{
+  width:32px;
+  height:32px;
+  margin:8px 1px 0 70px;
+  text-align:center;
+  color:#999;
+  text-shadow:0 0 0px #000;
+  font-size:16px;
+  line-height:2.2;
+  float:left;
+}
+
+#player #right .mute{
+  width:32px;
+  height:32px;
+  margin:8px 1px 0 10px;
+  text-align:center;
+  color:#999;
+  text-shadow:0 0 0px #000;
+  font-size:16px;
+  line-height:2.2;
+  float:left;
+}
+
+#mesaj{
+  width:280px;
+  margin:6px 5px 0 5px;
+  padding:5px 10px;
+  color:#999;
+  display:inline-block;
+  background:#222;
+  float:left;
+}
+
+#social{
+  float:right;
+  text-align:center;
+  line-height:2.2;
+}
+
+#social li{
+  width:32px;
+  height:32px;
+  margin:8px 6px 0 6px;
+  float:left;
+  list-style-type:none;
+}
+
+#social li a{
+  color:#999;
+}
+
+#social li:first-child{
+  margin-left:0;
+}
+
+#social li:last-child{
+  margin-right:0;
+}
+
+.player{
+  display:none;
+}
+
+@-webkit-keyframes glowOn {
+    to {
+      text-shadow: 0 0 10px #006CFE;
+    }
+}
+@-webkit-keyframes glowOff {
+    to {
+      text-shadow: 0 0 10px #D9534F;
+    }
+}
+
+#gecmis.online{
+  border:5px solid #006CFE;
+}
+#gecmis.offline{
+  border:5px solid #D9534F;
+}
+#gecmis{
+  width:360px;
+  height:200px;
+  margin:0;
+  padding:0;
+  background:#333;
+  overflow:auto;
+  position:absolute;
+  left:50%;
+  bottom:46px;
+  margin-left:-180px;
+  display:none;
+}
+
+#gecmis li{
+  color:#999;
+  padding:4px 10px;
+  list-style-type:none;
+}
+
+#gecmis li:nth-child(odd){
+  background:#222;
+}
+
+#gecmis li i{
+  margin-left:4px;
+  margin-right:10px;
+}
+.modal-title{color:#333;}
+*{border-radius:0 !important;}
+</style>
+
+  <script>
+  window.console = window.console || function(t) {};
+</script>
+
+  
+  
+  <script>
+  if (document.location.search.match(/type=embed/gi)) {
+    window.parent.postMesrighte("resize", "*");
+  }
+</script>
+
+
+</head>
+
+<body translate="no" >
+  <div id="icerik">
+</div>
+<footer id="player">
+  <audio src="https://rockfm.rockfm.com.tr:9450/stream" type="audio/mp3" controls="controls" class="player" autoplay="1"></audio>
+  <div class="container">
+    <ul id="gecmis"></ul>
+    <div id="info">
+      <div id="kapak">
+        <img src="https://www.flaticon.com/premium-icon/icons/svg/193/193154.svg" alt="" />
+      </div>
+      <div class="radyo"><strong></strong></div>
+      <br>
+      <div class="sarki"><strong>Şu an çalan şarkı : </strong><span></span></div>
+      <div class="list" data-toggle="tooltip" data-placement="top" title="Önceki Şarkılar"><i class="fa fa-bars"></i></div>
+      <div class="request" data-toggle="modal" data-target="#myModal"><i class="fa fa-envelope" data-toggle="tooltip" data-placement="top" title="İstek Gönder" ></i></div>
+    </div>
+    <div id="controls" data-toggle="tooltip" data-placement="top" title="Oynat / Durdur">
+      <i class="play glyphicon glyphicon-pause"></i>
+    </div>
+    <div id="right">
+      <div class="refresh" data-toggle="tooltip" data-placement="top" title="refresh"><i class="fa fa-refresh"></i></div>
+      <div class="mute" data-toggle="tooltip" data-placement="top" title="mute"><i class="fa fa-volume-up"></i></div>
+      <div id="mesaj">
+        <marquee></marquee>
+      </div>
+      <div id="social">
+        <li><a href="" target="_blank"><i class="fa fa-facebook"></i></a></li>
+        <li><a href="" target="_blank"><i class="fa fa-twitter"></i></a></li>
+        <li><a href="" target="_blank"><i class="fa fa-apple"></i></a></li>
+        <li><a href="" target="_blank"><i class="fa fa-android"></i></a></li>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&amp;times;</span></button>
+          <h4 class="modal-title">İstek Hattı</h4>
+        </div>
+        <div class="modal-body">
+           <p class="alert alert-danger">Bu radyo request kabul etmiyor :/</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+    <script src="https://cpwebassets.codepen.io/assets/common/stopExecutionOnTimeout-8216c69d01441f36c0ea791ae2d4469f0f8ff5326f00ae2d00e4bb7d20e24edb.js"></script>
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js'></script>
+<script src='https://designshack.net/tutorialexamples/html5-audio-player/js/mediaelement-and-player.min.js'></script>
+      <script id="rendered-js" >
+/* Wavestreaming.com - https://github.com/Wavestreaming/jquery-shoutcast - MIT licensed */
+!function (a) {"use strict";function b(a) {this._attr = {}, this.playedInterval = a.playedInterval || a.interval || 3e4, this.statsInterval = a.statsInterval || a.interval || 5e3, this.host = a.host, this.port = parseInt(a.port, 10) || 8e3, this.stream = parseInt(a.stream, 10) || 1, this.stats_path = a.stats_path || "stats", this.played_path = a.played_path || "played", this._statsinterval = null, this._playedinterval = null, this._stats = a.stats || function () {}, this._played = a.played || function () {};}b.prototype.get = function (a, b) {return a ? "undefined" != typeof this._attr[a.toLowerCase()] ? this._attr[a.toLowerCase()] : b : this._attr;}, b.prototype.stats = function (b) {var c,d = this,e = "https://" + this.host + ":" + this.port + "/" + this.stats_path + "?sid=" + this.stream + "&amp;json=1";return b = b || function () {}, c = a.ajax({ url: e, dataType: "jsonp", timeout: "2000" }), c.done(function (a) {return "object" != typeof a || "undefined" == typeof a.streamstatus ? void (d._status = 0) : (d._status = 1 === a.streamstatus ? 2 : 1, d._attr = a, d._attr.status = d.getStatusAsText(), b.call(d, d._attr), void d._stats(d._attr));}), c.fail(function () {d._status = 0, d._attr.status = d.getStatusAsText(), b.call(d, d._attr), d._stats(d._attr);}), this;}, b.prototype.played = function (b) {var c = this,d = "https://" + this.host + ":" + this.port + "/" + this.played_path + "?sid=" + this.stream + "&amp;type=json";return a.ajax({ url: d, dataType: "jsonp", timeout: 2e3, success: function (a) {a instanceof Array &amp;&amp; (b &amp;&amp; b.call(c, a), c._played(a));} }), this;}, b.prototype.startStats = function () {return this.stopStats(), this.stats(), this._statsinterval = setInterval(a.proxy(this.stats, this), this.statsInterval), this;}, b.prototype.stopStats = function () {return this._statsinterval &amp;&amp; clearInterval(this._statsinterval), this;}, b.prototype.startPlayed = function () {return this.stopPlayed(), this.played(), this._playedinterval = setInterval(a.proxy(this.played, this), this.playedInterval), this;}, b.prototype.stopPlayed = function () {return this._playedinterval &amp;&amp; clearInterval(this._playedinterval), this;}, b.prototype.getStatus = function () {return this._status;}, b.prototype.getStatusAsText = function () {return ["Offline", "Awaiting Connection", "On Air"][this._status];}, b.prototype.onAir = function () {return 2 === this._status;}, a.SHOUTcast = function (a) {return new b(a);};}(window.jQuery);
+
+var host = 'rockfm.rockfm.com.tr',
+port = '9450',
+refreshme = 1000,
+radyo_url = `https://${host}:${port}/;stream.mp3`,
+logo = 'https://www.rockfm.com.tr/images/rockfm_logo_siyah-bg.png',
+spotify_token = '';
+
+$(".list").click(function () {
+  $("#gecmis").slideToggle();
+});
+
+var player = new MediaElementPlayer('audio');
+interval = setInterval(function () {
+  $.SHOUTcast({
+    host: host,
+    port: port,
+    interval: 5000 }).
+  stats(function () {
+    if (this.onAir()) {
+      $("#player, #gecmis").removeClass("offline").addClass("online");
+      radyoismi = this.get("servertitle");
+      calansarki = this.get("songtitle");
+      $("#mesaj marquee").text('Şu anda bu yayını ' + this.get('currentlistners') + ' kişi dinliyor!');
+      $("#icerik p").html();
+      if (radyoismi.length >= 50) {
+        radyoismi = radyoismi.substr(0, 50);
+      }
+      if (calansarki.length >= 50) {
+        calansarki = calansarki.substr(0, 50);
+      }
+      $(".radyo strong").text(radyoismi);
+      $(".sarki span").text(calansarki);
+      $.ajax({
+        dataType: 'json',
+        url: `https://api.spotify.com/v1/search?q=${calansarki}&amp;type=track`,
+        headers: {
+          'Authorization:': `Bearer ${spotify_token}` },
+
+        success: function (response) {
+          console.log(response);
+          $("#icerik").css('background-image', 'url(' + response.tracks.items[0].album.images[0].url + ')');
+          $("#kapak img").attr('src', response.tracks.items[0].album.images[2].url);
+        } });
+
+
+    } else {
+      // Yayın kapalı
+      $("#player, #gecmis").removeClass("online").addClass("offline");
+      $(".radyo strong").text("Rock FM");
+      $(".sarki span").text("Yayın şu anda kapalı.");
+      $("#kapak img").attr("src", logo);
+    }
+  }).played(function (tracks) {
+    $("#gecmis").html("");
+    $.each(tracks, function (k, track) {
+      $("#gecmis").append('<li><i class="fa fa-music"></i> ' + track.title + '</li>');
+    });
+  });
+}, 1000);
+
+$("#controls").click(function () {
+  icon = $(this).find("i");
+  if (icon.attr('class') == 'fa fa-play') {
+    player.play();
+    icon.attr('class', 'glyphicon glyphicon-pause');
+  } else {
+    player.pause();
+    icon.attr('class', 'fa fa-play');
+  }
+});
+
+$(".refresh").click(function () {
+  player.setSrc(radyo_url);
+});
+
+$(".mute").click(function () {
+  icon = $(this).find('i');
+  if (icon.attr('class') == 'fa fa-volume-up') {
+    icon.attr('class', 'fa fa-volume-off');
+    player.setMuted(true);
+  } else {
+    icon.attr('class', 'fa fa-volume-up');
+    player.setMuted(false);
+  }
+});
+
+$('[data-toggle=tooltip]').tooltip();
+//# sourceURL=pen.js
+    </script>
+
+  
+
+</body>
+
+</html>

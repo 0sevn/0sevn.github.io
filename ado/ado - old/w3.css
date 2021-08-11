@@ -1,0 +1,434 @@
+﻿player offline
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+  
+<link rel="apple-touch-icon" type="image/png" href="https://cpwebassets.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png">
+<meta name="apple-mobile-web-app-title" content="CodePen">
+
+<link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico">
+
+<link rel="mask-icon" type="" href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111">
+
+
+  <title>CodePen - Radio Player</title>
+  
+  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mediaelement@2.17.0/src/css/mediaelementplayer.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+<style>
+html, body{height:100%;}
+#icerik{
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin: 0 auto -50px;
+  background-color:#000;
+  background-size:contain;
+  background-position:center center;
+  background-repeat:no-repeat;
+}
+
+#player{
+  height:50px;
+  color:#FFF;
+  background:#333;
+}
+
+#player.online{
+    border-top:4px solid #006CFE;
+}
+
+#player.offline{
+    border-top:4px solid #D9534F;
+}
+
+#player #bilgiler{
+  width:47%;
+  float:left;
+}
+
+#player #bilgiler #kapak{
+  width:54px;
+  height:54px;
+  margin-top:-8px;
+  background:#AAA;
+  border:3px solid #FFF;
+  box-shadow:0 0 10px rgba(0,0,0,0.5);
+  float:left;
+}
+#player #bilgiler #kapak img{
+  width:100%;
+  height:100%;
+}
+
+#player #bilgiler .radyo{
+  color:#FFF;
+  margin:2px 0 0 15px;
+  display:inline-block;
+}
+
+#player.online #bilgiler .radyo{
+  -webkit-animation: glowOn .5s infinite alternate;
+}
+
+#player.offline #bilgiler .radyo{
+  -webkit-animation: glowOff .5s infinite alternate;
+}
+
+#player #bilgiler .sarki{
+  font-size:12px;
+  margin:2px 0 0 15px;
+  display:inline-block;
+}
+
+#player #bilgiler .sarki strong{
+  color:#999;
+}
+
+#player #bilgiler .liste, #player #bilgiler .istek{
+  width:32px;
+  height:32px;
+  margin:-14px 1px 0 0;
+  text-align:center;
+  color:#999;
+  text-shadow:0 0 0px #000;
+  font-size:16px;
+  line-height:2.2;
+  float:right;
+}
+#player #bilgiler .istek i{
+  width:100%;
+  height:100%;
+  display:block;
+  line-height:1.9;
+}
+
+
+#player.online #kontrol:hover, #player.online #bilgiler .liste:hover, #player.online #bilgiler .istek:hover, #player.online #sag .yenile:hover, #player.online #sag .sessiz:hover, #player.online #sosyal li:hover, #player.online #sosyal li:hover > a{
+  cursor:pointer;
+  background:#006CFE;
+  color:#FFF;
+}
+
+#player.offline #kontrol:hover, #player.offline #bilgiler .liste:hover, #player.offline #bilgiler .istek:hover, #player.offline #sag .yenile:hover, #player.offline #sag .sessiz:hover, #player.offline #sosyal li:hover, #player.offline #sosyal li:hover > a{
+  cursor:pointer;
+  background:#D9534F;
+  color:#FFF;
+}
+
+#player #kontrol{
+  width:50px;
+  height:46px;
+  position:absolute;
+  left:50%;
+  margin-left:-25px;
+  background:#006CFE;
+  text-align:center;
+  font-size:24px;
+  line-height:2.2;
+}
+
+#player.online #kontrol{
+  background:#006CFE;
+}
+
+#player.offline #kontrol{
+  background:#D9534F;
+}
+
+#player #sag .yenile{
+  width:32px;
+  height:32px;
+  margin:8px 1px 0 70px;
+  text-align:center;
+  color:#999;
+  text-shadow:0 0 0px #000;
+  font-size:16px;
+  line-height:2.2;
+  float:left;
+}
+
+#player #sag .sessiz{
+  width:32px;
+  height:32px;
+  margin:8px 1px 0 10px;
+  text-align:center;
+  color:#999;
+  text-shadow:0 0 0px #000;
+  font-size:16px;
+  line-height:2.2;
+  float:left;
+}
+
+#mesaj{
+  width:280px;
+  margin:6px 5px 0 5px;
+  padding:5px 10px;
+  color:#999;
+  display:inline-block;
+  background:#222;
+  float:left;
+}
+
+#sosyal{
+  float:right;
+  text-align:center;
+  line-height:2.2;
+}
+
+#sosyal li{
+  width:32px;
+  height:32px;
+  margin:8px 6px 0 6px;
+  float:left;
+  list-style-type:none;
+}
+
+#sosyal li a{
+  color:#999;
+}
+
+#sosyal li:first-child{
+  margin-left:0;
+}
+
+#sosyal li:last-child{
+  margin-right:0;
+}
+
+.player{
+  display:none;
+}
+
+@-webkit-keyframes glowOn {
+    to {
+      text-shadow: 0 0 10px #006CFE;
+    }
+}
+@-webkit-keyframes glowOff {
+    to {
+      text-shadow: 0 0 10px #D9534F;
+    }
+}
+
+#gecmis.online{
+  border:5px solid #006CFE;
+}
+#gecmis.offline{
+  border:5px solid #D9534F;
+}
+#gecmis{
+  width:360px;
+  height:200px;
+  margin:0;
+  padding:0;
+  background:#333;
+  overflow:auto;
+  position:absolute;
+  left:50%;
+  bottom:46px;
+  margin-left:-180px;
+  display:none;
+}
+
+#gecmis li{
+  color:#999;
+  padding:4px 10px;
+  list-style-type:none;
+}
+
+#gecmis li:nth-child(odd){
+  background:#222;
+}
+
+#gecmis li i{
+  margin-left:4px;
+  margin-right:10px;
+}
+.modal-title{color:#333;}
+*{border-radius:0 !important;}
+</style>
+
+  <script>
+  window.console = window.console || function(t) {};
+</script>
+
+  
+  
+  <script>
+  if (document.location.search.match(/type=embed/gi)) {
+    window.parent.postMessage("resize", "*");
+  }
+</script>
+
+
+<script async="" src="https://rockfm.rockfm.com.tr:9450/stats?sid=1&amp;json=1&amp;callback=jQuery21309166886731139217_1627408164624&amp;_=1627408166150"></script><script async="" src="https://rockfm.rockfm.com.tr:9450/played?sid=1&amp;type=json&amp;callback=jQuery21309166886731139217_1627408164619&amp;_=1627408166151"></script><script async="" src="https://rockfm.rockfm.com.tr:9450/stats?sid=1&amp;json=1&amp;callback=jQuery21309166886731139217_1627408164614&amp;_=1627408166152"></script><script async="" src="https://rockfm.rockfm.com.tr:9450/played?sid=1&amp;type=json&amp;callback=jQuery21309166886731139217_1627408164628&amp;_=1627408166153"></script>
+</head>
+
+<body translate="no" class="" style="">
+  <div id="icerik">
+</div>
+<footer id="player" class="offline">
+  <div id="mep_0" class="mejs-container svg player mejs-audio" style="width: 400px; height: 30px;">
+  <div class="mejs-inner"><div class="mejs-mediaelement">
+  <audio src="https://rockfm.rockfm.com.tr:9450/;stream.mp3" type="audio/mp3" class="player" autoplay="1"></audio>
+  </div>
+  <div class="mejs-layers">
+  <div class="mejs-poster mejs-layer" style="display: none; width: 400px; height: 30px;">
+  </div></div>
+  <div class="mejs-controls"><div class="mejs-button mejs-playpause-button mejs-play"><button type="button" aria-controls="mep_0" title="Play/Pause" aria-label="Play/Pause"></button></div><div class="mejs-time mejs-currenttime-container"><span class="mejs-currenttime">00:00</span></div><div class="mejs-time-rail" style="width: 100px;"><span class="mejs-time-total" style="width: 90px;"><span class="mejs-time-buffering" style="display: none;"></span><span class="mejs-time-loaded" style="width: 0px;"></span><span class="mejs-time-current" style="width: 0px;"></span><span class="mejs-time-handle" style="left: -5px;"></span><span class="mejs-time-float"><span class="mejs-time-float-current">00:00</span><span class="mejs-time-float-corner"></span></span></span></div><div class="mejs-time mejs-duration-container"><span class="mejs-duration">NaN:NaN</span></div><div class="mejs-button mejs-volume-button mejs-mute"><button type="button" aria-controls="mep_0" title="Mute Toggle" aria-label="Mute Toggle"></button></div><div class="mejs-horizontal-volume-slider mejs-mute" style="display: none;"><div class="mejs-horizontal-volume-total"></div><div class="mejs-horizontal-volume-current" style="width: 50px;"></div><div class="mejs-horizontal-volume-handle" style="left: 37px;"></div></div></div>
+  <div class="mejs-clear"></div></div>
+  </div>
+  <div class="container">
+    <ul id="gecmis" class="offline" style="display: none;"></ul>
+    <div id="bilgiler">
+      <div id="kapak">
+        <img src="https://www.rockfm.com.tr/images/rockfm_logo_siyah-bg.png" alt="">
+      </div>
+      <div class="radyo"><strong>Rock FM</strong></div>
+      <br>
+      <div class="sarki"><strong>Şu an çalan şarkı : </strong><span>Yayın şu anda kapalı.</span></div>
+      <div class="liste" data-toggle="tooltip" data-placement="top" title="" data-original-title="Önceki Şarkılar"><i class="fa fa-bars"></i></div>
+      <div class="istek" data-toggle="modal" data-target="#myModal"><i class="fa fa-envelope" data-toggle="tooltip" data-placement="top" title="" data-original-title="İstek Gönder"></i></div>
+    </div>
+    <div id="kontrol" data-toggle="tooltip" data-placement="top" title="" data-original-title="Oynat / Durdur">
+      <i class="fa fa-play"></i>
+    </div>
+    <div id="sag">
+      <div class="yenile" data-toggle="tooltip" data-placement="top" title="" data-original-title="Yenile"><i class="fa fa-refresh"></i></div>
+      <div class="sessiz" data-toggle="tooltip" data-placement="top" title="" data-original-title="Sessiz"><i class="fa fa-volume-up"></i></div>
+      <div id="mesaj">
+        <marquee></marquee>
+      </div>
+      <div id="sosyal">
+        <li><a href="" target="_blank"><i class="fa fa-facebook"></i></a></li>
+        <li><a href="" target="_blank"><i class="fa fa-twitter"></i></a></li>
+        <li><a href="" target="_blank"><i class="fa fa-apple"></i></a></li>
+        <li><a href="" target="_blank"><i class="fa fa-android"></i></a></li>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+          <h4 class="modal-title">İstek Hattı</h4>
+        </div>
+        <div class="modal-body">
+           <p class="alert alert-danger">Bu radyo istek kabul etmiyor :/</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+    <script src="https://cpwebassets.codepen.io/assets/common/stopExecutionOnTimeout-8216c69d01441f36c0ea791ae2d4469f0f8ff5326f00ae2d00e4bb7d20e24edb.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="https://designshack.net/tutorialexamples/html5-audio-player/js/mediaelement-and-player.min.js"></script>
+      <script id="rendered-js">
+/* Wavestreaming.com - https://github.com/Wavestreaming/jquery-shoutcast - MIT licensed */
+!function (a) {"use strict";function b(a) {this._attr = {}, this.playedInterval = a.playedInterval || a.interval || 3e4, this.statsInterval = a.statsInterval || a.interval || 5e3, this.host = a.host, this.port = parseInt(a.port, 10) || 8e3, this.stream = parseInt(a.stream, 10) || 1, this.stats_path = a.stats_path || "stats", this.played_path = a.played_path || "played", this._statsinterval = null, this._playedinterval = null, this._stats = a.stats || function () {}, this._played = a.played || function () {};}b.prototype.get = function (a, b) {return a ? "undefined" != typeof this._attr[a.toLowerCase()] ? this._attr[a.toLowerCase()] : b : this._attr;}, b.prototype.stats = function (b) {var c,d = this,e = "https://" + this.host + ":" + this.port + "/" + this.stats_path + "?sid=" + this.stream + "&json=1";return b = b || function () {}, c = a.ajax({ url: e, dataType: "jsonp", timeout: "2000" }), c.done(function (a) {return "object" != typeof a || "undefined" == typeof a.streamstatus ? void (d._status = 0) : (d._status = 1 === a.streamstatus ? 2 : 1, d._attr = a, d._attr.status = d.getStatusAsText(), b.call(d, d._attr), void d._stats(d._attr));}), c.fail(function () {d._status = 0, d._attr.status = d.getStatusAsText(), b.call(d, d._attr), d._stats(d._attr);}), this;}, b.prototype.played = function (b) {var c = this,d = "https://" + this.host + ":" + this.port + "/" + this.played_path + "?sid=" + this.stream + "&type=json";return a.ajax({ url: d, dataType: "jsonp", timeout: 2e3, success: function (a) {a instanceof Array && (b && b.call(c, a), c._played(a));} }), this;}, b.prototype.startStats = function () {return this.stopStats(), this.stats(), this._statsinterval = setInterval(a.proxy(this.stats, this), this.statsInterval), this;}, b.prototype.stopStats = function () {return this._statsinterval && clearInterval(this._statsinterval), this;}, b.prototype.startPlayed = function () {return this.stopPlayed(), this.played(), this._playedinterval = setInterval(a.proxy(this.played, this), this.playedInterval), this;}, b.prototype.stopPlayed = function () {return this._playedinterval && clearInterval(this._playedinterval), this;}, b.prototype.getStatus = function () {return this._status;}, b.prototype.getStatusAsText = function () {return ["Offline", "Awaiting Connection", "On Air"][this._status];}, b.prototype.onAir = function () {return 2 === this._status;}, a.SHOUTcast = function (a) {return new b(a);};}(window.jQuery);
+
+var host = 'rockfm.rockfm.com.tr',
+port = '9450',
+yenileme = 1000,
+radyo_url = `https://${host}:${port}/;stream.mp3`,
+logo = 'https://www.rockfm.com.tr/images/rockfm_logo_siyah-bg.png',
+spotify_token = '';
+
+$(".liste").click(function () {
+  $("#gecmis").slideToggle();
+});
+
+var player = new MediaElementPlayer('audio');
+interval = setInterval(function () {
+  $.SHOUTcast({
+    host: host,
+    port: port,
+    interval: 5000 }).
+  stats(function () {
+    if (this.onAir()) {
+      $("#player, #gecmis").removeClass("offline").addClass("online");
+      radyoismi = this.get("servertitle");
+      calansarki = this.get("songtitle");
+      $("#mesaj marquee").text('Şu anda bu yayını ' + this.get('currentlisteners') + ' kişi dinliyor!');
+      $("#icerik p").html();
+      if (radyoismi.length >= 50) {
+        radyoismi = radyoismi.substr(0, 50);
+      }
+      if (calansarki.length >= 50) {
+        calansarki = calansarki.substr(0, 50);
+      }
+      $(".radyo strong").text(radyoismi);
+      $(".sarki span").text(calansarki);
+      $.ajax({
+        dataType: 'json',
+        url: `https://api.spotify.com/v1/search?q=${calansarki}&type=track`,
+        headers: {
+          'Authorization:': `Bearer ${spotify_token}` },
+
+        success: function (response) {
+          console.log(response);
+          $("#icerik").css('background-image', 'url(' + response.tracks.items[0].album.images[0].url + ')');
+          $("#kapak img").attr('src', response.tracks.items[0].album.images[2].url);
+        } });
+
+
+    } else {
+      // Yayın kapalı
+      $("#player, #gecmis").removeClass("online").addClass("offline");
+      $(".radyo strong").text("Rock FM");
+      $(".sarki span").text("Yayın şu anda kapalı.");
+      $("#kapak img").attr("src", logo);
+    }
+  }).played(function (tracks) {
+    $("#gecmis").html("");
+    $.each(tracks, function (k, track) {
+      $("#gecmis").append('<li><i class="fa fa-music"></i> ' + track.title + '</li>');
+    });
+  });
+}, 1000);
+
+$("#kontrol").click(function () {
+  icon = $(this).find("i");
+  if (icon.attr('class') == 'fa fa-play') {
+    player.play();
+    icon.attr('class', 'glyphicon glyphicon-pause');
+  } else {
+    player.pause();
+    icon.attr('class', 'fa fa-play');
+  }
+});
+
+$(".yenile").click(function () {
+  player.setSrc(radyo_url);
+});
+
+$(".sessiz").click(function () {
+  icon = $(this).find('i');
+  if (icon.attr('class') == 'fa fa-volume-up') {
+    icon.attr('class', 'fa fa-volume-off');
+    player.setMuted(true);
+  } else {
+    icon.attr('class', 'fa fa-volume-up');
+    player.setMuted(false);
+  }
+});
+
+$('[data-toggle=tooltip]').tooltip();
+//# sourceURL=pen.js
+    </script>
+
+  
+
+
+
+
+ 
+</body></html>
