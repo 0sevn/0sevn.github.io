@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+
+<head>
+  <meta charset="UTF-8">
+  
+<link rel="apple-touch-icon" type="image/png" href="https://cpwebassets.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png" />
+<meta name="apple-mobile-web-app-title" content="CodePen">
+
+<link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
+
+<link rel="mask-icon" type="" href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111" />
+
+
+  <title>CodePen - Radio Player</title>
+  
+  
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css'>
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/mediaelement@2.17.0/src/css/mediaelementplayer.css'>
+<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css'>
+  
+<style>
+html, body{height:100%;}
+#contents{
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin: 0 auto -50px;
+  background-color:#000;
+  background-size:contain;
+  background-position:center center;
+  background-repeat:no-repeat;
+}
+
+#player{
+  height:50px;
+  color:#FFF;
+  background:#333;
+}
+#player.online{
+    border-top:4px solid #006CFE;
+}
+
+#player #info{
+  width:47%;
+  float:left;
+}
+
+#player #info #cover{
+  width:54px;
+  height:54px;
+  margin-top:-8px;
+  background:#AAA;
+  border:3px solid #FFF;
+  box-shadow:0 0 10px rgba(0,0,0,0.5);
+  float:left;
+}
+#player #info #cover img{
+  width:100%;
+  height:100%;
+}
+
+#player #info .radio{
+  color:#FFF;
+  margin:2px 0 0 15px;
+  display:inline-block;
+}
+
+#player #info .song{
+  font-size:12px;
+  margin:2px 0 0 15px;
+  display:inline-block;
+}
+
+#player #info .song strong{
+  color:#999;
+}
+
+#player #info .list, #player #info .request{
+  width:32px;
+  height:32px;
+  margin:-14px 1px 0 0;
+  text-align:center;
+  color:#999;
+  text-shadow:0 0 0px #000;
+  font-size:16px;
+  line-height:2.2;
+  float:right;
+}
+#player #info .request i{
+  width:100%;
+  height:100%;
+  display:block;
+  line-height:1.9;
+}
+
+
+#player.online #controls:hover, #player.online #info .list:hover, #player.online #info .request:hover, #player.online #right .refresh:hover, #player.online #right .mute:hover, #player.online #social li:hover, #player.online #social li:hover > a{
+  cursor:pointer;
+  background:#006CFE;
+  color:#FFF;
+}
+
+#player.offline #controls:hover, #player.offline #info .list:hover, #player.offline #info .request:hover, #player.offline #right .refresh:hover, #player.offline #right .mute:hover, #player.offline #social li:hover, #player.offline #social li:hover > a{
+  cursor:pointer;
+  background:#D9534F;
+  color:#FFF;
+}
+
+#player #controls{
+  width:50px;
+  height:46px;
+  position:absolute;
+  left:50%;
+  margin-left:-25px;
+  background:#006CFE;
+  text-align:center;
+  font-size:24px;
+  line-height:2.2;
+}
+
+#player.online #controls{
+  background:#006CFE;
+}
+#player.offline #controls{
+  background:#D9534F;
+}
+
+#player #right .refresh{
+  width:32px;
+  height:32px;
+  margin:8px 1px 0 70px;
+  text-align:center;
+  color:#999;
+  text-shadow:0 0 0px #000;
+  font-size:16px;
+  line-height:2.2;
+  float:left;
+}
+
+#player #right .mute{
+  width:32px;
+  height:32px;
+  margin:8px 1px 0 10px;
+  text-align:center;
+  color:#999;
+  text-shadow:0 0 0px #000;
+  font-size:16px;
+  line-height:2.2;
+  float:left;
+}
+#message{
+  width:280px;
+  margin:6px 5px 0 5px;
+  padding:5px 10px;
+  color:#999;
+  display:inline-block;
+  background:#222;
+  float:left;
+}
+
+#social{
+  float:right;
+  text-align:center;
+  line-height:2.2;
+}
+
+#social li{
+  width:32px;
+  height:32px;
+  margin:8px 6px 0 6px;
+  float:left;
+  list-style-type:none;
+}
+
+#social li a{
+  color:#999;
+}
+
+#social li:first-child{
+  margin-left:0;
+}
+
+#social li:last-child{
+  margin-right:0;
+}
+.player{
+  display:none;
+}
+
+
+@-webkit-keyframes glowOn {
+    to {
+      text-shadow: 0 0 10px #006CFE;
+    }
+}
+@-webkit-keyframes glowOff {
+    to {
+      text-shadow: 0 0 10px #D9534F;
+    }
+}
+
+#previous.online{
+  border:5px solid #006CFE;
+}
+#previous.offline{
+  border:5px solid #D9534F;
+}
+#previous{
+  width:360px;
+  height:200px;
+  margin:0;
+  padding:0;
+  background:#333;
+  overflow:auto;
+  position:absolute;
+  left:50%;
+  bottom:46px;
+  margin-left:-180px;
+  display:none;
+}
+
+#previous li{
+  color:#999;
+  padding:4px 10px;
+  list-style-type:none;
+}
+
+#previous li:nth-child(odd){
+  background:#222;
+}
+
+#previous li i{
+  margin-left:4px;
+  margin-right:10px;
+}
+
+
+.modal-title{color:#333;}
+*{border-radius:0 !important;}
+</style>
+
+  <script>
+  window.console = window.console || function(t) {};
+</script>
+  
+  <script>
+  if (document.location.search.match(/type=embed/gi)) {
+    window.parent.postMesnexte("resize", "*");
+  }
+</script>
+
+
+</head>
+
+<body translate="no" >
+<div id="contents"></div>
+
+<footer id="player">
+  <audio src="Andain_-_Beautiful_things.mp3" type="audio/mp3" controls="controls" class="player" autoplay="1"></audio>
+  <div class="container">
+    <ul id="previous"></ul>
+    <div id="info">
+      <div id="cover">
+        <img src="canoo.png" alt="" />>
+      </div>
+      <div class="radio"><strong></strong></div>
+      <br>
+      <div class="song"><strong>Şu an çalan şarkı : </strong><span></span></div>
+      <div class="list" data-toggle="tooltip" data-placement="top" title="Önceki Şarkılar"><i class="fa fa-bars"></i></div>
+      <div class="request" data-toggle="modal" data-target="#myModal"><i class="fa fa-envelope" data-toggle="tooltip" data-placement="top" title="İstek Gönder" ></i></div>
+    </div>
+    <div id="kontrol" data-toggle="tooltip" data-placement="top" title="Oynat / Durdur">
+      <i class="play glyphicon glyphicon-pause"></i>
+    </div>
+    <div id="next">
+      <div class="refresh" data-toggle="tooltip" data-placement="top" title="refresh"><i class="fa fa-refresh"></i></div>
+      <div class="sessiz" data-toggle="tooltip" data-placement="top" title="Sessiz"><i class="fa fa-volume-up"></i></div>
+      <div id="message">
+        <marquee></marquee>
+      </div>
+      <div id="social">
+        <li><a href="" target="_blank"><i class="fa fa-facebook"></i></a></li>
+        <li><a href="" target="_blank"><i class="fa fa-twitter"></i></a></li>
+        <li><a href="" target="_blank"><i class="fa fa-apple"></i></a></li>
+        <li><a href="" target="_blank"><i class="fa fa-android"></i></a></li>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&amp;times;</span></button>
+          <h4 class="modal-title">İstek Hattı</h4>
+        </div>
+        <div class="modal-body">
+           <p class="alert alert-danger">Bu radio request kabul etmiyor :/</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
