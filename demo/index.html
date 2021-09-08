@@ -106,10 +106,9 @@ body .player .right .bottom video {
 			<nav class="slideshow__nav" id="audo">
 								
 				
-				<a class="nav-item" href="#slide-1"><i class="icon icon--rainy">
-					<!--audio src="media/Andain_-_Beautiful_things.mp3" id="demoAudio" controls></audio>
-				<input type="button" id="demoPlay" value="Play" disabled/>
-				<input type="button" id="demoPause" value="Pause" disabled/-->
+				<a class="nav-item" href="#slide-1"><i class="icon icon--rainy" id="demoPlay">
+					<audio src="media/Andain_-_Beautiful_things.mp3" id="demoAudio" controls></audio>
+				<input type="button" id="demoPause" value="Pause" disabled/>
 				</i><span>10/24</span></a>
 				<a class="nav-item" href="#slide-2"><i class="icon icon--drizzle"></i><span>10/25</span></a>
 				<a class="nav-item" href="#slide-3"><i class="icon icon--sun"></i><span>10/26</span></a>
@@ -137,12 +136,24 @@ var aud = document.getElementById("demoAudio");
  // (B) WAIT FOR SUFFICIENT AUDIO BUFFER
  aud.addEventListener("canplay", function(){
    // (C) ENABLE ALL CONTROLS
-   for (let i of document.querySelectorAll("#audo input")) {
+   for (let i of document.querySelectorAll("#audo a")) {
 	 i.disabled = false;
    }
+   document.getElementById("demoPlay").onclick = function(){ aud.play(); };
  
    // (D) ATTACH CONTROLS
-   document.getElementById("demoPlay").onclick = function(){ aud.play(); };
+   
+   const playIconContainer = aud.getElementById('demoPlay');
+   let state = 'play';
+   playIconContainer.addEventListener('click', () => {
+  if(state === 'play') {
+	audio.pause();
+    state = 'pause';
+  } else {
+	audio.play();
+    state = 'play';
+  }
+});
    document.getElementById("demoPause").onclick = function(){ aud.pause(); };
    document.getElementById("demoSkip").onclick = function(){
 	 aud.currentTime = document.getElementById("demoTime").value;
