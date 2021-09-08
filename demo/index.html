@@ -17,9 +17,44 @@
 	<!--[if IE]>
 		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
+	<style>
+		body .player {
+  z-index: 10;
+  background: #F9F9F9;
+  color: #000;
+  min-height: 80px;
+  max-height: 80px;
+  display: flex;
+  flex-direction: row;
+}
+body .player .right {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+body .player .right .top {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 10px;
+}
+body .player .right .top .song {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+body .player .right .bottom {
+  display: flex;
+}
+body .player .right .bottom video {
+  flex-grow: 1;
+  height: 32px;
+}
+	</style>
 </head>
 
 <body class="demo-1">
+
 	<div class="image-preload">
 		<img src="img/drop-color.png" alt="">
 		<img src="img/drop-alpha.png" alt="">
@@ -43,10 +78,23 @@
 				<a class="current-demo" href="index.html">Weather</a>
 			</nav>
 		</header-->
+		
+				
 		<div class="slideshow">
+			
 			<canvas width="1" height="1" id="container" style="position:absolute"></canvas>
+			<!--div class="player">
+				<div class="left"></div>
+				<div class="right">
+					<div class="bottom">
+						<video controls="" _autoplay="" name="media"><source src="media/Andain_-_Beautiful_things.mp3" type="audio/mpeg"></video>
+					 </div>
+					</div>
+					</div-->
 			<!-- Heavy Rain -->
 			<div class="slide" id="slide-1" data-weather="rain">
+
+				
 				<div class="slide__element slide__element--date">Sunday, 24<sup>th</sup> of October 2043</div>
 				<div class="slide__element slide__element--temp">12°<small>C</small></div>
 			</div>
@@ -64,24 +112,65 @@
 			<div class="slide" id="slide-5" data-weather="storm">
 				<div class="slide__element slide__element--date">Wednesday, 28<sup>th</sup> of October 2043</div>
 				<div class="slide__element slide__element--temp">20°<small>C</small></div>
+				
 			</div>
 			<!-- Fallout (greenish overlay with slightly greenish/yellowish drops) -->
+			
 			<div class="slide" id="slide-4" data-weather="fallout">
 				<div class="slide__element slide__element--date">Tuesday, 27<sup>th</sup> of October 2043</div>
 				<div class="slide__element slide__element--temp">34°<small>C</small></div>
+				
 			</div>
-			<nav class="slideshow__nav">
-				<a class="nav-item" href="#slide-1"><i class="icon icon--rainy"></i><span>10/24</span></a>
+			
+			<nav class="slideshow__nav" id="audo">
+								
+				
+				<a class="nav-item" href="#slide-1"><i class="icon icon--rainy">
+					<audio src="media/Andain_-_Beautiful_things.mp3" id="demoAudio" controls></audio>
+				<input type="button" id="demoPlay" value="Play" disabled/>
+				<input type="button" id="demoPause" value="Pause" disabled/>
+				</i><span>10/24</span></a>
 				<a class="nav-item" href="#slide-2"><i class="icon icon--drizzle"></i><span>10/25</span></a>
 				<a class="nav-item" href="#slide-3"><i class="icon icon--sun"></i><span>10/26</span></a>
 				<a class="nav-item" href="#slide-5"><i class="icon icon--storm"></i><span>10/28</span></a>
 				<a class="nav-item" href="#slide-4"><i class="icon icon--radioactive"></i><span>10/27</span></a>
+				
 			</nav>
+			
 		</div>
 		<p class="nosupport">Sorry, but your browser does not support WebGL!</p>
+		
 	</div>
+	<!-- (A) AUDIO TAG -->
+
+
+<!-- (B) CONTROLS -->
+
+	
 	<!-- /container -->
 	<script src="js/index.min.js"></script>
+	<script>
+	// (A) GET AUDIO ELEMENT
+var aud = document.getElementById("demoAudio");
+ 
+ // (B) WAIT FOR SUFFICIENT AUDIO BUFFER
+ aud.addEventListener("canplay", function(){
+   // (C) ENABLE ALL CONTROLS
+   for (let i of document.querySelectorAll("#audo input")) {
+	 i.disabled = false;
+   }
+ 
+   // (D) ATTACH CONTROLS
+   document.getElementById("demoPlay").onclick = function(){ aud.play(); };
+   document.getElementById("demoPause").onclick = function(){ aud.pause(); };
+   document.getElementById("demoSkip").onclick = function(){
+	 aud.currentTime = document.getElementById("demoTime").value;
+   };
+   document.getElementById("demoVolume").onclick = function(){
+	 aud.volume = document.getElementById("demoVol").value;
+   };
+ });
+ </script>
 </body>
 
 </html>
