@@ -76,44 +76,47 @@ body .player .right .bottom video {
 			<div class="slide" id="slide-1" data-weather="rain">
 
 				
-				<div class="slide__element slide__element--date">Sunday, 24<sup>th</sup> of October 2043</div>
+				<div class="slide__element slide__element--date"></div>
+				<div class="slide__element slide__element--temp">29°<small>C</small></div>
+			</div->
+			<!-- Drizzle >
+								<div class="slide__element slide__element--date">Sunday, 24<sup>th</sup> of October 2043</div>
 				<div class="slide__element slide__element--temp">12°<small>C</small></div>
-			</div>
-			<!-- Drizzle -->
+
 			<div class="slide" id="slide-2" data-weather="drizzle">
 				<div class="slide__element slide__element--date">Saturday, 25<sup>th</sup> of October 2043</div>
 				<div class="slide__element slide__element--temp">18°<small>C</small></div>
 			</div>
-			<!-- Sunny -->
+			
+			<!-- Sunny >
 			<div class="slide" id="slide-3" data-weather="sunny">
 				<div class="slide__element slide__element--date">Monday, 26<sup>th</sup> of October 2043</div>
 				<div class="slide__element slide__element--temp">25°<small>C</small></div>
 			</div>
-			<!-- Heavy rain -->
+			<!-- Heavy rain >
 			<div class="slide" id="slide-5" data-weather="storm">
 				<div class="slide__element slide__element--date">Wednesday, 28<sup>th</sup> of October 2043</div>
 				<div class="slide__element slide__element--temp">20°<small>C</small></div>
 				
 			</div>
-			<!-- Fallout (greenish overlay with slightly greenish/yellowish drops) -->
+			<!-- Fallout (greenish overlay with slightly greenish/yellowish drops) >
 			
 			<div class="slide" id="slide-4" data-weather="fallout">
 				<div class="slide__element slide__element--date">Tuesday, 27<sup>th</sup> of October 2043</div>
 				<div class="slide__element slide__element--temp">34°<small>C</small></div>
 				
-			</div>
+			</div-->
 			
 			<nav class="slideshow__nav" id="audo">
 								
 				
 				<a class="nav-item" href="#slide-1"><i class="icon icon--rainy" id="demoPlay">
-					<audio src="media/Andain_-_Beautiful_things.mp3" id="demoAudio" controls></audio>
-				<input type="button" id="demoPause" value="Pause" disabled/>
-				</i><span>10/24</span></a>
-				<a class="nav-item" href="#slide-2"><i class="icon icon--drizzle"></i><span>10/25</span></a>
+					<audio src="media/Andain_-_Beautiful_things.mp3" id="demoAudio"></audio>
+				</i><span></span></a>
+				<!--a class="nav-item" href="#slide-2"><i class="icon icon--drizzle"></i><span>10/25</span></a>
 				<a class="nav-item" href="#slide-3"><i class="icon icon--sun"></i><span>10/26</span></a>
 				<a class="nav-item" href="#slide-5"><i class="icon icon--storm"></i><span>10/28</span></a>
-				<a class="nav-item" href="#slide-4"><i class="icon icon--radioactive"></i><span>10/27</span></a>
+				<a class="nav-item" href="#slide-4"><i class="icon icon--radioactive"></i><span>10/27</span></a-->
 				
 			</nav>
 			
@@ -130,37 +133,29 @@ body .player .right .bottom video {
 	<!-- /container -->
 	<script src="js/index.min.js"></script>
 	<script>
+
 	// (A) GET AUDIO ELEMENT
 var aud = document.getElementById("demoAudio");
  
  // (B) WAIT FOR SUFFICIENT AUDIO BUFFER
  aud.addEventListener("canplay", function(){
    // (C) ENABLE ALL CONTROLS
-   for (let i of document.querySelectorAll("#audo a")) {
-	 i.disabled = false;
-   }
-   document.getElementById("demoPlay").onclick = function(){ aud.play(); };
+   //document.getElementById("demoPlay").onclick = function(){ aud.play(); };
  
    // (D) ATTACH CONTROLS
-   
-   const playIconContainer = aud.getElementById('demoPlay');
-   let state = 'play';
+   const playIconContainer = document.getElementById('demoPlay');
+   let state = 'pause';
    playIconContainer.addEventListener('click', () => {
   if(state === 'play') {
-	audio.pause();
+	aud.pause();
     state = 'pause';
   } else {
-	audio.play();
+	aud.play();
     state = 'play';
   }
 });
    document.getElementById("demoPause").onclick = function(){ aud.pause(); };
-   document.getElementById("demoSkip").onclick = function(){
-	 aud.currentTime = document.getElementById("demoTime").value;
-   };
-   document.getElementById("demoVolume").onclick = function(){
-	 aud.volume = document.getElementById("demoVol").value;
-   };
+
  });
  </script>
 </body>
