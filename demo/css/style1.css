@@ -39,19 +39,26 @@
 	content: "\e906";
 }
 
+.image {
+	position: absolute;
+	height: 70vh;
+	width: 25vw;
+	z-index: 20;
+}
+
 .container {
 	position: relative;
 	height: 100vh;
 	width: 100vw;
-	background: url(../img/city.jpg) no-repeat center top;
+	background: url(../img/city.jpg) no-repeat center bottom;
 	background-size: cover;
 	overflow: hidden;
 }
 .slideshow {
 	position: relative;
-	height: 80vh;
-	width: 50vw;
-	background: url(../img/city.jpg) no-repeat center top;
+	height: 60vh;
+	width: 25vw;
+	background: url(../img/city.jpg) no-repeat right bottom;
 	background-size: cover;
 	overflow: hidden;
 }
@@ -95,7 +102,7 @@
 	-webkit-align-items: center;
 	align-items: center;
 	position: absolute;
-	bottom: 28vh;
+	bottom: 23vh;
 }
 
 .nav-item {
@@ -104,6 +111,7 @@
 	color: #252445;
 	-webkit-transition: color 0.3s;
 	transition: color 0.3s;
+	z-index: 300;
 }
 
 .nav-item:hover,
@@ -141,8 +149,8 @@
 }
 
 .slide__element--temp {
-	font-size: 8em;
-	font-weight: 700;
+	font-size: 7em;
+	font-weight: 300;
 	margin: 0 0 0.1em;
 }
 
