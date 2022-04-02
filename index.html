@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 <title>Concept engineer</title>
+<!-- Import the component -->
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="w3.css">
@@ -17,8 +20,14 @@ body, html {height: 100%}
 }
 .w3-quarter img{margin-bottom: -6px}
 .w3-quarter img:hover{opacity: 0.6; transition: 0.3s}
+model-viewer {
+  width:400px;
+  height:400px;
+  margin: 0 auto;
+}
 </style>
 <body>
+
   <!-- Sidebar work/menu -->
 <nav class="w3-sidebar w3-bar-block w3-black w3-animate-left w3-top w3-text-light-grey w3-large" style="z-index:3;width:50%;font-weight:bold;display:none;left:0;" id="mySidebarWork">
   <a href="javascript:void()" onclick="w3_closeWork()" class="w3-bar-item w3-button w3-center w3-padding-32">CLOSE</a> 
@@ -79,6 +88,9 @@ body, html {height: 100%}
     <mark> California based product developer / Multi-disciplinary engineer. <br>
     Human-centred design, human factors and ergonomics specialist.
   </mark>
+  <model-viewer src="img/speaker3flat.glb" camera-controls auto-rotate>
+
+  </model-viewer>
 </div>
 
   <!-- First Grid: Logo & BG  cursor: pointer-->
@@ -207,7 +219,7 @@ body, html {height: 100%}
   </div>
 </div>
 <div class="w3-black w3-center w3-padding-24">
-  <p>Just call me awesome.</p>
+  <p>Just call me awesome.</p><p> human.</p>
 </div>
 
 <!-- botten -->
