@@ -25,16 +25,25 @@ model-viewer {
   height:200px;
   margin: 0 auto;
 }
+
+pre {
+        overflow-x: auto;
+        white-space: pre-wrap;
+        white-space: -moz-pre-wrap;
+        white-space: -pre-wrap;
+        white-space: -o-pre-wrap;
+        word-wrap: break-word;
+      }
 </style>
-<body>
+<body onload="myFunction()" style="margin:0;">
 
   <!-- Sidebar work/menu -->
-<nav class="w3-sidebar w3-bar-block w3-black w3-animate-left w3-top w3-text-light-grey w3-large" style="z-index:3;width:50%;font-weight:bold;display:none;left:0;" id="mySidebarWork">
+<nav class="w3-sidebar w3-bar-block w3-black w3-animate-left w3-top w3-text-light-grey w3-large" style="z-index:3;width:90%;font-weight:bold;display:none;left:0;" id="mySidebarWork">
   <a href="javascript:void()" onclick="w3_closeWork()" class="w3-bar-item w3-button w3-center w3-padding-32">CLOSE</a> 
-  <div class="w3-row w3-hide-small">
+  <div class="w3-row">
     <div class="w3-half w3-quarter">
       <img src="img/CV.png" style="width:100%" onclick="onClick(this)" alt="Complete vehicle layout, occupant package of manikin familiy, physical buck preparation<br>(Lynk&Co)">
-      <br><video width=340 controls>
+      <br><video width=100% controls>
         <source src="img/buss.mp4" type="video/mp4">
         Your browser does not support the video tag.
       </video><br>
@@ -58,12 +67,12 @@ model-viewer {
 </nav>
 
   <!-- Sidebar personal/menu -->
-  <nav class="w3-sidebar w3-bar-block w3-black w3-animate-left w3-top w3-text-light-grey w3-large" style="z-index:3;width:50%;font-weight:bold;display:none;left:0;" id="mySidebarPrivate">
+  <nav class="w3-sidebar w3-bar-block w3-black w3-animate-left w3-top w3-text-light-grey w3-large" style="z-index:3;width:90%;font-weight:bold;display:none;left:0;" id="mySidebarPrivate">
     <a href="javascript:void()" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-32">CLOSE</a> 
     <div class="w3-row">
       <div class="w3-half w3-quarter">
         <img src="img/CV2.png" style="width:100%" onclick="onClick(this)" alt="Concept vehicle layout<br>(2018)">
-        <video width=340 controls>
+        <video width=100% controls>
           <source src="img/yogi3.mp4" type="video/mp4">
           Your browser does not support the video tag.
         </video>
@@ -86,23 +95,15 @@ model-viewer {
       </div>
     </div>
   </nav>
-
 <div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
-  <div class="w3-display-topleft w3-padding-large w3-xlarge">
-    <mark> California based product developer / Multi-disciplinary engineer. <br>
-    Human-centred design, human factors and ergonomics specialist.
-  </mark>
-</div>
+  <div class="w3-display-topleft w3-padding-large w3-xlarge" >
+    <pre><mark id="demoa"> </mark></pre>
+  </div>
 
   <!-- First Grid: Logo & BG  cursor: pointer-->
   <div class="w3-row">
-    <div class="w3-half w3-transparent w3-container w3-center" style="height:700px">
-      <div class="w3-padding-64">
-        <h1> </h1>
-      </div>
-     
-    </div>
-    <div class="w3-half w3-transparent w3-container" style="height:700px">
+
+    <div class="w3-half w3-transparent w3-container" style="height:600px">
       <div class="w3-padding-64 w3-center">
         <h1> </h1>
 
@@ -110,6 +111,17 @@ model-viewer {
       </div>
     </div>
   </div>
+      <!-- Top menu on small screens -->
+      <div class="w3-container w3-white w3-xlarge w3-padding-16">
+        <span class="w3-left w3-padding">Work projects</span>
+        <a href="javascript:void(0)" class="w3-left w3-button w3-white" onclick="w3_openWork()">></a>
+        <span class="w3-left w3-padding">Personal projects</span>
+        <a href="javascript:void(0)" class="w3-left w3-button w3-white" onclick="w3_openPrivate()">></a>
+      </div>
+      <!-- Top menu on small screens -->
+      <div class="w3-container w3-white w3-xlarge w3-padding-16">
+
+      </div>
 <!-- Second Grid: Work & Resume -->
 <div class="w3-row">
   <div class="w3-half w3-light-grey w3-center" style="min-height:900px" id="work">
@@ -117,7 +129,7 @@ model-viewer {
       <h2>My Work</h2>
       <p>Some of my recent projects.</p>
     </div>
-    <div class="w3-row w3-hide-small">
+    <div class="w3-row">
 
       <div class="w3-half w3-quarter">
         <a href="https://www.canoo.com/"><img src="img/canoo-logo-black.png" style="width:40%"></a><br><br><br>
@@ -133,16 +145,7 @@ model-viewer {
     </div>
     <br><br><br><br>
     
-    <!-- Top menu on small screens -->
-    <div class="w3-container w3-white w3-xlarge w3-padding-16">
-      <span class="w3-left w3-padding">Work projects</span>
-      <a href="javascript:void(0)" class="w3-left w3-button w3-white" onclick="w3_openWork()">></a>
-    </div>
-    <!-- Top menu on small screens -->
-    <div class="w3-container w3-white w3-xlarge w3-padding-16">
-      <span class="w3-left w3-padding">Personal projects</span>
-      <a href="javascript:void(0)" class="w3-left w3-button w3-white" onclick="w3_openPrivate()">></a>
-    </div>
+
     
     
     <div class="w3-row w3-hide-small">
@@ -220,10 +223,9 @@ model-viewer {
   </div>
 </div>
 <div class="w3-black w3-center w3-padding-24">
-  <p>Just call me awesome.</p><p> human.</p>
+  <p>Just call me awesome / human.</p>
 </div>
 
-<!-- botten -->
 <script>
   // Script to open and close sidebar
   function w3_openWork() {
@@ -252,7 +254,23 @@ model-viewer {
     var captionText = document.getElementById("caption");
     captionText.innerHTML = element.alt;
   }
-  
+
+  var i = 0;
+  var txta = "California based product developer / Multi-disciplinary engineer."+"\n"+" Human-centred design, human factors and ergonomics specialist."; /* The text */
+  var speed = 50; /* The speed/duration of the effect in milliseconds */
+
+  function myFunction() {
+  myVar = setTimeout(showPage, 800);
+  }
+
+  function showPage() {
+
+    if (i < txta.length) {
+      document.getElementById("demoa").innerHTML += txta.charAt(i);
+      i++;
+      setTimeout(showPage, speed);
+    }
+  }
   </script>
   </body>
   
