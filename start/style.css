@@ -26,7 +26,7 @@ font-size:13px;
 
 .intext
 {
-font-size:16px;
+font-size:18px;
 padding:3px;
 }
 .submit
@@ -45,19 +45,19 @@ line-height:5px;
 
 
 #container {
-	margin: 30px auto 0 auto; /*30px från top, auto1= högercentrera, auto2= vänster centrera*/
+	margin: 30px auto 0 auto; /*30px frï¿½n top, auto1= hï¿½gercentrera, auto2= vï¿½nster centrera*/
 }
 .home {
-	width: 915px; /*Bredd på bakgrundsbilden*/
+	width: 915px; /*Bredd pï¿½ bakgrundsbilden*/
 }
 
-/*lägger in bakgrundbild för övre meny och textformat*/	
+/*lï¿½gger in bakgrundbild fï¿½r ï¿½vre meny och textformat*/	
 .home .nav	{
 			width: 100%;
 			height: 32px;
 			display: block;
 			line-height: 32px;
-			font-size: 11px; 
+			font-size: 14px; 
 			font-weight: bold;
 			text-transform: uppercase;
 			text-indent: 24px; 
@@ -65,47 +65,47 @@ line-height:5px;
 			background-repeat: no-repeat;
 }
 
-/*Lägger till pil*/
+/*Lï¿½gger till pil*/
 .nav .drop a {
 			background: url('arrow_bw.gif') no-repeat;
 			background-position: right; /*arrow*/
-			padding-right: 20px;	/*avstånd mellan text & arrow_*/
+			padding-right: 20px;	/*avstï¿½nd mellan text & arrow_*/
 }	
 		
 .nav .no_drop a {
 			padding-right: 10px;			
 }	
-/*Avstånd mellan menytext-lager och bakgrundsbild*/
+/*Avstï¿½nd mellan menytext-lager och bakgrundsbild*/
 .nav ul {
 			padding: 0px;
 			margin: 0px;
 			list-style: none; /*lower-roman inside*/
 }
 
-/*övre meny innan den faller ner, avstånd mellan menyalternativen*/
+/*ï¿½vre meny innan den faller ner, avstï¿½nd mellan menyalternativen*/
 .nav li {
 			display: inline;
 			padding: 1px 1px 1px 15px;
 			margin: 0px;
 			list-style: none;	
 			border-left: 1px solid orange;	
-			position: relative; /*varje nytt menyelement läggs till efter föregående*/
+			position: relative; /*varje nytt menyelement lï¿½ggs till efter fï¿½regï¿½ende*/
 }
-/*Övre meny som faller ner*/					
+/*ï¿½vre meny som faller ner*/					
 .nav .primary_nav {
-			float: right; /*Det håll som menyrubrikerna sorteras från*/
+			float: right; /*Det hï¿½ll som menyrubrikerna sorteras frï¿½n*/
 			z-index: 88;
 }
 
-/*Länk formatering för ej besökta länkar*/
+/*Lï¿½nk formatering fï¿½r ej besï¿½kta lï¿½nkar*/
 .nav .primary_nav a:link	{
 			display: inline;
-			color: #FFFFFF;  /*länkfärg*/
+			color: #FFFFFF;  /*lï¿½nkfï¿½rg*/
 			text-decoration: none; /*underline etc*/
-			padding-left: 8px; /*avstånd mellan länkar i droppen*/
+			padding-left: 8px; /*avstï¿½nd mellan lï¿½nkar i droppen*/
 			height: 14px;
 		}
-/*Länkformatering för besökta länkar*/
+/*Lï¿½nkformatering fï¿½r besï¿½kta lï¿½nkar*/
 .nav .primary_nav a:visited	{
 			display: inline;
 			color: #FFFFFF;
@@ -114,7 +114,7 @@ line-height:5px;
 			height: 14px;
 		}
 
-/*Länkformatering för aktiva länkar*/
+/*Lï¿½nkformatering fï¿½r aktiva lï¿½nkar*/
 .nav .primary_nav a:hover	{
 			display: inline;
 			color: #FFFFFF;
@@ -123,29 +123,29 @@ line-height:5px;
 			height: 14px;
 		}	
 
-/*Drop blocks grundform, position (endast grundinställd) och formatering*/
+/*Drop blocks grundform, position (endast grundinstï¿½lld) och formatering*/
 .nav .primary_nav li ul {
 	position: absolute;
 	top: 0px;
-	right: 3px; /*Avstånd för dropblock från vänster relativt början på menyelementets(=orange linje)*/
+	right: 3px; /*Avstï¿½nd fï¿½r dropblock frï¿½n vï¿½nster relativt bï¿½rjan pï¿½ menyelementets(=orange linje)*/
 	z-index: 99;
-	margin: 0px 0px 0px 0px; /*marginal från pilen,1:top,2:höger,3:ner,4:vänster*/
-	padding: 0px 0px 0px 0; /*avstånd inuti dropblock, 1:top,2:höger,3:ner,4:vänster*/
-	background: #8BC53F; /*bakgrundsfärg på blocks*/
-	width: 180px; /*bredd på dropblock, grundinställd*/
+	margin: 0px 0px 0px 0px; /*marginal frï¿½n pilen,1:top,2:hï¿½ger,3:ner,4:vï¿½nster*/
+	padding: 0px 0px 0px 0; /*avstï¿½nd inuti dropblock, 1:top,2:hï¿½ger,3:ner,4:vï¿½nster*/
+	background: #8BC53F; /*bakgrundsfï¿½rg pï¿½ blocks*/
+	width: 180px; /*bredd pï¿½ dropblock, grundinstï¿½lld*/
 	display: none;
-	border-bottom: 3px solid #8BC53F; /*nu grön, orange på nedre*/
+	border-bottom: 3px solid #8BC53F; /*nu grï¿½n, orange pï¿½ nedre*/
 }
 .nav .primary_nav li>ul {
-	top: 15px; /*Avstånd från menyrubrik till dropblock, måste täcka över menyrubrik för att inte försvinna när musen går över*/
+	top: 15px; /*Avstï¿½nd frï¿½n menyrubrik till dropblock, mï¿½ste tï¿½cka ï¿½ver menyrubrik fï¿½r att inte fï¿½rsvinna nï¿½r musen gï¿½r ï¿½ver*/
 }
 
-/*Första menyrubriken (Skola) ska ej ha border framför.*/
+/*Fï¿½rsta menyrubriken (Skola) ska ej ha border framfï¿½r.*/
 .nav .primary_nav li#nav_link_skol {
 	border-left: none;
 }
 
-/*Variationer på grund-dropblock*/
+/*Variationer pï¿½ grund-dropblock*/
 .nav .primary_nav li ul#nav_menu_skol {
 	left: 0px;
 	width: 200px;
@@ -197,7 +197,7 @@ line-height:5px;
 
 
 /******************************NEDRE***********************************/
-/*lägger in bakgrundbild för nedre meny och text format*/
+/*lï¿½gger in bakgrundbild fï¿½r nedre meny och text format*/
 .home .navd	{
 			width: 100%;
 			height: 42px;
@@ -211,27 +211,27 @@ line-height:5px;
 			background-repeat: no-repeat;
 		}
 		
-/*lägger in pilar*/
+/*lï¿½gger in pilar*/
 .navd .lift a {
 			background: url('arrow_bw.gif') no-repeat;
 			background-position: right; /*arrow*/
-			padding-right: 20px;	/*avstånd mellan text & arrow_*/	
+			padding-right: 20px;	/*avstï¿½nd mellan text & arrow_*/	
 		}	
 		
 .navd .no_lift a {
 			padding-right: 10px;			
 		}
 
-/*Avstånd mellan nedre menytext-lagret och bakgrundsbild*/
-/*Avstånd mellan hela list-lagret och bakgrund*/
+/*Avstï¿½nd mellan nedre menytext-lagret och bakgrundsbild*/
+/*Avstï¿½nd mellan hela list-lagret och bakgrund*/
 .navd ul {
 			padding: 0px;
 			margin: 0px;
 			list-style: none; /*lower-roman inside*/
 }
 
-/*nedre menyn innan den faller ner, avstånd mellan menyalternativen*/
-/*Avstånd mellan enskilda list-element*/
+/*nedre menyn innan den faller ner, avstï¿½nd mellan menyalternativen*/
+/*Avstï¿½nd mellan enskilda list-element*/
 .navd li {
 			display: inline;
 			padding: 10px 10px 10px 10px;
@@ -241,12 +241,12 @@ line-height:5px;
 			position: relative;
 }
 
-/*Höger(float:right)/vänster(float:left)-justering av menyrubriker*/					
+/*Hï¿½ger(float:right)/vï¿½nster(float:left)-justering av menyrubriker*/					
 .navd .primary_navd {
 			float: left;
 			z-index: 77;
 }
-/*Länk formatering för ej besökta länkar*/
+/*Lï¿½nk formatering fï¿½r ej besï¿½kta lï¿½nkar*/
 .navd .primary_navd a:link	{
 			display: inline;
 			color: #FFFFFF;
@@ -254,7 +254,7 @@ line-height:5px;
 			padding-left: 8px;
 			height: 14px;
 		}
-/*Länkformatering för besökta länkar*/
+/*Lï¿½nkformatering fï¿½r besï¿½kta lï¿½nkar*/
 .navd .primary_navd a:visited	{
 			display: inline;
 			color: #FFFFFF;
@@ -262,7 +262,7 @@ line-height:5px;
 			padding-left: 8px;
 			height: 14px;
 		}
-/*Länkformatering för aktiva länkar*/		
+/*Lï¿½nkformatering fï¿½r aktiva lï¿½nkar*/		
 .navd .primary_navd a:hover	{
 			display: inline;
 			color: #FFFFFF;
@@ -270,14 +270,14 @@ line-height:5px;
 			padding-left: 8px;
 			height: 14px;
 		}	
-/*Drop blocks grundform, position (endast grundinställd) och formatering*/
+/*Drop blocks grundform, position (endast grundinstï¿½lld) och formatering*/
 .navd .primary_navd li ul {
 	position: absolute;
 	bottom: 0px;
-	left: 30px;/*Avstånd för dropblock från vänster relativt yttersta vänstra referenspunkten*/
+	left: 30px;/*Avstï¿½nd fï¿½r dropblock frï¿½n vï¿½nster relativt yttersta vï¿½nstra referenspunkten*/
 	z-index: 99;
 	margin: 0px 0px 0px -30px; /*Placering av box. top,left,bottom,right*/
-	padding: px 0px 0px 0px; /*top,left,bottom,right-avstånd från sidorna i boxen*/
+	padding: px 0px 0px 0px; /*top,left,bottom,right-avstï¿½nd frï¿½n sidorna i boxen*/
 	background: #000;
 	width: 200px;
 	display: none;
@@ -289,7 +289,7 @@ line-height:5px;
 }
 
 .navd .primary_navd li#navd_link_psp {
-	border-left: none; /*ta bort vänster avdelare på psp*/
+	border-left: none; /*ta bort vï¿½nster avdelare pï¿½ psp*/
 }
 
 .navd .primary_navd li ul#navd_menu_musik {
