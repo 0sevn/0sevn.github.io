@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fovea</title>
 <style>
 body {
     font-family: "Lato", sans-serif;
@@ -12,15 +13,35 @@ body {
     font-weight: bold;
 }
 
-.topnav {
-    height:40px;
-    width: 65%;
+/*
+https://www.w3schools.com/css/css3_shadows_box.asp
+*/
+.mid {
+    margin:100px auto 100px auto;
+    color: #f2f2f2;
+    width: 55%;
     border-radius: 25px 5px;
     background-color: #333;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
-    margin:100px auto 500px auto;
+    padding:10px 0px 10px 20px;
+}
+/*
+https://www.w3schools.com/css/css_dropdowns.asp
+https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_navbar_border
+*/
+.topnav {
+    height:40px;
+    width: 55%;
+    border-radius: 25px 5px;
+    background-color: #333;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+    margin:100px auto 100px auto;
     padding:10px 0px 0px 20px;
 }
+
+/*
+https://www.w3schools.com/howto/howto_css_dropup.asp
+*/
 .bottomnav {
     height:40px;
     width: 50%;
@@ -33,11 +54,9 @@ body {
 
 .dropbtn {
     background-color: #252827;
-    width: 100px;
-    font-size: 14px;
-    
+    width: 100px;   
     text-transform: uppercase;
-    padding: 8px 0 10px 0;
+    padding: 8px 0 8px 0;
     color: white;
     border: 5px;
     border-color: coral;
@@ -47,11 +66,12 @@ body {
 a {
     color: white;
     border-radius: 15px;
+    font-size: 14px;
 }
 .dropdown {
     display: inline-block;
     color: #f2f2f2;
-    white-space: nowrap;    
+    white-space: nowrap;  
 }
 
 .dropdown-content {
@@ -61,6 +81,7 @@ a {
     border-radius: 5px 5px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
+    padding: 2px; 
 }
 .dropdown-content a {
     color: black;
@@ -76,6 +97,7 @@ a {
     border-radius: 5px 5px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
+    padding: 2px; 
 }
 
 .dropup-content a {
@@ -103,10 +125,86 @@ a {
     display: block;
   }
 }
+
+.time {
+    font-size: 10px;
+    color:darkkhaki;
+    display: inline-block;
+}
+/*https://www.w3schools.com/css/css_align.asp
+
+*/
+.fovea {
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+    line-height: 1.5em;
+    width: 240px;
+    float: right;
+    padding:10px;
+    color:rgb(206, 205, 198);
+    display: inline-block;
+}
+.circle {
+  background-color:rgba(226, 90, 90, 0.687); 
+  width: var(--circle-size, 20px);
+  height: var(--circle-size, 20px); 
+  position:fixed;
+  border-radius: 50%;
+  margin-left: 50%;
+  margin-top:10px;
+  
+  transition: 0.5s width, 0.5s height;
+}
+
+[type=number] {
+  display: block;
+}
+
+/* Tooltip container 
+https://www.w3schools.com/css/css_tooltip.asp 
+*/
+.tooltip {
+  position: relative;
+  display: inline-block;
+  /*border-bottom: 1px dotted black;  If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 220px;
+  background-color: rgb(79, 79, 79);
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+  font-weight: normal;
+  font-size:12px;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+  top: 15px;
+  right: 102%;
+}
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent transparent rgb(79, 79, 79);;
+}
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
 </style>
 </head>
 <body>
-
 <!-- Top navigation -->
 <div class="topnav">
     <!-- Life -->
@@ -156,7 +254,7 @@ https://m.co/se/sv-SE/stationer/
     </div>
         <!-- Bostad -->
     <div class="dropdown">
-        <button class="dropbtn"><a href="https://www.sverigehuset.se/projekt/jarntorgsgatanxbrogatan">Polivstil</a></button>
+        <button class="dropbtn"><a href="https://www.sverigehuset.se/projekt/jarntorgsgatanxbrogatan">Bostad</a></button>
         <div class="dropdown-content">
             
             <a href="http://www.boplats.se/">Boplats</a>
@@ -179,17 +277,101 @@ https://m.co/se/sv-SE/stationer/
         </div>
     </div>
 </div>
+<div class="circle" title="Fovea, a small depression within the retina where visual acuity is the highest.">
+</div> 
+<!-- Mid navigation -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script>
+    var counter = 1;
+    const input = document.querySelector('.circle-size');
+    const circles = document.querySelectorAll('.circle');
+/*todo list script at bottom
+https://stackoverflow.com/questions/49878020/how-to-add-textbox-value-into-a-list
+
+
+write list to any file node.js 
+https://stackoverflow.com/questions/52986777/how-to-create-html-file-with-javascript
+
+read list from file to html ajax, jquery
+https://stackoverflow.com/questions/40817894/text-to-html-list
+
+The dollar function, $(), can be used as shorthand for the getElementById function
+${} multiline string /string interpolation
+*/
+    function enter_task () {
+            var text = $('#enter_task').val();
+            var current = new Date(); /*Get current time*/
+            var tid = current.toLocaleString(); /* https://linuxhint.com/how_to_get_current_date_and_time_in_javascript/*/
+            counter++;
+    $('#todo_list').append('<li><span><input type="checkbox">  '+ text + ' <p class="time">' + tid + '</p>' + ' </span><input type="submit" id="edit' + counter + '" value="Edit">' + '<input type="submit" id="delete' + counter + '" value="Delete">' +'</li>');
+        circles.forEach(circle => {
+        circle.style.setProperty('--circle-size', counter*150 + 'px');
+        })
+        
+    $('#edit' + counter).click(function(){
+        $(this).prev().attr('contenteditable','true');
+        $(this).prev().focus();
+    });
+
+    $('#delete' + counter).click(function(){
+        $(this).parent().remove();
+        
+        counter--;
+        circles.forEach(circle => {
+        circle.style.setProperty('--circle-size', counter*150 + 'px');
+        })
+    });
+
+      
+    };
+
+    $(function() {
+        $('#add').on('click', enter_task);
+        
+    });
+
+
+</script>
+
+<div class="mid">
+    <div class="tooltip"><h1>Fovea - Todo today List</h1>
+        <span class="tooltiptext">Fovea, small spot on the retina where visual acuity is the highest.</span>
+      </div><br>
+        <input type="text" id="enter_task" placeholder="Enter Task">
+        <input type="submit" id="add" value="Add Task" class="circle-size">
+        <p>
+            <ul id="todo_list" style="list-style: none;">
+            </ul>
+        </p>
+    
+        
+
+       
+</div>
+
 <!-- Bottom navigation -->
 <div class="bottomnav">
+    <!-- Bank -->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="" target="_blank">Bank</a></button>
+        <div class="dropup-content">
+            <a href="">avanza</a>
+            <a href="">nordnet</a>
+            <a href="" target="_blank">lansforsakringar</a>
+            <a href="" target="_blank">skandia</a>
+            <a href="" target="_blank">swedbank</a>
+            <a href="" target="_blank">norwegian</a>
+            <a href="" target="_blank">hsbc</a>
+            <a href="" target="_blank">chase</a>
+        </div>
+    </div>
     <!-- Music -->
     <div class="dropdown">
         <button class="dropbtn"><a href="https://workflowy.com/" target="_blank">Music</a></button>
         <div class="dropup-content">
             <a href="https://streamsquid.com/#/playlists/spotify/cat/chill" target="_blank">Stream squid</a>
             <a href="http://listen.grooveshark.com/" target="_blank">grooveshark</a>
-            <a href="http://www.e-chords.com/escalas.asp" target="_blank">echords</a>
-            <a href="http://www.chordie.com/" target="_blank">chordie</a>
-            <a href="https://hydrogenaud.io/" target="_blank">hydrogen audio</a>
+                        <a href="https://hydrogenaud.io/" target="_blank">hydrogen audio</a>
             Handelskammaren
 ohposten.se/#redaktionen
 
@@ -203,7 +385,7 @@ http://www.aftonbladet.se/
 
 <hr>Kring
 
-            <a href="http://www.guitaretab.com/" target="_blank">Guitartab</a>
+            
             <a href="http://hypem.com/" target="_blank">Hypemachine</a>
             <a href="http://www.purevolume.com/" target="_blank">Purevolume</a>
             <a href="http://blogg.svt.se/psl/2009/12/07/musik-med-taken-by-trees/?lid=puff_1804446&lpos=lasmer" target="_blank">PSL</a>
@@ -217,6 +399,9 @@ http://www.aftonbladet.se/
         <div class="dropup-content">
             <a href="https://tapeop.com/reviews/gear/110/sunvox-modular-music-studio/">sunvox</a>
             <a href="https://client00.chat.mibbit.com/">sunvox</a>
+            <a href="http://www.e-chords.com/escalas.asp" target="_blank">echords</a>
+            <a href="http://www.chordie.com/" target="_blank">chordie</a>
+            <a href="http://www.guitaretab.com/" target="_blank">Guitartab</a>
         </div>
     </div>
     <div class="dropdown">
