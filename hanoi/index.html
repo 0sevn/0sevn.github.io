@@ -19,7 +19,7 @@
 		<![endif]-->
 	<style>
 	.crossfade > figure {
-		animation: imageAnimation 30s linear infinite 0s;
+		animation: imageAnimation 36s linear infinite 0s;
 		backface-visibility: hidden;
 		background-size: cover;
 		background-position: center center;
@@ -32,7 +32,7 @@
 		width: 100%;
 		z-index: 0;
 	  }
-	  .crossfade > figure:nth-child(1) { background-image: url('1.jpg'); }
+.crossfade > figure:nth-child(1) { background-image: url('1.jpg'); }
 
 .crossfade > figure:nth-child(2) {
   animation-delay: 6s;
@@ -58,7 +58,10 @@
   animation-delay: 30s;
   background-image: url('6.jpg');
 }
-
+.crossfade > figure:nth-child(7) {
+  animation-delay: 36s;
+  background-image: url('7.jpg');
+}
 @keyframes imageAnimation {
   0% {
     animation-timing-function: ease-in;
@@ -103,7 +106,9 @@
 		<figure></figure>
 		<figure></figure>
 		<figure></figure>
+		<figure></figure>
 	  </div>
+
 	 <nav class="slideshow__nav" id="audio">		
 				<a class="nav-item" href="#slide-1"><i class="icon icon--rainy" id="demoPlay" onclick="w3_openWindow()">
 					<audio src="media/4 Hero - 13 - Les Fleur.mp3" id="demoAudio"></audio>

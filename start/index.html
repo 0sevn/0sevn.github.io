@@ -205,6 +205,18 @@ https://www.w3schools.com/css/css_tooltip.asp
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+/*
+https://www.w3docs.com/snippets/css/how-to-style-input-and-submit-buttons.html
+*/
+input[type=submit] {
+        background-color: #62529c;
+        border: none;
+        color: #fff;
+        padding: 5px 8px;
+        text-decoration: none;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
 </style>
 </head>
 <body>
@@ -212,6 +224,7 @@ https://www.w3schools.com/css/css_tooltip.asp
 <div class="topnav">
     <!-- Life -->
     <div class="dropdown">
+
         <button class="dropbtn"><a href="https://workflowy.com/" target="_blank">Life</a></button>
         <div class="dropdown-content">
             <a href="https://streamsquid.com/#/playlists/spotify/cat/chill" target="_blank">Stream squid</a>
@@ -266,7 +279,7 @@ https://m.co/se/sv-SE/stationer/
             <a href="http://www.lib.chalmers.se/" target="_blank">Chalmers bibliotek</a>
         </div>
     </div>
-    <!-- Bostad -->
+    <!-- Hobby -->
     <div class="dropdown">
         <button class="dropbtn"><a href="https://www.sverigehuset.se/projekt/jarntorgsgatanxbrogatan">Hobby</a></button>
         <div class="dropdown-content">
@@ -278,20 +291,18 @@ https://m.co/se/sv-SE/stationer/
             <hr>
             
         </div>
-        
-    </div>
 
+    </div>
+    
 </div>
 
 <!-- Mid navigation -->
-
-
 <div class="mid">
     <div class="circle" title="Fovea, a small depression within the retina where visual acuity is the highest.">
     </div>  
-    <div class="tooltip"
-        ><h1>Fovea </h1>
-        <span class="tooltiptext">Fovea, is the small spot on the retina where visual acuity is the highest.</span>
+    <div class="tooltip">
+        <h1>Fovea </h1>
+        <span class="tooltiptext">Fovea, small region of the retina which produces the sharpest vision.</span>
 
       </div><br>
         
@@ -309,18 +320,23 @@ https://m.co/se/sv-SE/stationer/
     <div class="dropdown">
         <button class="dropbtn"><a href="" target="_blank">Bank</a></button>
         <div class="dropup-content">
-            <a href="">avanza</a>
-            <a href="">nordnet</a>
+            <a href="https://www.avanza.se/">avanza</a>
+            <a href="https://www.nordnet.se/">nordnet</a>
             <a href="" target="_blank">lansforsakringar</a>
             <a href="" target="_blank">skandia</a>
             <a href="" target="_blank">swedbank</a>
             <a href="" target="_blank">norwegian</a>
-            <a href="" target="_blank">hsbc</a>
+            <a href="https://www.security.us.hsbc.com/gsa/SECURITY_LOGON_PAGE/" target="_blank">hsbc US</a>
             <a href="" target="_blank">chase</a>
+            <a href="https://www.binance.com/en/my/pnl/spot_account" target="_blank">Binance</a>
+            <a href="https://www.coingecko.com/" target="_blank">Coingecko</a>
+            https://www.reddit.com/r/googlesheets/comments/j7w4sp/formula_for_tracking_current_average_buying_price/
+            
+
         </div>
     </div>
     <!-- Music -->
-    <div class="dropdown">
+    <div class="dropdown" id="category" class="category">
         <button class="dropbtn"><a href="https://workflowy.com/" target="_blank">Music</a></button>
         <div class="dropup-content">
             <a href="https://streamsquid.com/#/playlists/spotify/cat/chill" target="_blank">Stream squid</a>
@@ -335,8 +351,10 @@ http://www.nyinquirer.com/
 http://www.reuters.com/
 http://www.tt.se/
 http://www.aftonbladet.se/
-
-
+https://www.gp.se/livsstil/tv%C3%A5-dagar/obs-detta-mejl-g%C3%A5r-inte-att-svara-p%C3%A5-1.70634545
+Fusion 360
+https://www.youtube.com/watch?v=VbSkwvZyU_0
+https://tesreg.com/forums/fusion-360/when-how-to-use-3d-sketch-techniques-and-more/
 <hr>Kring
 
             
@@ -348,9 +366,11 @@ http://www.aftonbladet.se/
         </div>
     </div>
     <!-- Misc -->
-    <div class="dropdown">
+    <div class="dropdown" id="category" class="category">
         <button class="dropbtn"><a href="http://catiadoc.free.fr/online/CATIAfr_C2/stlugCATIAfrs.htm" target="_blank">Misc</a></button>
         <div class="dropup-content">
+            
+            <a href="http://puredata.info/">PureData</a>
             <a href="https://tapeop.com/reviews/gear/110/sunvox-modular-music-studio/">sunvox</a>
             <a href="https://client00.chat.mibbit.com/">sunvox</a>
             <a href="http://www.e-chords.com/escalas.asp" target="_blank">echords</a>
@@ -358,7 +378,7 @@ http://www.aftonbladet.se/
             <a href="http://www.guitaretab.com/" target="_blank">Guitartab</a>
         </div>
     </div>
-    <div class="dropdown">
+    <div class="dropdown" id="category" class="category">
         <button class="dropbtn"><a href="https://workflowy.com/">Tech</a></button>
         <div class="dropup-content">
             <a href="https://www.theverge.com/">The Verge</a>
@@ -372,12 +392,14 @@ http://www.aftonbladet.se/
             <a href="https://shop.hak5.org/pages/videos">Hak5</a>
         </div>
     </div>
+    <input type="submit" id="edit_nav" value="Edit">
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script>
     var counter = 1;
     const input = document.querySelector('.circle-size');
     const circles = document.querySelectorAll('.circle');
+    const categories = document.querySelectorAll('.category')
 /*todo list script at bottom
 https://stackoverflow.com/questions/49878020/how-to-add-textbox-value-into-a-list
 
@@ -414,12 +436,20 @@ ${} multiline string /string interpolation
         circle.style.setProperty('--circle-size', counter*20 + 'px');
         })
     });
-    };
+
+    $('#edit_nav').click(function(){
+
+        $(this).prev().attr('contenteditable','true');
+        $(this).prev().focus();
+
+    });
+    }
 
     $(function() {
         $('#add').on('click', enter_task);
-        
     });
+
+
 </script>
 </body>
 </html>
