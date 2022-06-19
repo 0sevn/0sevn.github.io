@@ -121,7 +121,25 @@
 		<div class="slideshow">
 			
 			<canvas width="1" height="1" id="container" class="window"></canvas>
-			
+			<div class="slideshow">
+				<canvas width="1" height="1" id="container" style="position:absolute"></canvas>
+				<!-- Heavy Rain -->
+				<div class="slide" id="slide-1" data-weather="rain">
+					<div class="slide__element slide__element--date"></div>
+					<div class="slide__element slide__element--temp"><small></small></div>
+				</div>
+				<!-- Night -->
+				<div class="slide" id="slide-2" data-weather="sunny">
+					<div class="slide__element slide__element--date"><sup></sup>
+					</div>
+					<div class="slide__element slide__element--temp"><small></small></div>
+				</div>
+				
+				<!-- Sunny -->
+				<div class="slide" id="slide-3" data-weather="drizzle">
+					<div class="slide__element slide__element--date"><sup></sup></div>
+					<div class="slide__element slide__element--temp"><small></small></div>
+				</div>
 		
 
 		</div>
@@ -142,6 +160,32 @@
     document.getElementById("myOverlayWork").style.display = "none";
   }
  </script>
+ 	<script>
+
+		// (A) GET AUDIO ELEMENT
+	var aud = document.getElementById("demoAudio");
+	 
+	 // (B) WAIT FOR SUFFICIENT AUDIO BUFFER
+	 aud.addEventListener("canplay", function(){
+	   // (C) ENABLE ALL CONTROLS
+	   //document.getElementById("demoPlay").onclick = function(){ aud.play(); };
+	 
+	   // (D) ATTACH CONTROLS
+	   const playIconContainer = document.getElementById('demoPlay');
+	   let state = 'pause';
+	   playIconContainer.addEventListener('click', () => {
+	  if(state === 'play') {
+		aud.pause();
+		state = 'pause';
+	  } else {
+		aud.play();
+		state = 'play';
+	  }
+	});
+	   document.getElementById("demoPause").onclick = function(){ aud.pause(); };
+	
+	 });
+	 </script>
 </body>
 
 </html>
