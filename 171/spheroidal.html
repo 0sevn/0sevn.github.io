@@ -30,24 +30,7 @@
         container: document.querySelector('#viewer'),
         panorama: 'pxl_photosphere.jpg',
                 caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
-    navbar: [
-        'zoom',
-        'move',
-        {
-            id: 'change',
-            title: 'Change image',
-            content: document.querySelector('#icon').innerText,
-            onClick(viewer) {
-                viewer.setPanorama('3pxl_photosphere.jpg', {
-                    caption: '',
-                    description: null,
-                });
-                viewer.navbar.getButton('change').hide();
-            },
-        },
-        'caption',
-        'fullscreen',
-    ],
+
     });
 </script>
 </body>
