@@ -7,8 +7,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css" />
     <style>
         @import 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5/index.css';
-
-        
     </style>
 </head>
 
@@ -31,14 +29,16 @@
     const viewer = new Viewer({
         container: document.querySelector('#viewer'),
         panorama: 'pxl_photosphere.jpg',
-            caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+                caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
     navbar: [
+        'zoom',
+        'move',
         {
             id: 'change',
             title: 'Change image',
             content: document.querySelector('#icon').innerText,
             onClick(viewer) {
-                viewer.setPanorama(baseUrl + '3pxl_photosphere.jpg', {
+                viewer.setPanorama(baseUrl + 'sphere-test.jpg', {
                     caption: '',
                     description: null,
                 });
