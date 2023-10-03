@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Short Form Blog</title>
+    <style>
+        .menu {
+            position: fixed;
+            border: 1px solid #000;
+            width: 63%;
+            /*left: 20%; */
+            background-color: #fff;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            padding: 5px 10px;
+            z-index: 1;
+        }
+        .menu a {
+            margin: 0px 0px;
+            color:rgb(50, 165, 204);
+        }
+        .post {
+            border: 0px solid #000;
+            margin: 0px;
+            padding: 30px;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 0px; /* Adjust this value as needed */
+            font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            color:#202020;
+        }
+        .content {
+            display: none;
+        }
+    </style>
+    <script>
+        function toggleContent(id) {
+            var content = document.getElementById(id);
+            if (content.style.display === "none") {
+                content.style.display = "block";
+            } else {
+                content.style.display = "none";
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="menu">
+        <a href="#">Words</a>
+        <a href="#">Squares</a>
+        <a href="spheroidal.html">Spheres</a>
+        <a href="#">Waves</a>
+    </div>
+    <div class="post" onclick="toggleContent('post1')">
+        <h2>Hanna Arendt</h2>
+        <div id="post1" class="content">
+            <p>
+                "A life in the past cannot be shared with the present. Each person who gets stuck in time gets stuck alone"
+
+When you realize you are mortal," the poet, painter, and philosopher Etel Adnan wrote while regarding a mountain, "you also realize the tremendousness of the future." A decade earlier, shortly before a heart attack severed her life-time, Hannah Arendt observed in her superb Gifford lectures on the life of the mind that our finitude, "set in an infinity of time stretching into both past and future, constitutes the infrastructure, as it were, of all mental activities." While Arendt was composing these thoughts and silent cells were barricading one of her arteries, Ursula K. Le Guin was composing her novelistic inquiry into what it means to live responsibly, observing: "If time and reason are functions of each other, if we are creatures of time, then we had better know it, and try to make the best of it." A generation before her, Borges had formulated the ultimate declaration of our temporal creatureliness, declaring: "Time is the substance I am made  of. Time is a river which sweeps me along, but I am the river; it is a tiger which destroys me, but I am the tiger; it is a fire which consumes me, but I am the fire."
+
+
+
+Half a century of neuroscience and psychology have confirmed the physical fact beneath the poetic sentiment - we now know that our experience of time is the crucible of empathy and the defining dimension of personal identity.
+
+The young clerk at the Bern patent office was thinking about none of this in spring of 1905, the spring of a new century still verdant with possibility, when he dreamt up his general relativity - the refutation of Newton that would rattle the flow of existence, forever changing our understanding of time; rather, Einstein was thinking of time as a plaything of mathematics, the cold clay of a impartial universe in which we ourselves are playthings of chance.
+
+Or was he?
+
+After all, a revolution in understanding time is a revolution in understanding ourselves as creatures of time, and no human being - not even the most abstract-minded physicist  - can think about time without thinking what it means to be human, to be concretely oneself, tender with transience.
+
+That is the predicate of the slender, poetic 1993 novel Einstein's Dreams by physicist Alan Lightman - a book about time and the tricks we play on ourselves to bear our transience, a book that does for time what Alain de Botton's The course of Love does for love:
+Punctuating a fictional world with philosophical quickening, thought experiments, lyrical reflections on a fundamental human dimension of the real world
+
+The young Einstein, overworked and burning with ideas, falls asleep at his patent office desk on a series of nights in that fertile spring of 1905, to dream of worlds in each of which time works differently. Each betokens a particular manifestation of our time-anxiety, that defining anxiety of our lives - each a particular tapestry of our hopes, fears, and other flights from the only reality we have and only place we really inhabit: the present.
+
+In one of these worlds, two times exist in parallel - mechanical time, "as rigid and metallic as a massive pendulum of iron that swings back and forth, back and forth, back and forth," and body time, pulsating with aliveness that  "squirms and wriggles like a bluefish in a bay." This world is a testament to astronomer Maria Mitchell's long-ago lament that "it seems to be difficult for anyone to take in the idea that two truths cannot conflict" - in it, people live out their lives subscribing to one time, distrusting and deriding the very existence of the other:
+"Where the two times meet, desperation. Where the two times go their separate ways, contentment. For, miraculously, a barrister, a nurse, a baker can make a world in either time, but not in both times. Each time is true, but the truths are not the same."
+
+Another dream draws
+
+
+
+            </p>
+        </div>
+        <h6>Oct 2 2023</h6>
+    </div>
+    <div class="post" onclick="toggleContent('post2')">
+        <h2>Post 2</h2>
+        <div id="post2" class="content">
+            <p>This is the content for Post 2.
+
+            </p>
+        </div>
+    </div>
+    <!-- Add more posts as needed -->
+</body>
+</html>
