@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css" />
+    <style>
+        @import 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5/index.css';
+
+        html, body, #viewer {
+          margin: 0;
+          width: 100vw;
+          height: 100vh;
+          font-family: sans-serif;
+        }
+    </style>
 </head>
 
 <!-- the viewer container must have a defined size -->
@@ -24,7 +34,7 @@
 
     const viewer = new Viewer({
         container: document.querySelector('#viewer'),
-        panorama: '/pxl_photosphere.jpg',
+        panorama: 'pxl_photosphere.jpg',
     });
 </script>
 <body>asdf
