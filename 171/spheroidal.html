@@ -34,6 +34,21 @@
         container: document.querySelector('#viewer'),
         panorama: '2pxl_photosphere.jpg',
         caption: 'Parc n',
+        navbar: [
+        {
+            id: 'change',
+            title: 'Change image',
+            content: document.querySelector('#icon').innerText,
+            onClick(viewer) {
+                viewer.setPanorama('3pxl_photosphere.jpg', {
+                    caption: '',
+                    description: null,
+                });
+                viewer.navbar.getButton('change').hide();
+            },
+        },
+        'fullscreen',
+    ],
 
     });
 </script>
