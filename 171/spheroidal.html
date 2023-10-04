@@ -29,10 +29,13 @@
 
 <script type="module">
     import { Viewer } from '@photo-sphere-viewer/core';
-
+    
+    const images = ['2pxl.jpg', '3pxl.jpg', '4pxl.jpg', '5pxl.jpg', '6pxl.jpg']; // Add your images to this array
+    let currentImageIndex = 0;
+    
     const viewer = new Viewer({
         container: document.querySelector('#viewer'),
-        panorama: '2pxl_photosphere.jpg',
+        panorama: images[currentImageIndex],
         caption: 'SUP',
         navbar: [
         'zoom',
@@ -42,11 +45,13 @@
             title: 'Change image',
             content: document.querySelector('#icon').innerText,
             onClick(viewer) {
-                viewer.setPanorama('3pxl_photosphere.jpg', {
+                viewer.setPanorama(images[currentImageIndex], {
                     caption: 'LOEN',
                     description: null,
                 });
-                viewer.navbar.getButton('change').hide();
+                    if (currentImageIndex === images.length - 1) {
+                        viewer.navbar.getButton('change').hide();
+                    }
             },
         },
         'caption',
