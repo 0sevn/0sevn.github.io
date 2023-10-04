@@ -30,7 +30,9 @@
 <script type="module">
     import { Viewer } from '@photo-sphere-viewer/core';
     
-    const images = ['2pxl.jpg', '3pxl.jpg', '4pxl.jpg', '5pxl.jpg', '6pxl.jpg']; // Add your images to this array
+    const images = ['1pxl.jpg','2pxl.jpg', '3pxl.jpg', '4pxl.jpg', '5pxl.jpg', '6pxl.jpg', '7pxl.jpg', '8pxl.jpg', '9pxl.jpg'];
+    const captions = ['Trojan point', 'SUP', 'LOEN', 'Palm springs', '..', '..', '..', '..', '..'];
+    
     let currentImageIndex = 0;
     
     const viewer = new Viewer({
@@ -38,16 +40,15 @@
         panorama: images[currentImageIndex],
         caption: 'SUP',
         navbar: [
-        'zoom',
-        'move',
         {
             id: 'change',
             title: 'Change image',
             content: document.querySelector('#icon').innerText,
             onClick(viewer) {
-                viewer.setPanorama(images[currentImageIndex], {
-                    caption: 'LOEN',
-                    description: null,
+                    currentImageIndex = (currentImageIndex + 1) % images.length;
+                    viewer.setPanorama(images[currentImageIndex], {
+                        caption: captions[currentImageIndex],
+                        description: null,
                 });
                     if (currentImageIndex === images.length - 1) {
                         viewer.navbar.getButton('change').hide();
