@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Short Form Blog</title>
+    <style>
+        .menu {
+            position: fixed;
+            border: 0px solid #000;
+            width: 63%;
+            /*left: 20%; */
+            background-color: #fff;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            padding: 5px 10px 0px;
+
+            z-index: 1;
+        }
+        .menu a {
+            margin: 0px 0px;
+            color:rgb(50, 165, 204);
+        }
+        .post {
+            border: 0px solid #000;
+            margin: 0px;
+            padding: 0px;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 0px; /* Adjust this value as needed */
+            font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            color:#202020;
+        }
+        .content {
+            display: none;
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="menu">
+        <a href="index.html">Words</a>
+        <a href="#">Squares</a>
+        <a href="spheroidal.html">Spheres</a>
+        <a href="waves.html">Waves</a>
+    </div>
+ 
+<div style="padding: 30px;">
+    <div class="post" onclick="toggleContent('post1')">
+        <h2>WF_AF - Vad Har Pengarna Gjort Med Dig [90 A].mp3</h2>
+        <audio controls loop autoplay>
+            <source src="waves/WF_AF - Vad Har Pengarna Gjort Med Dig [90 A].mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+        <h6>Oct 2 2023</h6>
+    </div>
+    <div class="post" onclick="toggleContent('post2')">
+        <h2>WF_AF - Blåbär De LoFi [82 Eb].mp3</h2>
+        <audio controls loop autoplay>
+            <source src="waves/WF_AF - Blåbär De LoFi [82 Eb].mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+        <h6>Oct 2 2023</h6>
+    </div>
+</div>
+    <!-- Add more posts as needed -->
+
+
+</body>
+</html>
