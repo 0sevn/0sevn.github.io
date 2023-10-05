@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <style>
+        .menu {
+            position: fixed;
+            border: 1px solid #000;
+            width: 63%;
+            /*left: 20%; */
+            background-color: #fff;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            padding: 5px 10px;
+        }
+        .menu a {
+            margin: 0px 0px;
+            color:rgb(50, 165, 204);
+        }
+
         @import 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5/index.css';
         html, body, #viewer {
           margin: auto;
@@ -17,6 +34,12 @@
 
 
 <body><!-- the viewer container must have a defined size -->
+    <div class="menu">
+        <a href="index.html">Words</a>
+        <a href="#">Squares</a>
+        <a href="spheroidal.html">Spheres</a>
+        <a href="waves.html">Waves</a>
+    </div>
 <div id="viewer"></div>
 
 <script type="importmap">
