@@ -18,6 +18,23 @@
 		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
 	<style>
+		.menu {
+            position: fixed;
+            border: 0px solid #000;
+            width: 55%;
+            /*left: 20%; */
+            background-color: #fff;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            padding: 5px 10px;
+            z-index: 1;
+        }
+        .menu a {
+            margin: 0px;
+            color:rgb(50, 165, 204);
+        }
 	.crossfade > figure {
 		animation: imageAnimation 36s linear infinite 0s;
 		backface-visibility: hidden;
@@ -86,7 +103,12 @@
 </head>
 
 <body>
-
+	<div class="menu">
+		<a href="../index.html">Words</a>
+		<a href="hanoi/index.html">Squares</a>
+		<a href="../spheroidal.html">Spheres</a>
+		<a href="../waves.html">Waves</a>
+	</div>
 	<div class="image-preload">
 		<img src="img/drop-color.png" alt="">
 		<img src="img/drop-alpha.png" alt="">
@@ -117,6 +139,7 @@
 				<!--a class="nav-item" href="#slide-3"><i class="icon icon--drizzle"></i><span></span></a-->
 			</nav>
 	<div class="container" id="myWindow">
+		
 		<img src="img/fg-night.png" alt="" class="image" >
 		<div class="slideshow">
 			
@@ -129,6 +152,7 @@
 		<p class="nosupport">Sorry, but your browser does not support WebGL!</p>
 
 	</div>
+	
 	<!-- /container -->
 	<script src="js/index.min.js"></script>
 <script>
@@ -169,6 +193,7 @@
 	
 	 });
 	 </script>
+
 </body>
 
 </html>
