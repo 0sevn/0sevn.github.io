@@ -1,0 +1,87 @@
+<!doctype html public "lice">
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!-- Consider adding a manifest.appcache: h5bp.com/d/Offline -->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <title>jquery tagcloud</title>
+
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script type="text/javascript" src="tagcloud.jquery.js"></script>
+    
+
+    <style>
+            /* Mother effin brute force CSS reset... */
+            /* Always include after any other CSS */
+        * {
+            resize: none;
+            border: none;
+            outline: none;
+            text-decoration: none;
+            padding: 0px;
+            margin: 0px;
+            list-style-type: none;
+        }
+    </style>
+
+
+<script type="text/javascript">
+    var settings = {
+    //height of sphere container
+    height: 300,
+    //width of sphere container
+    width: 300,
+    //radius of sphere
+    radius: 100,
+    //rotation speed
+    speed: 2,
+    //sphere rotations slower
+    slower: 0.9,
+    //delay between update position
+    timer: 20,
+    //dependence of a font size on axis Z
+    fontMultiplier: 25,
+    //tag css stylies on mouse over
+    hoverStyle: {
+        border: 'none',
+        color: '#000000'
+    },
+    //tag css stylies on mouse out
+    mouseOutStyle: {
+        border: '',
+        color: ''
+    }
+    };
+    $(document).ready(function(){
+        $('#tagcloud').tagoSphere(settings);
+    });
+</script>
+</head>
+<body>
+<!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+     chromium.org/developers/how-tos/chrome-frame-getting-started -->
+<!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+
+
+    <div id="tagcloud">
+        <ul>
+            <li><a href="#">Time</a></li>
+            <li><a href="#">Wellbeing</a></li>
+            <li><a href="#">Authenticity</a></li>
+            <li><a href="#">Relationships</a></li>
+            <li><a href="#">Boundaries</a></li>
+            <li><a href="#">Test</a></li>
+            <li><a href="#">airfoil</a></li>
+
+
+          
+            
+        </ul>
+    </div>
+
+
+</body>
+</html>
