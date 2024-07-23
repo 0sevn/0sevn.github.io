@@ -48,6 +48,9 @@ class TagCloud {
         containerClass: 'tagcloud',
         itemClass: 'tagcloud--item',
         useHTML: false,
+        layoutMode: 'grid', // or 'sphere'
+        gridColumns: 3, // Number of columns in grid layout
+        gridGap: 10, // Gap between grid cells
     };
 
     // speed value
@@ -130,15 +133,37 @@ class TagCloud {
     _computePosition(index, random = false) {
         const self = this;
         const textsLength = self.texts.length;
-        // if random `true`, It means that a random appropriate place is generated, and the position will be independent of `index`
-        if (random) index = Math.floor(Math.random() * (textsLength + 1));
-        const phi = Math.acos(-1 + (2 * index + 1) / textsLength);
-        const theta = Math.sqrt((textsLength + 1) * Math.PI) * phi;
-        return {
-            x: (self.size * Math.cos(theta) * Math.sin(phi)) / 2,
-            y: (self.size * Math.sin(theta) * Math.sin(phi)) / 2,
-            z: (self.size * Math.cos(phi)) / 2,
-        };
+        if (self.config.layoutMode === 'grid') {
+            const columns = self.config.gridColumns || 3; // Default to 3 columns
+            const gap = self.config.gridGap || 5; // Default gap of 5px
+      
+            const containerWidth = self.$el.clientWidth;
+            const containerHeight = self.$el.clientHeight;
+      
+            // Calculate cell dimensions considering the gap
+            const cellWidth = (containerWidth - (columns - 1) * gap) / columns;
+            const cellHeight = (containerHeight - (rows - 1) * gap) / rows;
+      
+            const colIndex = index % columns;
+            const rowIndex = Math.floor(index / columns);
+      
+            // Calculate center of the cell
+            const x = (colIndex * cellWidth) + (colIndex * gap) + (cellWidth / 2);
+            const y = (rowIndex * cellHeight) + (rowIndex * gap) + (cellHeight / 2);
+      
+            return { x, y, z: 0 }; // z is not used in grid layout
+          } else {
+        
+            // if random `true`, It means that a random appropriate place is generated, and the position will be independent of `index`
+            if (random) index = Math.floor(Math.random() * (textsLength + 1));
+            const phi = Math.acos(-1 + (2 * index + 1) / textsLength);
+            const theta = Math.sqrt((textsLength + 1) * Math.PI) * phi;
+            return {
+                x: (self.size * Math.cos(theta) * Math.sin(phi)) / 2,
+                y: (self.size * Math.sin(theta) * Math.sin(phi)) / 2,
+                z: (self.size * Math.cos(phi)) / 2,
+            };
+          }
     }
 
     _requestInterval(fn, delay) {

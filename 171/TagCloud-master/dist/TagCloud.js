@@ -1,8 +1,11 @@
+console.log("test: Script is loaded1");
+
 /*!
  * TagCloud.js v2.4.0
  * Copyright (c) 2016-2023 @ Cong Min
  * MIT License - https://github.com/mcc108/TagCloud
  */
+
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -102,6 +105,7 @@
   var TagCloud = /*#__PURE__*/function () {
     /* constructor */
     function TagCloud() {
+      console.log("test: TagCloud constructor");
       var container = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : document.body;
       var texts = arguments.length > 1 ? arguments[1] : undefined;
       var options = arguments.length > 2 ? arguments[2] : undefined;
@@ -144,7 +148,7 @@
       // create elment
       function _createElment() {
         var self = this;
-
+        console.log("test: Creating element");
         // create container
         var $el = document.createElement('div');
         $el.className = self.config.containerClass;
@@ -206,18 +210,43 @@
     }, {
       key: "_computePosition",
       value: function _computePosition(index) {
+        console.log("test: Computing position for index", index);
         var random = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
         var self = this;
         var textsLength = self.texts.length;
-        // if random `true`, It means that a random appropriate place is generated, and the position will be independent of `index`
-        if (random) index = Math.floor(Math.random() * (textsLength + 1));
-        var phi = Math.acos(-1 + (2 * index + 1) / textsLength);
-        var theta = Math.sqrt((textsLength + 1) * Math.PI) * phi;
-        return {
-          x: self.size * Math.cos(theta) * Math.sin(phi) / 2,
-          y: self.size * Math.sin(theta) * Math.sin(phi) / 2,
-          z: self.size * Math.cos(phi) / 2
-        };
+          // Grid calculation
+          if (self.config.layoutMode === 'grid') {
+            const columns = self.config.gridColumns || 3; // Default to 3 columns
+            const gap = self.config.gridGap || 5; // Default gap of 5px
+            console.log("hello1")
+            const containerWidth = self.$el.clientWidth;
+            const containerHeight = self.$el.clientHeight;
+            const rows = Math.ceil(textsLength / columns);
+
+            // Calculate cell dimensions considering the gap
+            const cellWidth = (containerWidth - (columns - 1) * gap) / columns;
+            const cellHeight = (containerHeight - (rows - 1) * gap) / rows;
+            
+            const colIndex = index % columns;
+            const rowIndex = Math.floor(index / columns);
+        
+              // Calculate center of the cell
+              const x = (colIndex * cellWidth) + (colIndex * gap) + (cellWidth / 2);
+              const y = (rowIndex * cellHeight) + (rowIndex * gap) + (cellHeight / 2);
+        
+              return { x, y, z: 0 }; // z is not used in grid layout
+            } else {
+              console.log("hello2")
+              // if random `true`, It means that a random appropriate place is generated, and the position will be independent of `index`
+          if (random) index = Math.floor(Math.random() * (textsLength + 1));
+          var phi = Math.acos(-1 + (2 * index + 1) / textsLength);
+          var theta = Math.sqrt((textsLength + 1) * Math.PI) * phi;
+          return {
+            x: self.size * Math.cos(theta) * Math.sin(phi) / 2,
+            y: self.size * Math.sin(theta) * Math.sin(phi) / 2,
+            z: self.size * Math.cos(phi) / 2
+          };
+        }
       }
     }, {
       key: "_requestInterval",
@@ -247,6 +276,7 @@
       key: "_init",
       value: function _init() {
         var self = this;
+        console.log("test: Initializing TagCloud");
         self.active = false; // whether the mouse is activated
 
         self.mouseX0 = self.initSpeed * Math.sin(self.direction * (Math.PI / 180)); // init distance between the mouse and rolling center x axis
@@ -414,13 +444,13 @@
   TagCloud.list = [];
   // default config
   TagCloud._defaultConfig = {
-    radius: 100,
+    radius: 500,
     // rolling radius, unit `px`
     maxSpeed: 'normal',
     // rolling max speed, optional: `slow`, `normal`(default), `fast`
     initSpeed: 'normal',
     // rolling init speed, optional: `slow`, `normal`(default), `fast`
-    direction: 135,
+    direction: 335,
     // rolling init direction, unit clockwise `deg`, optional: `0`(top) , `90`(left), `135`(right-bottom)(default)...
     keep: true,
     // whether to keep rolling after mouse out area, optional: `false`, `true`(default)(decelerate to rolling init speed, and keep rolling with mouse)
@@ -428,7 +458,10 @@
     useItemInlineStyles: true,
     containerClass: 'tagcloud',
     itemClass: 'tagcloud--item',
-    useHTML: false
+    useHTML: false,
+    layoutMode: 'grid', // or grid sphere
+    gridColumns: 3, // Number of columns in grid layout
+    gridGap: 10 // Gap between grid cells
   };
   // speed value
   TagCloud._getMaxSpeed = function (name) {

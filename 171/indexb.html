@@ -33,6 +33,18 @@
         a:hover {
             text-decoration: underline;
         }
+        .circle {
+  background-color:rgba(226, 90, 90, 0.687);
+  width: var(--circle-size, 20px);
+  height: var(--circle-size, 20px); 
+  border-radius: 50%;
+  position:fixed;
+  display:inline-block;
+ 
+  margin-top:5px;
+  /*margin-left:19px;*/
+  transition: 0.5s width, 0.5s height;
+}
     </style>
     <style>
         .tagcloud {
@@ -100,6 +112,16 @@
             color:rgb(50, 165, 204);
         }
     </style>
+    <style type="text/css">
+        .tg  {border-collapse:collapse;border-spacing:0;}
+        .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+          overflow:hidden;padding:10px 5px;word-break:normal;}
+        .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+          font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+        .tg .tg-ul38{position:-webkit-sticky;position:sticky;text-align:left;top:-1px;vertical-align:top;will-change:transform}
+        .tg .tg-0lax{text-align:left;vertical-align:top}
+        @media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;}}
+    </style>
 </head>
 <body>
     <div class="menu">
@@ -107,11 +129,20 @@
 
         <a href="spheres/spheroidal.html">Spheres</a>
         <a href="waves.html">Waves</a>
+        <form action="/my-handling-form-page" method="post">
+                <label for="title">On:</label>
+                <input type="text" id="title" name="title_name" />
+                <br><label for="text">Content:</label>
+                <textarea id="text" name="text"></textarea>
+                <input type="submit" id="add" value="Add Text" class="circle-size">
+          </form>
+          
     </div>
     <div class="content">
         <!-- content -->
     </div>
-
+    <div class="circle" title="FOvea, a small depression within the retina where visual acuity is the highest.">
+    </div>
     <script type="text/javascript" src="TagCloud.min.js"></script>
     <script>
         var texts = [
@@ -141,8 +172,141 @@ More recent understanding of time and space has the potential to bridge, not onl
         `<b>On anxiety</b><br><br>
         A consequence of repeated activation of stress response, anxiety can leave the mind stuck in a state of apprehension, impairing and impeding the ability to function.
         <br><br>"The most basic symptoms may relate to energy use, and the most direct treatment may be dietary."
+        
+        <br><br>
+<div class="tg-wrap">
+    <table class="tg">
+<thead>
+  <tr>
+    <th class="tg-ul38">Nutrient</th>
+    <th class="tg-ul38">Occurs in</th>
+    <th class="tg-ul38">Deficiency symptom</th>
+    <th class="tg-ul38">Daily intake</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-0lax"><b>Magnesium</b> modulates the activity of the hypothalamic-pituitary adrenal (HPA) axis, inhibiting stress response, and increases serotonin synthesis from tryptophan.</td>
+    <td class="tg-0lax">Pumpkin, Almond, Spinach</td>
+    <td class="tg-0lax">Nausea</td>
+    <td class="tg-0lax">350mg</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax"><b>Selenium</b> protects cells, including neurons, from damage due to oxidative stress</td>
+    <td class="tg-0lax">Fish, nuts/seeds, milk, cheese, eggs</td>
+    <td class="tg-0lax">Heart muscle changes, cancers</td>
+    <td class="tg-0lax">90 mikrog</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax"><b>Zinc</b> regulates many biological processes; it has neuroprotective and anti-inflammatory effects and helps modulate activity of the HPA axis</td>
+    <td class="tg-0lax">Meat, dairy, whole wheat, animal protein</td>
+    <td class="tg-0lax">skin changes, loss of appetite</td>
+    <td class="tg-0lax">12.7 mg</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax"><b>Vitamin D</b></td>
+    <td class="tg-0lax">Fatty salmon, herring, mackerel</td>
+    <td class="tg-0lax"></td>
+    <td class="tg-0lax">5-10 mikrog, 15min sun exposure, 2-3 times a week</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax"><b>Omega-3</b> fatty acids, among multiple roles, functions as anti-inflammatory agents, influence neurotransmitter levels, increase brain growth factors, and improve the microbiome balance</td>
+    <td class="tg-0lax">Fatty salmon, herring, mackerel (EPA, DHA), algae, rape seed oil, walnuts</td>
+    <td class="tg-0lax">inflammatory </td>
+    <td class="tg-0lax">2.5-3g per day, 1 portion salmon or 2 spoonfuls canola oil</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax"><b>Turmeric</b>'s active component curcumin is a polyphenol that decreases inflammation, increases serotonin, and balances the microbiome</td>
+    <td class="tg-0lax"></td>
+    <td class="tg-0lax"></td>
+    <td class="tg-0lax"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax"><b>Prebiotics</b> and <b>probiotics</b> balance the microbiome</td>
+    <td class="tg-0lax"></td>
+    <td class="tg-0lax"></td>
+    <td class="tg-0lax"></td>
+  </tr>
+</tbody>
+</table></div>
+
         <h6>Sep 11 2023</h6>`, 
-    'Content for On authenticity', 
+        `Events fortold by environment, stick with us
+Form opinions based on those events
+Decisions based on opinions
+Actions taken on decisions
+
+Idea of authenticity, desirable?
+But necessity?
+
+Ideally
+Completeness vs compatibility
+Cultural ideals, honesty, truth
+Superman - truth, justice, the american way
+
+What changed- 
+Market push pull - individual prosperity,
+Attempts to further maximize, optimize, wealth accumulation, extraction
+
+Cargo culting until you get what you want - (safety not guaranteed)
+Not even malicious intent, just difference between how we perceive things work, and how things actually work
+
+What's wrong about what changed
+Tired of manipulation of needs and desires by  marketers, celebrity endorsers, paid influencers
+
+Yearning for authenticity
+
+Fragmentation and fluidity of external environment
+Diversification of once stable structures (family, religion, national identity, gender)
+Understanding of current events flooded by mis- and disinformation, even those we experience ourselves.
+
+Everyday life merges with simulated and synthetic experiences, AI enhances and distorts reality.
+Forcing us to redefine what self is
+Psychological difficulties arise when truth is not reliable and established. 
+Facts need to be questioned and agreed on to be real, today
+
+Authenticity directly impacts self-esteem, coping ability, meaningful goal pursuit and other parts of healthy psychological functioning.  Foundation of shared reality, bedrock of social life. Contributes to a personally meaningful existence, on an individual level.
+
+
+What is authenticity
+Personalities are not singular. Grapple with thoughts and ways of relating to others. Our psychological make up consists of different contrasting and contradictory aspects.
+Greater authenticity is greater awareness of multifaceted self-aspects and drive to integrate them into cohesive self-structure.
+As an idea, it shapes and propels the individual identity through the constantly changing stream of experience.
+
+As a feeling, authenticity feels good.
+Lack of it, or feeling inauthentic is part of development as we nurture new parts of ourselves across the life span
+Clinging too tightly to what feels like authenticity can hinder growth
+
+The heart of authenticity - unimpeded operation of one's true self, in one's daily enterprise.
+Discover, develop, construct core sense of self and, how core is maintained over time and situation
+Activity spaces:
+Awareness, unbiased mental processing, ways of behaving, relational orientation
+
+
+Awareness
+Do you know what you like? What feels good?
+Can identify good feeling, but do you know the source?
+
+Unbiased processing
+Low Interprative distortions
+Low Ego defense mechanism
+Leads to choices that further self-development
+
+
+Behavior
+Self deception to attain?
+For others, social comparison?
+Willing to endure negative consequences, by expressing true beliefs
+
+Relational orientation
+How easy do you make it for close others to get to know you
+Important for others to see the dark, not routinely discussed. Accurate perception, fosters secure attachment.
+
+
+Passport to growth
+Less need for Defensiveness, in face of self-threatening information
+Perception of threat to self-image
+`, 
     `"It is not your responsibility to figure out what someone else is feeling and why. Let go of the illusion that fixing their bad mood will make you feel better."
     <h6>Aug 7 2023</h6>`,
 

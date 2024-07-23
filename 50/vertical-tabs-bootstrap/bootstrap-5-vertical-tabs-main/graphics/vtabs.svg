@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <rect style="fill: rgb(255, 255, 255);" width="500" height="500" rx="100" ry="100"/>
+  <rect style="fill: rgb(10, 88, 202); fill-opacity: 0.25;" x="154.819" y="79.527" width="126.588" height="16" rx="10" ry="10"/>
+  <rect style="fill: rgb(10, 88, 202); fill-opacity: 0.25;" x="154.819" y="283.11" width="80" height="16" rx="10" ry="10"/>
+  <rect style="fill: rgb(10, 88, 202); fill-opacity: 0.25;" x="154.819" y="384.902" width="80" height="16" rx="10" ry="10"/>
+  <g transform="matrix(1, 0, 0, 0.79972, 111, 36.125431)">
+    <rect style="fill: rgb(0, 14, 34); fill-opacity: 0.25;" x="43.819" y="181.555" width="57.539" height="20" rx="10" ry="10"/>
+    <rect style="fill: rgb(0, 14, 34); fill-opacity: 0.25;" x="116.745" y="181.562" width="29.098" height="20" rx="10" ry="10"/>
+  </g>
+  <path style="fill: none; stroke-linejoin: round; stroke-linecap: round; stroke: rgb(59, 58, 58); stroke-width: 13px;" d="M 343.765 236.042 L 140.442 236.042 C 134.122 236.042 129 228.879 129 220.042 L 129 162.257 C 129 153.42 134.122 146.257 140.442 146.257 M 343.765 39.057 L 343.765 146.257 M 140.442 146.257 L 343.765 146.257 M 343.765 236.042 L 343.765 455.091"/>
+  <path style="fill: none; stroke-linejoin: round; stroke: rgb(226, 226, 226); stroke-width: 6px;" d="M 336.743 440.466 L 136.281 440.466 C 130.051 440.466 125 433.303 125 424.466 L 125 366.681 C 125 357.844 130.051 350.681 136.281 350.681 M 136.281 350.681 L 336.743 350.681"/>
+  <path d="M 275.454 451.389 L 270.087 456.756 L 255.767 442.621 L 252.546 454.223 L 240.572 421.594 L 272.682 433.987 L 261.083 437.203 Z" style="" transform="matrix(0.898182, 0.439623, -0.439623, 0.898182, 219.341792, -68.712714)"/>
+</svg>

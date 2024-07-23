@@ -396,7 +396,7 @@ https://tesreg.com/forums/fusion-360/when-how-to-use-3d-sketch-techniques-and-mo
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script>
-    var counter = 1;
+    
     const input = document.querySelector('.circle-size');
     const circles = document.querySelectorAll('.circle');
     const categories = document.querySelectorAll('.category')
@@ -413,41 +413,70 @@ https://stackoverflow.com/questions/40817894/text-to-html-list
 The dollar function, $(), can be used as shorthand for the getElementById function
 ${} multiline string /string interpolation
 */
-    function enter_task () {
-            var text = $('#enter_task').val();
-            var current = new Date(); /*Get current time*/
-            var tid = current.toLocaleString(); /* https://linuxhint.com/how_to_get_current_date_and_time_in_javascript/*/
-            counter++;
-    $('#todo_list').append('<li><span><input type="checkbox">  '+ text + ' <p class="time">' + tid + '</p>' + ' </span><input type="submit" id="edit' + counter + '" value="Edit">' + '<input type="submit" id="delete' + counter + '" value="Delete">' +'</li>');
-        circles.forEach(circle => {
-        circle.style.setProperty('--circle-size', counter*20 + 'px');
-        })
+$(function() {
+    var counter = 0;
+
+    function enterTask() {
+        counter++;
+        var text = $('#enter_task').val();
+        var time = new Date().toLocaleString();
+
+        var newListItem = $('<li><span><input type="checkbox"> ' + text + ' <p class="time">' + time + '</p>' + ' </span><input type="submit" class="edit" value="Edit"><input type="submit" class="delete" value="Delete"></li>');
         
-    $('#edit' + counter).click(function(){
-        $(this).prev().attr('contenteditable','true');
-        $(this).prev().focus();
-    });
+        var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+        todoList.push({ text: text, timestamp: time });
+        localStorage.setItem('todoList', JSON.stringify(todoList));
 
-    $('#delete' + counter).click(function(){
-        $(this).parent().remove();
-        
-        counter--;
-        circles.forEach(circle => {
-        circle.style.setProperty('--circle-size', counter*20 + 'px');
-        })
-    });
-
-    $('#edit_nav').click(function(){
-
-        $(this).prev().attr('contenteditable','true');
-        $(this).prev().focus();
-
-    });
+        $('#todo_list').append(newListItem);
+        updateCircleSize();
     }
 
-    $(function() {
-        $('#add').on('click', enter_task);
+    function deleteTask() {
+        var listItem = $(this).closest('li');
+        var index = $('#todo_list li').index(listItem);
+        listItem.remove();
+        counter--;
+        updateCircleSize();
+
+        // Remove the task from local storage
+        var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+        todoList.splice(index, 1); // Remove the task at the corresponding index
+        localStorage.setItem('todoList', JSON.stringify(todoList));
+    }
+
+    function updateCircleSize() {
+        var circleSize = counter * 20 + 'px';
+        $('.circle').css('--circle-size', circleSize);
+    }
+
+    $('#add').on('click', enterTask);
+
+    $('#todo_list').on('click', '.edit', function() {
+        var taskText = $(this).siblings('span').find('.task-text');
+        taskText.attr('contenteditable', 'true').focus();
+
+        // Update local storage when the task content changes
+        taskText.on('input', function() {
+            var index = $(this).closest('li').index();
+            var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+            todoList[index].text = $(this).text();
+            localStorage.setItem('todoList', JSON.stringify(todoList));
+        });
     });
+
+    // Event delegation for delete button
+    $('#todo_list').on('click', '.delete', deleteTask);
+
+    // Load tasks from local storage on page load
+    var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+    counter = todoList.length;
+    todoList.forEach(item => {
+        var newListItem = $('<li><span><input type="checkbox"> <span class="task-text">' + item.text + '</span> <p class="time">' + item.timestamp + '</p></span><input type="submit" class="edit" value="Edit"><input type="submit" class="delete" value="Delete"></li>');
+        $('#todo_list').append(newListItem);
+    });
+
+    updateCircleSize();
+});
 
 
 </script>

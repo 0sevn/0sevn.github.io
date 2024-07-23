@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Short Form Blog</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+        }
+
+        .light {
+            background: #666;
+            color: #fff;
+        }
+        ul {
+            display: inline-block;
+        }
+
+        a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <style>
+        .content .tagcloud {
+            display: inline-block;
+            margin: 120px;
+        }
+        
+        .tagcloud {
+            font-size: 18px;
+            display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /**Adjust minmax values as needed**/
+        gap: 1px; /** Match the gridGap configuration**/
+        }
+
+        .tagcloud span {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        }
+        .tagcloud--item {
+            padding: 2px 4px; /**mouse over highlight**/
+            background-color: transparent;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .tagcloud--item:hover {
+            background-color: rgba(0, 0, 0, .1);
+            border: 0px solid #333;
+            -webkit-border-radius: 2px;
+            -moz-border-radius: 2px;
+            border-radius: 2px;
+            opacity: 1 !important;
+            z-index: 100 !important;
+        }
+
+        .light .tagcloud--item {
+            color: #fff;
+        }
+
+        .light .tagcloud--item:hover {
+            background-color: rgba(255, 255, 255, .1);
+            border: 1px solid #fff;
+        }
+        .post {
+            position: absolute; /* Position it absolutely */
+            top: 80px; /* Center it vertically */
+            left: 50%; /* Center it horizontally */
+            transform: translate(-50%, -0%); /* Adjust for its own width and height */
+            border: 0px solid #000;
+            
+            padding: 30px;
+            width: 500px;
+            margin-left: 0;
+            text-align: left;
+            margin-top: 0px; /* Adjust this value as needed */
+            font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            color:#202020;
+            background:#eae9e9;
+            
+            z-index: 101;
+        }
+        .menu {
+            position: fixed;
+            border: 0px solid #000;
+            width: 10%;
+            left: 5%;
+            background-color: #fff;
+            text-align: left;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            padding: 5px 10px;
+            z-index: 1;
+        }
+        .menu a {
+            margin: 0px;
+            color:rgb(50, 165, 204);
+        }
+    </style>
+
+</head>
+<body>
+    <div class="menu">
+        <label for="title">Title:</label>
+        <input type="text" id="title" placeholder="Enter title">
+        <br>
+        <label for="text">Content:</label>
+        <textarea id="text" name="text" placeholder="Enter content"></textarea>
+        <br>
+        <input type="submit" id="add" value="Add Text">
+        <!--p>
+            <ul id="container_list" style="list-style: none;">
+            </ul>
+        </p-->  
+        <button id="toggleLayoutButton">Toggle Layout</button>
+          
+    </div>
+    <div class="content">
+        <!-- tag cloud content -->
+    </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="TagCloud.js"></script>
+<script>
+
+$(function() {
+    var counter = 0;
+
+    //initialize arrays
+    var texts = [
+        'On time', 'On anxiety','On authenticity', 'On boundaries', 
+        'On identity & belonging', 'On findability'
+    ];
+    var divContents = [
+        `FOvea, a small depression within the retina where visual acuity is the highest.">-</div>`,
+        `On time`,
+        `<h6>Aug 18 2023</h6>`,
+        `On time`,
+        `On time`,
+        `On time`,
+    ];  
+    const options = {
+    // radius: 300, // rolling radius, unit `px`- set to not escalate transformation
+    // maxSpeed: 'normal', // rolling max speed, optional: `slow`, `normal`(default), `fast`
+    // initSpeed: 'normal', // rolling init speed, optional: `slow`, `normal`(default), `fast`
+    // direction: 335, // rolling init direction, unit clockwise `deg`, optional: `0`(top) , `90`(left), `135`(right-bottom)(default)...
+    // keep: true, // whether to keep rolling after mouse out area, optional: `false`, `true`(default)(decelerate to rolling init speed, and keep rolling with mouse)
+    // useContainerInlineStyles: true,
+    // useItemInlineStyles: true,
+    // containerClass: 'tagcloud',
+    // itemClass: 'tagcloud--item',
+    // useHTML: false,
+    // layoutMode: 'sphere', // or grid sphere
+    // gridColumns: 4, // Number of columns in grid layout
+    // gridGap: 2 // Gap between grid cells
+};
+
+// Declare the tc instance in the higher scope and initialize it immediately
+let tc = new TagCloud('.content', texts, options);
+
+    function addContent() {
+        
+        var title = $('#title').val(); //content title
+        var text = $('#text').val(); //content text
+        var time = new Date().toLocaleString(); //timestamp
+        
+        //save containerList to local Storage
+        var containerList = JSON.parse(localStorage.getItem('containerList') || '[]');        
+        containerList.push({ title:title, text:text, time:time });
+        localStorage.setItem('containerList', JSON.stringify(containerList));
+
+
+        //addTag()
+        if (!tc) {
+            return;
+        }
+        texts.push(title);  
+        tc.update(texts);
+        divContents.push(text)
+        //console.log(title) console.log(texts) console.log(containerList) console.log(divContents)
+        
+
+        // Create a div for each tag
+        texts.forEach(function(text, index) {
+            var div = document.createElement('div');
+            div.id = text.replace(/\s/g, ''); // Remove spaces from the id
+            div.className = 'post';
+            div.style.display = 'none'; // Initially hide the div
+            div.innerHTML = divContents[index]; // Use corresponding content from divContents array
+            document.body.appendChild(div);
+        });
+        counter++;
+    }
+
+
+    // Load tasks from local storage on page load
+    var containerList = JSON.parse(localStorage.getItem('containerList') || '[]');
+        counter = containerList.length;
+        containerList.forEach(item => {
+        var newListItem = (' <b>' + item.title +' </b><br><br>'  + item.text + '<br><br><p class="time">' + item.time + '</p>');
+        $('#container_list').append(newListItem);
+        });
+
+
+    $('#add').on('click', addContent);
+
+
+
+    document.getElementById('toggleLayoutButton').addEventListener('click', toggleLayout);
+
+    
+
+    function toggleLayout() {
+        console.log("layout switch button press")
+        // Get the current layout mode
+        const currentMode = tc.config.layoutMode;
+
+        // Toggle the layout mode
+        const newMode = currentMode === 'sphere' ? 'grid' : 'sphere';
+        tc.config.layoutMode = newMode;
+
+        // Reinitialize the TagCloud instance
+        tc.update(tc.texts);
+
+        // Apply new positions and styles based on the layout mode
+        if (newMode === 'grid') {
+            tc.items.forEach((item, index) => {
+            const position = tc._computePosition(index);
+            item.el.style.position = 'absolute';
+            item.el.style.left = `${position.x}px`;
+            item.el.style.top = `${position.y}px`;
+            item.el.style.opacity = 1; // Ensure tags are visible in grid layout
+            });
+        } else {
+            tc.items.forEach(item => {
+            item.el.style.position = '';
+            item.el.style.left = '';
+            item.el.style.top = '';
+            item.el.style.opacity = ''; // Reset opacity for spherical layout
+            });
+            // Reinitialize animation for spherical layout
+            tc._init();
+        }
+    }
+
+
+
+    // Add click event to each tag
+    var tags = document.querySelectorAll('.tagcloud--item');
+    tags.forEach(function(tag) {
+        tag.addEventListener('click', function() {
+            var id = this.innerText.replace(/\s/g, '');
+            var div = document.getElementById(id);
+            div.style.display = 'block'; // Show the corresponding div
+        });
+    });
+    // Add click event to each div
+    var divs = document.querySelectorAll('.post');
+    divs.forEach(function(div) {
+        div.addEventListener('click', function() {
+            this.style.display = 'none'; // Hide the clicked div index.js
+        });
+    });
+});
+
+</script>
+
+</body>
+</html>
+
+
+    
+    
