@@ -5,11 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Short Form Blog</title>
-
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Karma&display=swap" rel="stylesheet">
-    
+    <!-- Import the component -->
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <style>
     body {
       font-family: "Karma", serif;
@@ -203,7 +204,9 @@ float: right;
                   </div> 
   
                   <div class="tabcontent2">   
-                      <div class="t1content">Lunge<img src="spine.png"> </div>
+                      <div class="t1content">
+                        <model-viewer style="width:100%; height:400px;" src="pos1.glb" camera-controls auto-rotate></model-viewer>
+                      </div>
                       <div class="t2content">Bridge <img src="bridge.png"></div>
                       <div class="t3content">src Spine</div>
                   </div>
@@ -238,7 +241,7 @@ float: right;
             <br><br>
                 Slow down.<br>
                 There is no rush.<br>
-                It's not to late, nor is it too early to be part of <i>less than 50%</i>
+                It's not to late, nor is it too early to be in the <i>lower 50%</i>
                 <br><br><br>
               
 
@@ -247,7 +250,7 @@ float: right;
               You can make a difference.<br>
               <br><br><br>
              
-              <br><br><br><br><br><br>
+              <!--<br><br><br><br><br><br>
              
               <br><br><br><br><br><br>
              
@@ -255,10 +258,10 @@ float: right;
               
 
             
-              A BMI over 30 is associated with severe health implications such as
+               A BMI over 30 is associated with severe health implications such as
               reduced mobility, increased risk of coronary disorders and diabetes.
               Our busy schedules don't always allow the energy to go to the gym for several hours a week.
-              Which side of 50% are you on?
+              Which side of 50% are you on? -->
               </p>
             
             </div>
