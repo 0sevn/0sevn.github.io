@@ -196,6 +196,7 @@ function startPauseTimer(duration, display, isRunning = false) {
     intervalId;
     var currentTabIndex = 1; // Start from the first tab (index 1)
     const instructions = ["Get ready","Breathe","Rest","Done!"]
+    
 function getNumberOfTabs() {
   // Assuming you have a fixed number of tabs (level 1)
   return document.querySelectorAll('input[name="tabGroup2"]').length;
@@ -225,23 +226,29 @@ function switchTab(tabIndex) {
     seconds = seconds < 10 ? "0" + seconds : seconds;
 
     display.textContent = minutes + ":" + seconds;
-    console.log(seconds)
-
+    console.log(currentTabIndex)
+    const radioButtons1 = document.querySelectorAll('input[name="tabGroup1"]');
+    radioButtons1[0].checked = true;
       if (seconds>55) {
         console.log(instructions[0])
         document.querySelector('#instruct').textContent =instructions[0];
+        switchTab(currentTabIndex);
       }
       else if (seconds<55 && seconds>50) {
         console.log(instructions[1])
         document.querySelector('#instruct').textContent =instructions[1];
+        switchTab(currentTabIndex);
+        
       }
       else if (seconds<50 && seconds>45) {
         console.log(instructions[2])
         document.querySelector('#instruct').textContent =instructions[2];
+        switchTab(currentTabIndex);
       }
       else if (seconds<45 && seconds>30) {
         console.log(instructions[3])
         document.querySelector('#instruct').textContent =instructions[3];
+        switchTab(currentTabIndex);
       }
   if (diff <= 0)  
  {
