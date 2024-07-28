@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Karma&display=swap" rel="stylesheet">
     <!-- Import the component -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <style>
     body {
@@ -164,11 +165,142 @@
       min-height: 350px;
     }
 
+    .timer {
+      float: right;
+      background: rgb(255, 255, 255);
+      width:15%;
+      height:185px;
+      /* height:50px; */
+      text-align: right;
+      font-size: 16pt;
+      background-image: url("501.png");
+      background-repeat: no-repeat;
+      background-position: right top;
+      background-size: 100%;
+
+    }
+    .timerContent {
+      position:absolute;
+      bottom: 0;
+    }
 
 </style>
+<script>
+  
 
+function startPauseTimer(duration, display, isRunning = false) {
+  var start = Date.now(),
+    diff,
+    minutes,
+    seconds,
+    intervalId;
+    var currentTabIndex = 1; // Start from the first tab (index 1)
+    const instructions = ["Get ready","Breathe","Rest","Done!"]
+function getNumberOfTabs() {
+  // Assuming you have a fixed number of tabs (level 1)
+  return document.querySelectorAll('input[name="tabGroup2"]').length;
+}
+function switchTab(tabIndex) {
+  // Get all radio buttons for tab selection (level 1)
+  const radioButtons = document.querySelectorAll('input[name="tabGroup2"]');
+
+  // Uncheck all radio buttons
+  radioButtons.forEach(radioButton => radioButton.checked = false);
+
+  // Check the radio button for the desired tab
+  radioButtons[tabIndex - 1].checked = true;
+
+  // Trigger any necessary events to update the displayed content based on the tab change
+  // (This might involve additional logic depending on your specific setup)
+}
+  function timer() {
+    if (!isRunning) return; // Don't update timer if not running
+
+    diff = duration - (((Date.now() - start) / 1000) | 0);
+
+    minutes = (diff / 60) | 0;
+    seconds = (diff % 60) | 0;
+
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    display.textContent = minutes + ":" + seconds;
+    console.log(seconds)
+
+      if (seconds>55) {
+        console.log(instructions[0])
+        document.querySelector('#instruct').textContent =instructions[0];
+      }
+      else if (seconds<55 && seconds>50) {
+        console.log(instructions[1])
+        document.querySelector('#instruct').textContent =instructions[1];
+      }
+      else if (seconds<50 && seconds>45) {
+        console.log(instructions[2])
+        document.querySelector('#instruct').textContent =instructions[2];
+      }
+      else if (seconds<45 && seconds>30) {
+        console.log(instructions[3])
+        document.querySelector('#instruct').textContent =instructions[3];
+      }
+  if (diff <= 0)  
+ {
+      // Add one second for full duration display
+      start = Date.now() + 1000;
+      if (currentTabIndex > 2) {
+        isRunning = false; // Stop timer after reaching 0
+      }
+
+      
+      // Update currentTabIndex and switch tabs
+      currentTabIndex++;
+      if (currentTabIndex > getNumberOfTabs()) {
+        currentTabIndex = 1; // Reset to first tab if reached the end
+      }
+      switchTab(currentTabIndex);
+  }
+}
+
+  // Start timer immediately (optional)
+  if (isRunning) {
+    start = Date.now();
+    timer();
+  }
+
+  intervalId = setInterval(timer, 1000);
+
+  return function toggleTimer() {
+    isRunning = !isRunning; // Toggle running state
+    if (isRunning) {
+      start = Date.now(); // Reset start time on resume
+    }
+    clearInterval(intervalId); // Clear previous interval
+    intervalId = setInterval(timer, 1000); // Restart interval
+  };
+}
+
+window.onload = function () {
+  //countdown duration,seconds
+  var count = 60,
+    display = document.querySelector('#time'),
+    toggleTimer = startPauseTimer(count, display, false); // Initialize not running
+    
+  document.getElementById('startPause').addEventListener('click', function () {
+    toggleTimer(); // Call toggleTimer function on button click
+  });
+};
+</script>
   </head>
   <body>
+    <div class="timer" id="startPause">
+      <div ><br><br><br><br><br><br>
+        <!-- <button id="startPause">Start</button> -->
+        <div> <span id="time"></span> 
+        <br><br>
+        <span id="instruct"></span>
+      </div>
+      </div>
+    </div>
     <!-- lvl1 content -->
     <div class="tabGroup">
       <input type="radio" name="tabGroup1" id="rad1" class="tab1"/>
@@ -242,7 +374,7 @@
                 
                 <br><br>
                 Anyone can benefit from adding motion to their daily habits.
-                The movement postures presented here are gentle and stimulating, regardless of what shape you are in.
+                The postures presented here are gentle and stimulating, regardless of previous experience.
 
                 They can be done anytime, anywhere and require no special equipment.
 
@@ -251,12 +383,12 @@
                 A consequence of our sedentary lifestyle is that muscles grow short and stiff and the risk of preventable injury or inflammation increases.
                 Current research suggests that 50% of the US population is expected to be moderately to severely obese by 2030. <a href="https://www.hsph.harvard.edu/news/press-releases/half-of-us-to-have-obesity-by-2030/">[1]</a>
                 Obesity, or BMI above 30, is associated with health implications such as reduced mobility, diabetes and increased risk of cardiovascular disorders. <a href="https://www.who.int/health-topics/obesity#tab=tab_1">[2]</a> <br><br>
-                We don't need to rush towards this future.<br>
-                It's not to late, nor is it too early to choose where you will be in 5 years time.
+                We don't need to rush into this future.<br>
+                It's not too late, nor is it too early to choose where you will be in 5 years' time.
                 <br><br>
                 This is a call to slow down. To reclaim your mobility.
-                <br>
-                To join the <i>lower 50%</i>
+                <br><br>
+                To be part of the <i>lower 50%</i>
                 
                 
                 <br><br><br>
