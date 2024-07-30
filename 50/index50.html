@@ -166,24 +166,27 @@
     }
 
     .timer {
+      position:absolute;
+      left: 50%;
+      background: rgb(235, 199, 199);
+      text-align: center;
+      font-size: 16pt;
+      /* top:0%;
+      margin:5%; */
+      /* width:15%; */
+      /* height:50px; */
+
+    }
+    .logo {
       float: right;
       background: rgb(255, 255, 255);
       width:15%;
       height:185px;
-      /* height:50px; */
-      text-align: right;
-      font-size: 16pt;
       background-image: url("501.png");
       background-repeat: no-repeat;
       background-position: right top;
       background-size: 100%;
-
     }
-    .timerContent {
-      position:absolute;
-      bottom: 0;
-    }
-
 </style>
 <script>
   
@@ -229,42 +232,77 @@ function switchTab(tabIndex) {
     console.log(currentTabIndex)
     const radioButtons1 = document.querySelectorAll('input[name="tabGroup1"]');
     radioButtons1[0].checked = true;
-      if (seconds>55) {
+    // get ready1
+    if (seconds>55) {
         console.log(instructions[0])
         document.querySelector('#instruct').textContent =instructions[0];
-        switchTab(currentTabIndex);
       }
+    // inhale, exhale1
       else if (seconds<55 && seconds>50) {
         console.log(instructions[1])
         document.querySelector('#instruct').textContent =instructions[1];
-        switchTab(currentTabIndex);
-        
       }
+    // rest1
       else if (seconds<50 && seconds>45) {
         console.log(instructions[2])
         document.querySelector('#instruct').textContent =instructions[2];
+      }
+    // get ready next2
+      else if (seconds<=45 && seconds>44) {
+        console.log(instructions[0])
+        document.querySelector('#instruct').textContent =instructions[0];
+        // Update currentTabIndex and switch tabs
+        currentTabIndex++;
+        if (currentTabIndex > getNumberOfTabs()) {
+          currentTabIndex = 1; // Reset to first tab if reached the end
+        }
         switchTab(currentTabIndex);
       }
-      else if (seconds<45 && seconds>30) {
+      // inhale, exhale2
+      else if (seconds<40 && seconds>35) {
+        console.log(instructions[1])
+        document.querySelector('#instruct').textContent =instructions[1];
+        
+      }
+      // rest, 2
+      else if (seconds<30 && seconds>25) {
+        console.log(instructions[2])
+        document.querySelector('#instruct').textContent =instructions[2];
+      }
+      // get ready next3
+      else if (seconds<=25 && seconds>24) {
+        console.log(instructions[0])
+        document.querySelector('#instruct').textContent =instructions[0];
+        // Update currentTabIndex and switch tabs
+        currentTabIndex++;
+        if (currentTabIndex > getNumberOfTabs()) {
+          currentTabIndex = 1; // Reset to first tab if reached the end
+        }
+        switchTab(currentTabIndex);
+      }
+      // inhale, exhale3
+      else if (seconds<20 && seconds>15) {
+        console.log(instructions[1])
+        document.querySelector('#instruct').textContent =instructions[1];
+        
+      }
+      // Done, 
+      else if (seconds<15) {
         console.log(instructions[3])
-        document.querySelector('#instruct').textContent =instructions[3];
-        switchTab(currentTabIndex);
+        document.querySelector('#instruct').textContent =instructions[2];
       }
+
+      //diff = duration - (currenttime-starttime) = duration - time elapsed = time left
+      //if time left is 0
   if (diff <= 0)  
  {
       // Add one second for full duration display
       start = Date.now() + 1000;
+      //last tab = done!
       if (currentTabIndex > 2) {
         isRunning = false; // Stop timer after reaching 0
       }
-
-      
-      // Update currentTabIndex and switch tabs
-      currentTabIndex++;
-      if (currentTabIndex > getNumberOfTabs()) {
-        currentTabIndex = 1; // Reset to first tab if reached the end
-      }
-      switchTab(currentTabIndex);
+      console.log(seconds)
   }
 }
 
@@ -299,13 +337,12 @@ window.onload = function () {
 </script>
   </head>
   <body>
-    <div class="timer" id="startPause">
-      <div ><br><br><br><br><br><br>
+    <div class="logo" id="startPause"></div>
+    <div class="timer">
         <!-- <button id="startPause">Start</button> -->
         <div> <span id="time"></span> 
-        <br><br>
+        <br>
         <span id="instruct"></span>
-      </div>
       </div>
     </div>
     <!-- lvl1 content -->
@@ -386,14 +423,17 @@ window.onload = function () {
                 They can be done anytime, anywhere and require no special equipment.
 
                 <br><br>
-                Most adults today use a limited range of motion, both in terms of moving their body as a whole and their indivudual joints.
+                Most adults today use a limited range of motion of indivudual joints, but also when moving the body as a whole.
                 A consequence of our sedentary lifestyle is that muscles grow short and stiff and the risk of preventable injury or inflammation increases.
                 Current research suggests that 50% of the US population is expected to be moderately to severely obese by 2030. <a href="https://www.hsph.harvard.edu/news/press-releases/half-of-us-to-have-obesity-by-2030/">[1]</a>
                 Obesity, or BMI above 30, is associated with health implications such as reduced mobility, diabetes and increased risk of cardiovascular disorders. <a href="https://www.who.int/health-topics/obesity#tab=tab_1">[2]</a> <br><br>
+                <br>
+                While Body Mass Index is an important metric, it doesn't tell the whole story. 
+                
                 We don't need to rush into this future.<br>
                 It's not too late, nor is it too early to choose where you will be in 5 years' time.
                 <br><br>
-                This is a call to slow down. To reclaim your mobility.
+                This is a call to slow down. To reclaim your mobility and wellbeing.
                 <br><br>
                 To be part of the <i>lower 50%</i>
                 
