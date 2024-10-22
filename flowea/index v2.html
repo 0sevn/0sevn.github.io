@@ -27,110 +27,16 @@ https://www.w3schools.com/css/css3_shadows_box.asp
     padding:10px 0px 10px 20px;
     z-index: -99;
 }
-/*
-https://www.w3schools.com/css/css_dropdowns.asp
-https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_navbar_border
-*/
-.topnav {
-    height:40px;
-    width: 55%;
-    border-radius: 25px 5px;
-    background-color: #333;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
-    margin:100px auto 100px auto;
-    padding:10px 0px 0px 20px;
-}
 
-/*
-https://www.w3schools.com/howto/howto_css_dropup.asp
-*/
-.bottomnav {
-    height:40px;
-    width: 50%;
-    border-radius: 5px 25px;;
-    background-color: #333;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
-    margin:auto;
-    padding:10px 0px 0px 20px;
-}
-
-.dropbtn {
-    background-color: #252827;
-    width: 100px;   
-    text-transform: uppercase;
-    padding: 8px 0 8px 0;
-    color: white;
-    border: 5px;
-    border-color: coral;
-    border-radius: 5px 5px 0 0;
-    margin-left:15px;
-}
 a {
     color: white;
     border-radius: 15px;
     font-size: 14px;
 }
-.dropdown {
-    display: inline-block;
-    color: #f2f2f2;
-    white-space: nowrap;  
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f1f1f1;
-    border-radius: 5px 5px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    padding: 2px; 
-}
-.dropdown-content a {
-    color: black;
-    padding: 8px 26px;
-    display: block;
-}
-
-.dropup-content {
-    display: none;
-    position: absolute;
-    bottom: 40px;
-    background-color: #f1f1f1;
-    border-radius: 5px 5px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    padding: 2px; 
-}
-
-.dropup-content a {
-    color: black;
-    padding: 8px 26px;
-    display: block;
-}
-
-.dropdown-content a:hover {
-    background-color: coral;
-}
-
-.dropup-content a:hover {
-    background-color: coral;
-}
-
-.dropdown:hover .dropdown-content {display: block;}
-.dropdown:hover .dropup-content {display: block;}
-
-.dropdown:hover .dropbtn {background-color: #3e6a8e;}
-/* Responsive navigation menu (for mobile devices) */
-@media screen and (max-width: 600px) {
-  .topnav a {
-    float: none;
-    display: block;
-  }
-}
 
 .time {
     font-size: 10px;
-    color:darkkhaki;
+    color:rgb(150, 148, 131);
     display: inline-block;
 }
 /*https://www.w3schools.com/css/css_align.asp
@@ -223,10 +129,10 @@ input[type=submit] {
       }
 
 .fileops {
-  width: 320px;
+  width: 180px;
   background-color: rgb(79, 79, 79);
   color: #fff;
-  text-align: left;
+  text-align: right;
   padding: 5px;
   border-radius: 6px;
   font-weight: normal;
@@ -235,15 +141,15 @@ input[type=submit] {
   /* Position the tooltip text - see examples below! */
   position: absolute;
   z-index: 1;
-  top: 5%;
-  right: 23%;
+  top: 3%;
+  right: 2%;
 }
 
 </style>
 </head>
 <body>
 <!-- Top navigation -->
-<div class="fileops" style="top:5%; width: 130px;">
+<div class="fileops" style="width: 130px; right: 23%;">
     <!-- Top menu on small screens -->
   <div class="w3-container w3-text-light-grey w3-xlarge w3-padding-8">
       <a href="javascript:void(0)" class="w3-left w3-button w3-text-light-grey" onclick="w3_openPrivate()" style="font-size: 12px;">< History</a>
@@ -273,7 +179,7 @@ input[type=submit] {
 
 <!-- Sidebar personal/menu -->
 <nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:3;width:30%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
-    <a href="javascript:void()" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-8" style="right:0;">CLOSE</a> 
+    <a href="javascript:void()" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-8" style="text-align: right;">CLOSE</a> 
     <!-- list elements -->
     <ul id="purge_list" style="list-style: none;">
     </ul>
@@ -284,7 +190,7 @@ input[type=submit] {
             <button class="btn btn-outline-secondary btn-sm" id="exportHistory" onclick="exportHistory()">Export</button > 
                 <a id="exportHistoryLink" style="display: none;">Export</a>
                 <br>
-                <label for="FileInputLabel"><b>Import</b></label>
+                <!-- <label for="FileInputLabel"><b>Import</b></label> -->
                 <!-- style="display: none;" -->
                 <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="circle-size"></input>
         </div>
@@ -297,8 +203,8 @@ input[type=submit] {
 <!-- Bottom navigation -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script>
-        const fileInput = document.getElementById('jsonFileInput');
-        const fileNameDisplay = document.getElementById('FileInputLabel');
+        // const fileInput = document.getElementById('jsonFileInput');
+        // const fileNameDisplay = document.getElementById('FileInputLabel');
 
         //fileInput.style.opacity = 0;
 
@@ -318,10 +224,17 @@ $(function() {
 
     function enterTask() {
         
-        var text = $('#enter_task').val();
+        // var text = $('#enter_task').val();
+        var text = $('#enter_task').val().trim();
         var time = new Date().toLocaleString();
-
-        var newListItem = $('<li><span><input type="checkbox"> ' + text + ' <p class="time">' + time + '</p>' + ' </span><input type="submit" class="edit" value="Edit"><input type="submit" class="delete" value="Delete"></li>');
+    if (text !== '') {  // Ensure the input isn't empty
+        var newListItem = $(
+            '<li><span><input type="checkbox"> ' +
+            '<span class="task-text">' + text + ' '+'</span>' +
+            ' <p class="time">' + time + '</p></span>' +
+            '<input type="submit" class="edit" value="Edit">' +
+            '<input type="submit" class="delete" value="Delete"></li>'
+        );
         
         var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
         todoList.push({ text: text, timestamp: time });
@@ -329,9 +242,33 @@ $(function() {
 
         $('#todo_list').append(newListItem);
 
+        
         counter++;
         console.log('Counter after adding task:', counter); // Log the counter value
+
+        // Update the circle size after adding a new task
         updateCircleSize();
+
+        // Clear the input box
+        // $('#enter_task').val('');
+    }
+}
+// Attach a delegated event listener to handle checkbox changes for existing and new tasks
+$('#todo_list').on('change', '.task-checkbox', function() {
+    updateCircleSize();
+});
+
+// Trigger add task when pressing Enter key
+$('#enter_task').on('keypress', function(e) {
+    if (e.which === 13) {  // Enter key code
+        enterTask();
+    }
+});
+
+    function updateTaskInStorage(index, newText) {
+        var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+        todoList[index].text = newText;
+        localStorage.setItem('todoList', JSON.stringify(todoList));
     }
 
     function deleteTask() {
@@ -349,9 +286,18 @@ $(function() {
     }
 
     function updateCircleSize() {
-        var circleSize = counter * 20 + 1+'px';
-        $('.circle').css('--circle-size', circleSize);
-        console.log('circle size:', circleSize); // Log the counter value
+        // var taskCount = $('#todo_list li').length; // Get the number of tasks in the list
+        var uncheckedTasks = $('#todo_list input[type="checkbox"]:not(:checked)').length;
+        var baseSize = 10; // Base size of the circle
+        var sizeIncrement = 6; // Increase size per task
+
+        // Calculate new size based on task count
+        var newSize = baseSize + (uncheckedTasks * sizeIncrement*sizeIncrement);
+
+        // Update the --circle-size CSS variable for the circle element
+        document.querySelector('.circle').style.setProperty('--circle-size', newSize + 'px');
+
+        console.log('Circle size updated. New size:', newSize + 'px');
     }
 
 function purgeList() {
@@ -385,8 +331,6 @@ function purgeList() {
         // Add the removed task to purgeList
         purgeList.push(removedItem);
 
-        
-
         // Check if a week header already exists for this week
         if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
             // Add a headline for the week if it doesn't exist
@@ -395,7 +339,7 @@ function purgeList() {
         }
 
         // Add the purged task under the appropriate week header
-        var newPurgeItem = $('<li><span>' + text + '<p class="time">' + time + '</p></span></li>');
+        var newPurgeItem = $('<li><span>' + text + 'a** '+' <p class="time"> ' + time + ' </p></span></li>');
         $(`.week-${purgedWeek}`).after(newPurgeItem);
     });
 
@@ -426,14 +370,31 @@ function purgeList() {
 
     $('#todo_list').on('click', '.edit', function() {
         var taskText = $(this).siblings('span').find('.task-text');
+        var originalText = taskText.text();
+
+        // Make the task text editable
         taskText.attr('contenteditable', 'true').focus();
 
-        // Update local storage when the task content changes
-        taskText.on('input', function() {
-            var index = $(this).closest('li').index();
-            var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
-            todoList[index].text = $(this).text();
-            localStorage.setItem('todoList', JSON.stringify(todoList));
+        // Disable editing when Enter is pressed or focus is lost
+        taskText.on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent new line creation
+                taskText.attr('contenteditable', 'false');
+
+        // Save the updated text to local storage // Update local storage when the task content changes
+                var index = $(this).closest('li').index();
+                updateTaskInStorage(index, $(this).text());
+        
+            }
+        });
+
+        // Also stop editing when the text field loses focus
+        taskText.on('blur', function() {
+        taskText.attr('contenteditable', 'false');
+        
+        // Save the updated text to local storage
+        var index = $(this).closest('li').index();
+        updateTaskInStorage(index, $(this).text());
         });
     });
 
@@ -444,7 +405,7 @@ function purgeList() {
     var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
     // counter = todoList.length;
     todoList.forEach(item => {
-        var newListItem = $('<li><span><input type="checkbox"> <span class="task-text">' + item.text + '</span> <p class="time">' + item.timestamp + '</p></span><input type="submit" class="edit" value="Edit"><input type="submit" class="delete" value="Delete"></li>');
+        var newListItem = $('<li><span><input type="checkbox"> <span class="task-text"> ' + item.text + ' '+'</span> <p class="time"> ' + item.timestamp + ' </p></span><input type="submit" class="edit" value="Edit"><input type="submit" class="delete" value="Delete"></li>');
         $('#todo_list').append(newListItem);
     });
 
