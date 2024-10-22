@@ -229,7 +229,7 @@ $(function() {
         var time = new Date().toLocaleString();
     if (text !== '') {  // Ensure the input isn't empty
         var newListItem = $(
-            '<li><span><input type="checkbox"> ' +
+            '<li><span><input type="checkbox" class="task-checkbox"> ' +
             '<span class="task-text">' + text + ' '+'</span>' +
             ' <p class="time">' + time + '</p></span>' +
             '<input type="submit" class="edit" value="Edit">' +
@@ -256,6 +256,7 @@ $(function() {
 // Attach a delegated event listener to handle checkbox changes for existing and new tasks
 $('#todo_list').on('change', '.task-checkbox', function() {
     updateCircleSize();
+    console.log('Checkbox changed:')
 });
 
 // Trigger add task when pressing Enter key
