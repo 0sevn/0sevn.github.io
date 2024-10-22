@@ -3,6 +3,7 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FloWea</title>
+<link rel="stylesheet" href="w3.css">
 <style>
 body {
     font-family: "Lato", sans-serif;
@@ -209,19 +210,46 @@ https://www.w3schools.com/css/css_tooltip.asp
 https://www.w3docs.com/snippets/css/how-to-style-input-and-submit-buttons.html
 */
 input[type=submit] {
-        background-color: #62529c;
+        background-color: rgb(79, 79, 79);
         border: none;
         color: #fff;
         padding: 5px 8px;
         text-decoration: none;
         margin: 4px 2px;
+        border-radius: 6px;
         cursor: pointer;
+        font-size:12px;
+        font-weight: bold;
       }
+
+.fileops {
+  width: 320px;
+  background-color: rgb(79, 79, 79);
+  color: #fff;
+  text-align: left;
+  padding: 5px;
+  border-radius: 6px;
+  font-weight: normal;
+  font-size:12px;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+  top: 5%;
+  right: 23%;
+}
+
 </style>
 </head>
 <body>
 <!-- Top navigation -->
+<div class="fileops" style="top:5%; width: 130px;">
+    <!-- Top menu on small screens -->
+  <div class="w3-container w3-text-light-grey w3-xlarge w3-padding-8">
+      <a href="javascript:void(0)" class="w3-left w3-button w3-text-light-grey" onclick="w3_openPrivate()" style="font-size: 12px;">< History</a>
 
+  </div>
+</div>
 <!-- Mid navigation -->
 <div class="mid">
     <div class="circle" title="FOvea, a small depression within the retina where visual acuity is the highest.">
@@ -229,21 +257,51 @@ input[type=submit] {
     <div class="tooltip">
         <h1>Flowea </h1>
         <span class="tooltiptext">Fovea, small region of the retina which produces the sharpest vision.</span>
-
-      </div><br>
         
+    </div>
+    <br>
+    <!-- <input type="text" id="enter_week" placeholder="Enter Week"><br> -->
       <input type="text" id="enter_task" placeholder="Enter Task">
       <input type="submit" id="add" value="Add Task" class="circle-size">
+      <input type="submit" id="purge" value="Purge List" class="circle-size">
       <p>
+        <!-- list elements -->
           <ul id="todo_list" style="list-style: none;">
           </ul>
-      </p>    
+      </p>     
 </div>
+
+<!-- Sidebar personal/menu -->
+<nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:3;width:30%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
+    <a href="javascript:void()" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-8" style="right:0;">CLOSE</a> 
+    <!-- list elements -->
+    <ul id="purge_list" style="list-style: none;">
+    </ul>
+        
+    <div class="w3-row">
+      <div class="w3-half w3-quarter">
+        <div class="fileops" style=" top:5%;">
+            <button class="btn btn-outline-secondary btn-sm" id="exportHistory" onclick="exportHistory()">Export</button > 
+                <a id="exportHistoryLink" style="display: none;">Export</a>
+                <br>
+                <label for="FileInputLabel"><b>Import</b></label>
+                <!-- style="display: none;" -->
+                <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="circle-size"></input>
+        </div>
+      </div>
+
+    </div>
+  </nav>
+
 
 <!-- Bottom navigation -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script>
-    
+        const fileInput = document.getElementById('jsonFileInput');
+        const fileNameDisplay = document.getElementById('FileInputLabel');
+
+        //fileInput.style.opacity = 0;
+
 
 /*todo list script at bottom
 write list to any file node.js 
@@ -296,7 +354,75 @@ $(function() {
         console.log('circle size:', circleSize); // Log the counter value
     }
 
+function purgeList() {
+    // Get the todoList from localStorage
+    var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+    // Get the purgeList from localStorage
+    var purgeList = JSON.parse(localStorage.getItem('purgeList') || '[]');
+
+    // Select all checked list items from #todo_list
+    $('#todo_list input[type="checkbox"]:checked').each(function() {
+        var listItem = $(this).closest('li');
+        var index = $('#todo_list li').index(listItem);
+
+        // Get task details
+        var text = listItem.find('span .task-text').text();
+        var time = listItem.find('.time').text();
+        // console.log(listItem);
+        console.log('Purge item index:', index, 'text:', text, 'time:', time);
+
+        // Remove the task from the DOM
+        listItem.remove();
+
+        // Remove the corresponding task from todoList
+            const removedItem = todoList.splice(index, 1)[0];
+            const purgedAt = new Date().toLocaleString(); // Record the purge time
+            const purgedWeek = getWeekNumber(new Date(purgedAt)); // Get the week number
+            removedItem.purgedAt = purgedAt;
+            removedItem.purgedWeek = purgedWeek; // Store the week number
+             console.log(purgedWeek);
+
+        // Add the removed task to purgeList
+        purgeList.push(removedItem);
+
+        
+
+        // Check if a week header already exists for this week
+        if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
+            // Add a headline for the week if it doesn't exist
+            var weekHeadline = $(`<li class="week-header week-${purgedWeek}">Week ${purgedWeek} - ${new Date().getFullYear()}</li>`);
+            $('#purge_list').append(weekHeadline);
+        }
+
+        // Add the purged task under the appropriate week header
+        var newPurgeItem = $('<li><span>' + text + '<p class="time">' + time + '</p></span></li>');
+        $(`.week-${purgedWeek}`).after(newPurgeItem);
+    });
+
+    // Update the localStorage after modification
+    localStorage.setItem('todoList', JSON.stringify(todoList)); // Update todoList in local storage
+    localStorage.setItem('purgeList', JSON.stringify(purgeList)); // Store the new purgeList in local storage
+
+    // Update counter and circle size
+    counter = $('#todo_list li').length; // Update the counter based on remaining tasks
+    updateCircleSize();
+
+    alert('Checked tasks moved to purge list!');
+}
+    // Function to get the week number of a given date
+    function getWeekNumber(date) {
+        
+        var firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+        var pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+        return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+
+        // //read week text
+        // var weekText = $('#enter_week').val();
+        // return weekText
+    }
+
     $('#add').on('click', enterTask);
+    $('#purge').on('click', purgeList);
 
     $('#todo_list').on('click', '.edit', function() {
         var taskText = $(this).siblings('span').find('.task-text');
@@ -316,16 +442,101 @@ $(function() {
 
     // Load tasks from local storage on page load
     var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
-    counter = todoList.length;
+    // counter = todoList.length;
     todoList.forEach(item => {
         var newListItem = $('<li><span><input type="checkbox"> <span class="task-text">' + item.text + '</span> <p class="time">' + item.timestamp + '</p></span><input type="submit" class="edit" value="Edit"><input type="submit" class="delete" value="Delete"></li>');
         $('#todo_list').append(newListItem);
     });
 
+    var purgeList = JSON.parse(localStorage.getItem('purgeList') || '[]');
+    // Add the task to #purge_list in the DOM
+    purgeList.forEach(item => {
+        const purgedWeek = item.purgedWeek || getWeekNumber(new Date(item.purgedAt));
+
+        // Check if the week header already exists, otherwise create it
+        if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
+            var weekHeadline = $(`<li class="week-header week-${purgedWeek}">Week ${purgedWeek} - ${new Date().getFullYear()}</li>`);
+            $('#purge_list').append(weekHeadline);
+        }
+
+        var newPurgeItem = $('<li><span>' + item.text + '<p class="time">' + item.timestamp + '</p></span></li>');
+        $(`.week-${purgedWeek}`).after(newPurgeItem);
+    });
+    
+
     updateCircleSize();
 });
 
+//Exports the contents of local storage to a file in JSON format
+//https://stackoverflow.com/questions/61586888/javascript-export-local-storage
+function exportHistory() {  
+    console.log("started"); 
+    var _myArray = JSON.stringify(localStorage.getItem('todoList') , null, 4); //indentation in json format, human readable
+    var filetime = new Date().toLocaleString();
 
+    //Note: We use the anchor tag here instead button.
+    var vLink = document.getElementById('exportHistoryLink');
+
+    var vBlob = new Blob([_myArray], {type: "octet/stream"});
+    vName = 'working_history_' + filetime + '.json';
+    vUrl = window.URL.createObjectURL(vBlob);
+    console.log(vLink);
+
+    vLink.setAttribute('href', vUrl);
+    vLink.setAttribute('download', vName );
+
+    //Note: Programmatically click the link to download the file
+    vLink.click();
+
+    console.log("finished");    
+}
+
+//import to local storage**/
+document.getElementById('jsonFileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0]; // Get the selected file
+
+    if (file) {
+        const reader = new FileReader();
+
+        // Define what happens when the file is loaded
+        reader.onload = function(e) {
+            try {
+                // Parse the file content as JSON
+                const jsonContent = JSON.parse(e.target.result);
+                console.log('parsed data:', jsonContent);
+                console.log('stringified', JSON.stringify(jsonContent));
+                // Store JSON content in local storage
+                localStorage.setItem('todoList', jsonContent);
+
+                jsonContent.forEach(item => {
+                var newListItem = $('text:'+item.text + 'timestamp:' + item.timestamp);
+                //$('#todo_list').append(newListItem);
+                console.log('new list:', newListItem);
+    });
+                console.log('JSON data successfully stored in local storage:', jsonContent);
+                alert('JSON data has been stored in local storage.');
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+                alert('Invalid JSON file. Please try again.');
+            }
+        };
+
+        // Read the file as a text (which should be JSON)
+        reader.readAsText(file);
+    } else {
+        console.log('No file selected.');
+    }
+});
+
+function w3_openPrivate() {
+    document.getElementById("mySidebarPrivate").style.display = "block";
+    // document.getElementById("myOverlayPrivate").style.display = "block";
+  }
+  
+  function w3_closePrivate() {
+    document.getElementById("mySidebarPrivate").style.display = "none";
+    // document.getElementById("myOverlayPrivate").style.display = "none";
+  }
 </script>
 </body>
 </html>
