@@ -178,7 +178,7 @@ input[type=submit] {
 </div>
 
 <!-- Sidebar personal/menu -->
-<nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:3;width:30%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
+<nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:3;width:30%;font-weight:bold;display:block;right:0;" id="mySidebarPrivate">
     <a href="javascript:void()" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-8" style="text-align: right;">CLOSE</a> 
     <!-- list elements -->
     <ul id="purge_list" style="list-style: none;">
@@ -335,12 +335,12 @@ function purgeList() {
         // Check if a week header already exists for this week
         if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
             // Add a headline for the week if it doesn't exist
-            var weekHeadline = $(`<li class="week-header week-${purgedWeek}">Week ${purgedWeek} - ${new Date().getFullYear()}</li>`);
+            var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:12px">Week: ${purgedWeek} - ${new Date().getFullYear()}</li>`);
             $('#purge_list').append(weekHeadline);
         }
 
         // Add the purged task under the appropriate week header
-        var newPurgeItem = $('<li><span>' + text + 'a** '+' <p class="time"> ' + time + ' </p></span></li>');
+        var newPurgeItem = $('<li><span>' + text + '  '+' <p class="time"> ' +' '+ time + ' </p></span></li>');
         $(`.week-${purgedWeek}`).after(newPurgeItem);
     });
 
@@ -411,19 +411,31 @@ function purgeList() {
     });
 
     var purgeList = JSON.parse(localStorage.getItem('purgeList') || '[]');
-    // Add the task to #purge_list in the DOM
-    purgeList.forEach(item => {
-        const purgedWeek = item.purgedWeek || getWeekNumber(new Date(item.purgedAt));
 
-        // Check if the week header already exists, otherwise create it
-        if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
-            var weekHeadline = $(`<li class="week-header week-${purgedWeek}">Week ${purgedWeek} - ${new Date().getFullYear()}</li>`);
-            $('#purge_list').append(weekHeadline);
+        // Check if jsonContent is an array
+        if (Array.isArray(purgeList)) {
+            // Append each item from the parsed JSON to the list
+            purgeList.forEach(item => {
+                const purgedWeek = item.purgedWeek || getWeekNumber(new Date(item.purgedAt));
+
+                // Check if the week header already exists, otherwise create it
+                if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
+                    var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:16px; color:#f2f;">Week ${purgedWeek} - ${new Date().getFullYear()}</li>`);
+                    $('#purge_list').append(weekHeadline);
+                }
+
+                var newPurgeItem = $('<li><span style="font-size:13px; color:light-grey;">' + item.text + ' <p class="time"> ' +' '+ item.timestamp + '</p></span></li>');
+                $(`.week-${purgedWeek}`).after(newPurgeItem);
+
+                console.log('new purge item:', newPurgeItem);
+            });
+        } else {
+            // Handle case where jsonContent is an object
+            console.warn('JSON content is not an array, handling as a single object.');
+            var newListItem = $('<li>').text('Text: ' + purgeList.text + ', Timestamp: ' + purgeList.timestamp);
+            $('#purge_list').append(newListItem);
+            console.log('new list item:', newListItem);
         }
-
-        var newPurgeItem = $('<li><span>' + item.text + '<p class="time">' + item.timestamp + '</p></span></li>');
-        $(`.week-${purgedWeek}`).after(newPurgeItem);
-    });
     
 
     updateCircleSize();
@@ -433,23 +445,20 @@ function purgeList() {
 //https://stackoverflow.com/questions/61586888/javascript-export-local-storage
 function exportHistory() {  
     console.log("started"); 
-    var _myArray = JSON.stringify(localStorage.getItem('todoList') , null, 4); //indentation in json format, human readable
+    const purgeHistory = JSON.stringify(localStorage.getItem('purgeList') , null, 2); //indentation in json format, human readable
     var filetime = new Date().toLocaleString();
 
-    //Note: We use the anchor tag here instead button.
-    var vLink = document.getElementById('exportHistoryLink');
+    const blob = new Blob([purgeHistory], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
 
-    var vBlob = new Blob([_myArray], {type: "octet/stream"});
-    vName = 'working_history_' + filetime + '.json';
-    vUrl = window.URL.createObjectURL(vBlob);
-    console.log(vLink);
-
-    vLink.setAttribute('href', vUrl);
-    vLink.setAttribute('download', vName );
-
-    //Note: Programmatically click the link to download the file
-    vLink.click();
-
+    console.log(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'working_history_' + filetime + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
     console.log("finished");    
 }
 
@@ -462,19 +471,15 @@ document.getElementById('jsonFileInput').addEventListener('change', function(eve
 
         // Define what happens when the file is loaded
         reader.onload = function(e) {
+
             try {
                 // Parse the file content as JSON
                 const jsonContent = JSON.parse(e.target.result);
-                console.log('parsed data:', jsonContent);
-                console.log('stringified', JSON.stringify(jsonContent));
                 // Store JSON content in local storage
-                localStorage.setItem('todoList', jsonContent);
+                localStorage.setItem('purgeList', jsonContent);
 
-                jsonContent.forEach(item => {
-                var newListItem = $('text:'+item.text + 'timestamp:' + item.timestamp);
-                //$('#todo_list').append(newListItem);
-                console.log('new list:', newListItem);
-    });
+                // Clear the current list before appending new items
+                // $('#todo_list').empty();    
                 console.log('JSON data successfully stored in local storage:', jsonContent);
                 alert('JSON data has been stored in local storage.');
             } catch (error) {
