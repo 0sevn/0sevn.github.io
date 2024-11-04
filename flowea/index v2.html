@@ -13,19 +13,19 @@ body {
     position: relative;
     font-weight: bold;
 }
-
 /*
 https://www.w3schools.com/css/css3_shadows_box.asp
 */
 .mid {
     margin:100px auto 100px auto;
     color: #f2f2f2;
-    width: 55%;
+    width: 75%;
     border-radius: 25px 5px;
     background-color: #333;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
     padding:10px 0px 10px 20px;
     z-index: -99;
+    font-size: 18px;
 }
 
 a {
@@ -40,19 +40,7 @@ a {
     display: inline-block;
 }
 /*https://www.w3schools.com/css/css_align.asp
-
 */
-.fovea {
-    font-family: "Trebuchet MS", Helvetica, sans-serif;
-    font-size: 15px;
-    font-weight: normal;
-    line-height: 1.5em;
-    width: 240px;
-
-    padding:10px;
-    color:rgb(206, 205, 198);
-    display: inline-block;
-}
 .circle {
   background-color:rgba(226, 90, 90, 0.687);
   width: var(--circle-size, 20px);
@@ -63,6 +51,7 @@ a {
  
   margin-top:5px;
   transition: 0.5s width, 0.5s height;
+  z-index: 1;
 }
 
 
@@ -73,9 +62,15 @@ a {
 /* Tooltip container 
 https://www.w3schools.com/css/css_tooltip.asp 
 */
+.overlay {
+    position: relative;
+    display: inline-block;
+    z-index: 100;
+}
 .tooltip {
   position: relative;
   display: inline-block;
+  z-index: 100;
   /*border-bottom: 1px dotted black;  If you want dots under the hoverable text */
 }
 
@@ -89,11 +84,11 @@ https://www.w3schools.com/css/css_tooltip.asp
   padding: 5px;
   border-radius: 6px;
   font-weight: normal;
-  font-size:12px;
+  font-size:14px;
 
   /* Position the tooltip text - see examples below! */
   position: absolute;
-  z-index: 1;
+  z-index: -100;
   bottom: 80%;
   left: 0%;
   margin-left: -60px;
@@ -136,7 +131,7 @@ input[type=submit] {
   padding: 5px;
   border-radius: 6px;
   font-weight: normal;
-  font-size:12px;
+  font-size:14px;
 
   /* Position the tooltip text - see examples below! */
   position: absolute;
@@ -144,7 +139,9 @@ input[type=submit] {
   top: 3%;
   right: 2%;
 }
-
+.bold {
+  font-weight: bold;
+}
 </style>
 </head>
 <body>
@@ -166,20 +163,22 @@ input[type=submit] {
         
     </div>
     <br>
-    <!-- <input type="text" id="enter_week" placeholder="Enter Week"><br> -->
-      <input type="text" id="enter_task" placeholder="Enter Task">
-      <input type="submit" id="add" value="Add Task" class="circle-size">
-      <input type="submit" id="purge" value="Purge List" class="circle-size">
-      <p>
-        <!-- list elements -->
-          <ul id="todo_list" style="list-style: none;">
-          </ul>
-      </p>     
+    <div class="overlay">
+        <!-- <input type="text" id="enter_week" placeholder="Enter Week"><br> -->
+        <input type="text" id="enter_task" placeholder="Enter Task">
+        <input type="submit" id="add" value="Add Task" class="circle-size">
+        <input type="submit" id="purge" value="Purge List" class="circle-size">
+        <p>
+            <!-- list elements -->
+            <ul id="todo_list" style="list-style: none;">
+            </ul>
+        </p>
+    </div>
 </div>
 
 <!-- Sidebar personal/menu -->
 <nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:3;width:30%;font-weight:bold;display:block;right:0;" id="mySidebarPrivate">
-    <a href="javascript:void()" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-8" style="text-align: right;">CLOSE</a> 
+    <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-8" style="text-align: right;">CLOSE</a> 
     <!-- list elements -->
     <ul id="purge_list" style="list-style: none;">
     </ul>
@@ -201,25 +200,41 @@ input[type=submit] {
 
 
 <!-- Bottom navigation -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
-        // const fileInput = document.getElementById('jsonFileInput');
-        // const fileNameDisplay = document.getElementById('FileInputLabel');
-
-        //fileInput.style.opacity = 0;
-
 
 /*todo list script at bottom
-write list to any file node.js 
-https://stackoverflow.com/questions/52986777/how-to-create-html-file-with-javascript
-
-read list from file to html ajax, jquery
-https://stackoverflow.com/questions/40817894/text-to-html-list
 
 The dollar function, $(), can be used as shorthand for the getElementById function
 ${} multiline string /string interpolation
 */
 $(function() {
+
+    //Update local storage with new list order
+    $("#todo_list").sortable({
+    axis: "y",
+    update: function(event, ui) {
+        const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+        const newOrder = $(this).sortable('toArray');
+        console.log('todoList: ', todoList)
+        console.log('newOrder: ', newOrder)
+
+        // Update the todoList array in-place based on the newOrder using splice
+        for (let i = 0; i < newOrder.length; i++) {
+            const oldIndex = todoList.indexOf(todoList[newOrder[i]]);
+            const newIndex = i;
+            if (oldIndex !== newIndex) {
+                todoList.splice(newIndex, 0, todoList.splice(oldIndex, 1)[0]);
+            }
+        }
+
+        // Store the reordered todoList back to local storage
+        localStorage.setItem('todoList', JSON.stringify(todoList));
+        }
+    });
+
     var counter = 0;
 
     function enterTask() {
@@ -227,48 +242,36 @@ $(function() {
         // var text = $('#enter_task').val();
         var text = $('#enter_task').val().trim();
         var time = new Date().toLocaleString();
-    if (text !== '') {  // Ensure the input isn't empty
-        var newListItem = $(
-            '<li><span><input type="checkbox" class="task-checkbox"> ' +
-            '<span class="task-text">' + text + ' '+'</span>' +
-            ' <p class="time">' + time + '</p></span>' +
-            '<input type="submit" class="edit" value="Edit">' +
-            '<input type="submit" class="delete" value="Delete"></li>'
-        );
-        
-        var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
-        todoList.push({ text: text, timestamp: time });
-        localStorage.setItem('todoList', JSON.stringify(todoList));
+        if (text !== '') {  // Ensure the input isn't empty
+            var newListItem = $(
+                '<li id="item-'+counter+'"><span><input type="checkbox" class="task-checkbox"> ' +
+                '<span class="task-text">' + text + ' '+'</span>' +
+                ' <p class="time">' + time + '</p></span>' +
+                '<input type="submit" class="edit" value="Edit">' +
+                '<input type="submit" class="delete" value="Delete"></li>'
+            );
+            
+            var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+            todoList.push({ text: text, timestamp: time });
+            localStorage.setItem('todoList', JSON.stringify(todoList));
 
-        $('#todo_list').append(newListItem);
+            $('#todo_list').append(newListItem);
 
-        
-        counter++;
-        console.log('Counter after adding task:', counter); // Log the counter value
+            counter++;
+            console.log('Counter after adding task:', counter); // Log the counter value
 
-        // Update the circle size after adding a new task
-        updateCircleSize();
+            // Update the circle size after adding a new task
+            updateCircleSize();
 
-        // Clear the input box
-        // $('#enter_task').val('');
+            // Clear the input box
+            $('#enter_task').val('');
+        }
     }
-}
-// Attach a delegated event listener to handle checkbox changes for existing and new tasks
-$('#todo_list').on('change', '.task-checkbox', function() {
-    updateCircleSize();
-    console.log('Checkbox changed:')
-});
 
-// Trigger add task when pressing Enter key
-$('#enter_task').on('keypress', function(e) {
-    if (e.which === 13) {  // Enter key code
-        enterTask();
-    }
-});
-
-    function updateTaskInStorage(index, newText) {
+    function updateTaskInStorage(index, newText, checked) {
         var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
         todoList[index].text = newText;
+        todoList[index].checked = checked;
         localStorage.setItem('todoList', JSON.stringify(todoList));
     }
 
@@ -287,8 +290,14 @@ $('#enter_task').on('keypress', function(e) {
     }
 
     function updateCircleSize() {
+        // Retrieve tasks from local storage
+        const tasks = JSON.parse(localStorage.getItem('todoList') || '[]');
+
+        // Count unchecked tasks
+        const uncheckedTasks = tasks.filter(task => !task.checked).length;
+
         // var taskCount = $('#todo_list li').length; // Get the number of tasks in the list
-        var uncheckedTasks = $('#todo_list input[type="checkbox"]:not(:checked)').length;
+        // var uncheckedTasks = $('#todo_list input[type="checkbox"]:not(:checked)').length;
         var baseSize = 10; // Base size of the circle
         var sizeIncrement = 6; // Increase size per task
 
@@ -301,59 +310,60 @@ $('#enter_task').on('keypress', function(e) {
         console.log('Circle size updated. New size:', newSize + 'px');
     }
 
-function purgeList() {
-    // Get the todoList from localStorage
-    var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
-    // Get the purgeList from localStorage
-    var purgeList = JSON.parse(localStorage.getItem('purgeList') || '[]');
+    function purgeList() {
+        // Get the todoList from localStorage
+        var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+        // Get the purgeList from localStorage
+        var purgeList = JSON.parse(localStorage.getItem('purgeList') || '[]');
 
-    // Select all checked list items from #todo_list
-    $('#todo_list input[type="checkbox"]:checked').each(function() {
-        var listItem = $(this).closest('li');
-        var index = $('#todo_list li').index(listItem);
+        // Select all checked list items from #todo_list
+        $('#todo_list input[type="checkbox"]:checked').each(function() {
+            var listItem = $(this).closest('li');
+            var index = $('#todo_list li').index(listItem);
 
-        // Get task details
-        var text = listItem.find('span .task-text').text();
-        var time = listItem.find('.time').text();
-        // console.log(listItem);
-        console.log('Purge item index:', index, 'text:', text, 'time:', time);
+            // Get task details
+            var text = listItem.find('span .task-text').text();
+            var time = listItem.find('.time').text();
+            // console.log(listItem);
+            console.log('Purge item index:', index, 'text:', text, 'time:', time);
 
-        // Remove the task from the DOM
-        listItem.remove();
+            // Remove the task from the DOM
+            listItem.remove();
 
-        // Remove the corresponding task from todoList
-            const removedItem = todoList.splice(index, 1)[0];
-            const purgedAt = new Date().toLocaleString(); // Record the purge time
-            const purgedWeek = getWeekNumber(new Date(purgedAt)); // Get the week number
-            removedItem.purgedAt = purgedAt;
-            removedItem.purgedWeek = purgedWeek; // Store the week number
-             console.log(purgedWeek);
+            // Remove the corresponding task from todoList
+                const removedItem = todoList.splice(index, 1)[0];
+                const purgedAt = new Date().toLocaleString(); // Record the purge time
+                const purgedWeek = getWeekNumber(new Date(purgedAt)); // Get the week number
+                removedItem.purgedAt = purgedAt;
+                removedItem.purgedWeek = purgedWeek; // Store the week number
+                console.log(purgedWeek);
 
-        // Add the removed task to purgeList
-        purgeList.push(removedItem);
+            // Add the removed task to purgeList
+            purgeList.push(removedItem);
 
-        // Check if a week header already exists for this week
-        if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
-            // Add a headline for the week if it doesn't exist
-            var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:12px">Week: ${purgedWeek} - ${new Date().getFullYear()}</li>`);
-            $('#purge_list').append(weekHeadline);
-        }
+            // Check if a week header already exists for this week
+            if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
+                // Add a headline for the week if it doesn't exist
+                var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:12px">Week: ${purgedWeek} - ${new Date().getFullYear()}</li>`);
+                $('#purge_list').append(weekHeadline);
+            }
 
-        // Add the purged task under the appropriate week header
-        var newPurgeItem = $('<li><span>' + text + '  '+' <p class="time"> ' +' '+ time + ' </p></span></li>');
-        $(`.week-${purgedWeek}`).after(newPurgeItem);
-    });
+            // Add the purged task under the appropriate week header
+            var newPurgeItem = $('<li><span>' + text + '  '+' <p class="time"> ' +' '+ time + ' </p></span></li>');
+            $(`.week-${purgedWeek}`).after(newPurgeItem);
+        });
 
-    // Update the localStorage after modification
-    localStorage.setItem('todoList', JSON.stringify(todoList)); // Update todoList in local storage
-    localStorage.setItem('purgeList', JSON.stringify(purgeList)); // Store the new purgeList in local storage
+        // Update the localStorage after modification
+        localStorage.setItem('todoList', JSON.stringify(todoList)); // Update todoList in local storage
+        localStorage.setItem('purgeList', JSON.stringify(purgeList)); // Store the new purgeList in local storage
 
-    // Update counter and circle size
-    counter = $('#todo_list li').length; // Update the counter based on remaining tasks
-    updateCircleSize();
+        // Update counter and circle size
+        counter = $('#todo_list li').length; // Update the counter based on remaining tasks
+        updateCircleSize();
 
-    alert('Checked tasks moved to purge list!');
-}
+        alert('Checked tasks moved to purge list!');
+    }
+
     // Function to get the week number of a given date
     function getWeekNumber(date) {
         
@@ -366,9 +376,30 @@ function purgeList() {
         // return weekText
     }
 
+    
     $('#add').on('click', enterTask);
     $('#purge').on('click', purgeList);
 
+    // Trigger add task when pressing Enter key
+    $('#enter_task').on('keypress', function(e) {
+        if (e.which === 13) {  // Enter key code
+            enterTask();
+        }
+    });
+
+    // Attach a delegated event listener to handle checkbox changes for existing and new tasks
+    $('#todo_list').on('change', '.task-checkbox', function() {
+    const index = $(this).closest('li').index();
+    const tasks = JSON.parse(localStorage.getItem('todoList') || '[]');
+    tasks[index].checked = $(this).is(':checked');
+    localStorage.setItem('todoList', JSON.stringify(tasks));
+
+    updateCircleSize();
+    $(this).closest('li').toggleClass('bold', !$(this).is(':checked'));
+    console.log('Checkbox changed:')
+    });
+
+    // Edit functionality
     $('#todo_list').on('click', '.edit', function() {
         var taskText = $(this).siblings('span').find('.task-text');
         var originalText = taskText.text();
@@ -402,14 +433,19 @@ function purgeList() {
     // Event delegation for delete button
     $('#todo_list').on('click', '.delete', deleteTask);
 
+
+
     // Load tasks from local storage on page load
     var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
     // counter = todoList.length;
+    i=0;
     todoList.forEach(item => {
-        var newListItem = $('<li><span><input type="checkbox"> <span class="task-text"> ' + item.text + ' '+'</span> <p class="time"> ' + item.timestamp + ' </p></span><input type="submit" class="edit" value="Edit"><input type="submit" class="delete" value="Delete"></li>');
+        var newListItem = $('<li id="item-'+i+'"><span><input type="checkbox" class="task-checkbox" ' + (item.checked ? 'checked' : '') + '> <span class="task-text"> ' + item.text + ' '+'</span> <p class="time"> ' + item.timestamp + ' </p></span><input type="submit" class="edit" value="Edit"><input type="submit" class="delete" value="Delete"></li>');
         $('#todo_list').append(newListItem);
+        i++;
     });
 
+    //Load purged list from local storage
     var purgeList = JSON.parse(localStorage.getItem('purgeList') || '[]');
 
         // Check if jsonContent is an array
@@ -436,8 +472,6 @@ function purgeList() {
             $('#purge_list').append(newListItem);
             console.log('new list item:', newListItem);
         }
-    
-
     updateCircleSize();
 });
 
@@ -479,7 +513,7 @@ document.getElementById('jsonFileInput').addEventListener('change', function(eve
                 localStorage.setItem('purgeList', jsonContent);
 
                 // Clear the current list before appending new items
-                // $('#todo_list').empty();    
+                // $('#todo_list').empty();
                 console.log('JSON data successfully stored in local storage:', jsonContent);
                 alert('JSON data has been stored in local storage.');
             } catch (error) {
@@ -498,12 +532,12 @@ document.getElementById('jsonFileInput').addEventListener('change', function(eve
 function w3_openPrivate() {
     document.getElementById("mySidebarPrivate").style.display = "block";
     // document.getElementById("myOverlayPrivate").style.display = "block";
-  }
+}
   
-  function w3_closePrivate() {
+function w3_closePrivate() {
     document.getElementById("mySidebarPrivate").style.display = "none";
     // document.getElementById("myOverlayPrivate").style.display = "none";
-  }
+}
 </script>
 </body>
 </html>
