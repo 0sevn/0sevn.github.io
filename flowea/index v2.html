@@ -7,11 +7,11 @@
 <style>
 body {
     font-family: "Lato", sans-serif;
-    background-color: rgb(117, 117, 117);
+    background-color: rgb(107, 107, 107);
     text-align: left;
     text-decoration: none;
     position: relative;
-    font-weight: bold;
+
 }
 /*
 https://www.w3schools.com/css/css3_shadows_box.asp
@@ -19,13 +19,14 @@ https://www.w3schools.com/css/css3_shadows_box.asp
 .mid {
     margin:100px auto 100px auto;
     color: #f2f2f2;
-    width: 75%;
+    width: 80%;
     border-radius: 25px 5px;
-    background-color: #333;
+    background-color: #5e5e5e;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
     padding:10px 0px 10px 20px;
     z-index: -99;
     font-size: 18px;
+    /* opacity: 50%; */
 }
 
 a {
@@ -36,11 +37,10 @@ a {
 
 .time {
     font-size: 10px;
-    color:rgb(150, 148, 131);
+    color:rgb(154, 153, 150);
     display: inline-block;
 }
-/*https://www.w3schools.com/css/css_align.asp
-*/
+
 .circle {
   background-color:rgba(226, 90, 90, 0.687);
   width: var(--circle-size, 20px);
@@ -53,7 +53,6 @@ a {
   transition: 0.5s width, 0.5s height;
   z-index: 1;
 }
-
 
 [type=number] {
   display: block;
@@ -71,7 +70,7 @@ https://www.w3schools.com/css/css_tooltip.asp
   position: relative;
   display: inline-block;
   z-index: 100;
-  /*border-bottom: 1px dotted black;  If you want dots under the hoverable text */
+ border-bottom: 1px dotted black; /*  If you want dots under the hoverable text */
 }
 
 /* Tooltip text */
@@ -86,7 +85,7 @@ https://www.w3schools.com/css/css_tooltip.asp
   font-weight: normal;
   font-size:14px;
 
-  /* Position the tooltip text - see examples below! */
+  /* Position the tooltip text */
   position: absolute;
   z-index: -100;
   bottom: 80%;
@@ -133,7 +132,7 @@ input[type=submit] {
   font-weight: normal;
   font-size:14px;
 
-  /* Position the tooltip text - see examples below! */
+  /* Position the tooltip text */
   position: absolute;
   z-index: 1;
   top: 3%;
@@ -142,14 +141,21 @@ input[type=submit] {
 .bold {
   font-weight: bold;
 }
+
+.connected-sortable {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
 </style>
 </head>
+
 <body>
-<!-- Top navigation -->
+<!-- Purge list -->
 <div class="fileops" style="width: 130px; right: 23%;">
     <!-- Top menu on small screens -->
   <div class="w3-container w3-text-light-grey w3-xlarge w3-padding-8">
-      <a href="javascript:void(0)" class="w3-left w3-button w3-text-light-grey" onclick="w3_openPrivate()" style="font-size: 12px;">< History</a>
+      <a href="javascript:void(0)" class="w3-left w3-button w3-text-light-grey" onclick="w3_openPrivate()" style="font-size: 12px;">< Purged list</a>
 
   </div>
 </div>
@@ -164,20 +170,24 @@ input[type=submit] {
     </div>
     <br>
     <div class="overlay">
-        <!-- <input type="text" id="enter_week" placeholder="Enter Week"><br> -->
         <input type="text" id="enter_task" placeholder="Enter Task">
-        <input type="submit" id="add" value="Add Task" class="circle-size">
+        <input type="submit" id="add" value="&#43;" class="circle-size">
         <input type="submit" id="purge" value="Purge List" class="circle-size">
-        <p>
+<p style="font-size: 8px; padding-left: 3px; border-color: red;">Urgent__</p>
             <!-- list elements -->
-            <ul id="todo_list" style="list-style: none;">
-            </ul>
-        </p>
+            <div id="sort_list" style="padding-left: 5%;">
+                
+                <ul id="todo_list" style="list-style: none;" class="connected-sortable">
+                    
+                </ul>
+            </div>
+
+
     </div>
 </div>
 
-<!-- Sidebar personal/menu -->
-<nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:3;width:30%;font-weight:bold;display:block;right:0;" id="mySidebarPrivate">
+<!-- Purged list -->
+<nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:3;width:30%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
     <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-8" style="text-align: right;">CLOSE</a> 
     <!-- list elements -->
     <ul id="purge_list" style="list-style: none;">
@@ -212,31 +222,22 @@ ${} multiline string /string interpolation
 */
 $(function() {
 
-    //Update local storage with new list order
-    $("#todo_list").sortable({
-    axis: "y",
-    update: function(event, ui) {
-        const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
-        const newOrder = $(this).sortable('toArray');
-        console.log('todoList: ', todoList)
-        console.log('newOrder: ', newOrder)
-
-        // Update the todoList array in-place based on the newOrder using splice
-        for (let i = 0; i < newOrder.length; i++) {
-            const oldIndex = todoList.indexOf(todoList[newOrder[i]]);
-            const newIndex = i;
-            if (oldIndex !== newIndex) {
-                todoList.splice(newIndex, 0, todoList.splice(oldIndex, 1)[0]);
-            }
-        }
-
-        // Store the reordered todoList back to local storage
-        localStorage.setItem('todoList', JSON.stringify(todoList));
+    $("#sort_list").sortable({
+        axis: "y",
+        connectWith: ".connected-sortable",
+        cursor: "move",
+        opacity: 0.5,
+        update: function(event, ui) {
+            // Update local storage with the new list order
+            // const taskId = ui.item.attr('id');
+            // const newCategory = ui.item.closest('.category').attr('id');
         }
     });
 
-    var counter = 0;
+    var counter = 1;
 
+//Create a new task
+//add to web, local storage and update circle size
     function enterTask() {
         
         // var text = $('#enter_task').val();
@@ -376,7 +377,13 @@ $(function() {
         // return weekText
     }
 
-    
+    $(".connected-sortable").sortable({
+        connectWith: ".connected-sortable",
+        cursor: "move",
+        opacity: 0.5,
+        // ... other options
+    });
+
     $('#add').on('click', enterTask);
     $('#purge').on('click', purgeList);
 
@@ -435,13 +442,18 @@ $(function() {
 
 
 
+
     // Load tasks from local storage on page load
     var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
     // counter = todoList.length;
+    
     i=0;
     todoList.forEach(item => {
+        const category = item.category;
         var newListItem = $('<li id="item-'+i+'"><span><input type="checkbox" class="task-checkbox" ' + (item.checked ? 'checked' : '') + '> <span class="task-text"> ' + item.text + ' '+'</span> <p class="time"> ' + item.timestamp + ' </p></span><input type="submit" class="edit" value="Edit"><input type="submit" class="delete" value="Delete"></li>');
         $('#todo_list').append(newListItem);
+        // Append the task to the correct category's list
+        $(`#${category}-list`).append(newListItem);
         i++;
     });
 
@@ -531,12 +543,10 @@ document.getElementById('jsonFileInput').addEventListener('change', function(eve
 
 function w3_openPrivate() {
     document.getElementById("mySidebarPrivate").style.display = "block";
-    // document.getElementById("myOverlayPrivate").style.display = "block";
 }
   
 function w3_closePrivate() {
     document.getElementById("mySidebarPrivate").style.display = "none";
-    // document.getElementById("myOverlayPrivate").style.display = "none";
 }
 </script>
 </body>
