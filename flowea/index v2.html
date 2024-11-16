@@ -21,7 +21,7 @@ https://www.w3schools.com/css/css3_shadows_box.asp
     color: #f2f2f2;
     width: 80%;
     border-radius: 25px 5px;
-    background-color: #5e5e5e;
+    background-color: #454545;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
     padding:10px 0px 10px 20px;
     z-index: -99;
@@ -187,7 +187,7 @@ input[type=submit] {
 </div>
 
 <!-- Purged list -->
-<nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:3;width:30%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
+<nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:3;width:45%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
     <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-8" style="text-align: right;">CLOSE</a> 
     <!-- list elements -->
     <ul id="purge_list" style="list-style: none;">
@@ -228,16 +228,50 @@ $(function() {
         cursor: "move",
         opacity: 0.5,
         update: function(event, ui) {
+            const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+
+// Get the new index of the moved item
+const newIndex = $('#todo_list li').index(ui.item);
+
+// Remove the item from its original position in the array
+const movedItem = todoList.splice(ui.item.index(), 1)[0];
+
+// Insert the item at its new position in the array
+todoList.splice(newIndex, 0, movedItem);
+
+// Update local storage with the reordered todoList
+localStorage.setItem('todoList', JSON.stringify(todoList));
+            // // // // // // // // // // /// /// / // // / / / / / 
+            // // Get the updated order of tasks from the DOM
+            // const newOrder = $('#todo_list li').map(function() {
+            //     return $(this).attr('id');
+            // }).get();
+
+            // // Update the task order in local storage
+            // const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+            // const reorderedTodoList = newOrder.map(taskId => {
+            //     return todoList.find(task => task.id === taskId);
+            // });
+            // localStorage.setItem('todoList', JSON.stringify(reorderedTodoList));
+            // // // // // // // // // // /// /// / // // / / / / / 
             // Update local storage with the new list order
             // const taskId = ui.item.attr('id');
             // const newCategory = ui.item.closest('.category').attr('id');
-        }
-    });
 
-    var counter = 1;
+            // Update the task's category in local storage
+        // const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+        //     const taskIndex = todoList.findIndex(task => task.id === taskId);
+        //     if (taskIndex !== -1) {
+        //         todoList[taskIndex].category = newCategory;
+        //         localStorage.setItem('todoList', JSON.stringify(todoList));
+        //     }
+        }
+    }).disableSelection(); // Prevent text selection on mobile
+
+    var counter = 0;
 
 //Create a new task
-//add to web, local storage and update circle size
+//render to page, local storage and update circle size
     function enterTask() {
         
         // var text = $('#enter_task').val();
@@ -440,9 +474,6 @@ $(function() {
     // Event delegation for delete button
     $('#todo_list').on('click', '.delete', deleteTask);
 
-
-
-
     // Load tasks from local storage on page load
     var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
     // counter = todoList.length;
@@ -453,7 +484,7 @@ $(function() {
         var newListItem = $('<li id="item-'+i+'"><span><input type="checkbox" class="task-checkbox" ' + (item.checked ? 'checked' : '') + '> <span class="task-text"> ' + item.text + ' '+'</span> <p class="time"> ' + item.timestamp + ' </p></span><input type="submit" class="edit" value="Edit"><input type="submit" class="delete" value="Delete"></li>');
         $('#todo_list').append(newListItem);
         // Append the task to the correct category's list
-        $(`#${category}-list`).append(newListItem);
+        // $(`#${category}-list`).append(newListItem);
         i++;
     });
 
