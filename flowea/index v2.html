@@ -64,7 +64,7 @@ https://www.w3schools.com/css/css_tooltip.asp
 .overlay {
     position: relative;
     display: inline-block;
-    z-index: 100;
+    z-index: 1;
 }
 .tooltip {
   position: relative;
@@ -187,7 +187,7 @@ input[type=submit] {
 </div>
 
 <!-- Purged list -->
-<nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:3;width:45%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
+<nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:3;width:65%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
     <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-8" style="text-align: right;">CLOSE</a> 
     <!-- list elements -->
     <ul id="purge_list" style="list-style: none;">
@@ -230,17 +230,31 @@ $(function() {
         update: function(event, ui) {
             const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
 
-// Get the new index of the moved item
-const newIndex = $('#todo_list li').index(ui.item);
+    // Get the new order of tasks from the DOM
+    const newOrder = $('#todo_list li').map(function() {
+        return $(this).attr('id');
+    }).get();
 
-// Remove the item from its original position in the array
-const movedItem = todoList.splice(ui.item.index(), 1)[0];
+    // Update the `id` property of each task in the todoList to match the new order
+    newOrder.forEach((id, index) => {
+        todoList.find(task => task.id === id).id = index + 1;
+    });
 
-// Insert the item at its new position in the array
-todoList.splice(newIndex, 0, movedItem);
+    // Update local storage with the reordered todoList
+    localStorage.setItem('todoList', JSON.stringify(todoList));
+//             const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
 
-// Update local storage with the reordered todoList
-localStorage.setItem('todoList', JSON.stringify(todoList));
+// // Get the new index of the moved item
+// const newIndex = $('#todo_list li').index(ui.item);
+
+// // Remove the item from its original position in the array
+// const movedItem = todoList.splice(ui.item.index(), 1)[0];
+
+// // Insert the item at its new position in the array
+// todoList.splice(newIndex, 0, movedItem);
+
+// // Update local storage with the reordered todoList
+// localStorage.setItem('todoList', JSON.stringify(todoList));
             // // // // // // // // // // /// /// / // // / / / / / 
             // // Get the updated order of tasks from the DOM
             // const newOrder = $('#todo_list li').map(function() {
