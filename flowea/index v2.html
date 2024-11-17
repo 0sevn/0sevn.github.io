@@ -123,19 +123,18 @@ input[type=submit] {
       }
 
 .fileops {
-  width: 200px;
   background-color: rgb(79, 79, 79);
   color: #fff;
+  font-weight: normal;
+  font-size: 14px;
   text-align: right;
+
+  position: absolute;
+  z-index: 2;
   padding: 5px;
   border-radius: 6px;
-  font-weight: normal;
-  font-size:14px;
   top: 5%;
   right: 2%;
-    /* Position the tooltip text */
-  /* position: absolute; */
-  /* z-index: 1; */
 }
 .bold {
   font-weight: bold;
@@ -161,7 +160,7 @@ input[type=submit] {
     </div>
 
     <!-- Purge list -->
-<div class="fileops" style="width: 130px; right: 11%; position:absolute;z-index: 2;">
+<div class="fileops" style="width: 130px; right: 11%;">
     <a href="javascript:void(0)" class="w3-left w3-button w3-text-light-grey" onclick="w3_openPrivate()" style="font-size: 12px; width: 100%;">< History</a>
 </div>
     <br>
@@ -188,7 +187,7 @@ input[type=submit] {
 
     <!-- <div class="w3-row" style="border-style: solid; border-width: 1px;"> </div> -->
       <!-- <div class="w3-half w3-quarter"  style="border-style: solid; border-width: 1px;"> --><!-- </div> -->
-    <div class="fileops" style="right: 1%; position:absolute;z-index: 2;">
+    <div class="fileops">
         <button class="btn btn-outline-secondary btn-sm" id="exportHistory" onclick="exportHistory()">Export</button > 
             <a id="exportHistoryLink" style="display: none;">Export</a>
             <br>
