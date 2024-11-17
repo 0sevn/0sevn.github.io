@@ -123,7 +123,7 @@ input[type=submit] {
       }
 
 .fileops {
-  width: 180px;
+  width: 200px;
   background-color: rgb(79, 79, 79);
   color: #fff;
   text-align: right;
@@ -131,12 +131,11 @@ input[type=submit] {
   border-radius: 6px;
   font-weight: normal;
   font-size:14px;
-
-  /* Position the tooltip text */
-  position: absolute;
-  /* z-index: 1; */
-  top: 3%;
+  top: 5%;
   right: 2%;
+    /* Position the tooltip text */
+  /* position: absolute; */
+  /* z-index: 1; */
 }
 .bold {
   font-weight: bold;
@@ -151,14 +150,7 @@ input[type=submit] {
 </head>
 
 <body>
-<!-- Purge list -->
-<div class="fileops" style="width: 130px; right: 11%;">
-    <!-- Top menu on small screens -->
-  <div class="w3-container w3-text-light-grey w3-xlarge w3-padding-8">
-      <a href="javascript:void(0)" class="w3-left w3-button w3-text-light-grey" onclick="w3_openPrivate()" style="font-size: 12px;">< History</a>
 
-  </div>
-</div>
 <!-- Mid navigation -->
 <div class="mid">
     <div class="circle" title="FOvea, a small depression within the retina where visual acuity is the highest.">
@@ -166,8 +158,12 @@ input[type=submit] {
     <div class="tooltip">
         <h1>Flowea </h1>
         <span class="tooltiptext">Fovea, small region of the retina which produces the sharpest vision.</span>
-        
     </div>
+
+    <!-- Purge list -->
+<div class="fileops" style="width: 130px; right: 11%; position:absolute;z-index: 2;">
+    <a href="javascript:void(0)" class="w3-left w3-button w3-text-light-grey" onclick="w3_openPrivate()" style="font-size: 12px;">< History</a>
+</div>
     <br>
     <div class="overlay">
         <input type="text" id="enter_task" placeholder="Enter Task">
@@ -189,26 +185,23 @@ input[type=submit] {
 <!-- Purged list -->
 <nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:65%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
     <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-8" style="text-align: right;">CLOSE</a> 
-    
-        
-    <div class="w3-row">
-      <div class="w3-half w3-quarter">
-        <div class="fileops" style=" top:5%;">
-            <button class="btn btn-outline-secondary btn-sm" id="exportHistory" onclick="exportHistory()">Export</button > 
-                <a id="exportHistoryLink" style="display: none;">Export</a>
-                <br>
-                <!-- <label for="FileInputLabel"><b>Import</b></label> -->
-                <!-- style="display: none;" -->
-                <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="circle-size"></input>
-        </div>
-      </div>
 
+    <!-- <div class="w3-row" style="border-style: solid; border-width: 1px;"> </div> -->
+      <!-- <div class="w3-half w3-quarter"  style="border-style: solid; border-width: 1px;"> --><!-- </div> -->
+    <div class="fileops">
+        <button class="btn btn-outline-secondary btn-sm" id="exportHistory" onclick="exportHistory()">Export</button > 
+            <a id="exportHistoryLink" style="display: none;">Export</a>
+            <br>
+            <!-- <label for="FileInputLabel"><b>Import</b></label> -->
+            <!-- style="display: none;" -->
+            <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="circle-size"></input>
     </div>
-
-    <!-- list elements -->
-    <ul id="purge_list" style="list-style: none;margin-top: 5%;">
-    </ul>
-  </nav>
+    <div>
+        <!-- list elements -->
+        <ul id="purge_list" style="list-style: none;margin-top: 5%;">
+        </ul>
+    </div>
+</nav>
 
 
 <!-- Bottom navigation -->
