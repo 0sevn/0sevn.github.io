@@ -131,7 +131,7 @@ input[type=submit] {
 
   position: absolute;
  
-  padding: 5px;
+  /* padding: 5px; */
   border-radius: 6px;
   top: 5%;
   right: 8%;
@@ -144,6 +144,10 @@ input[type=submit] {
     list-style-type: none;
     margin: 0;
     padding: 0;
+}
+ul {
+    margin: 0; /* To remove default bottom margin */ 
+    padding: 0; /* To remove default left padding */
 }
 </style>
 </head>
@@ -185,19 +189,16 @@ input[type=submit] {
 <nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:65%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
     <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-8" style="text-align: right;">CLOSE</a> 
 
-    <!-- <div class="w3-row" style="border-style: solid; border-width: 1px;"> </div> -->
-      <!-- <div class="w3-half w3-quarter"  style="border-style: solid; border-width: 1px;"> --><!-- </div> -->
     <div class="fileops" style="width: 200px;">
         <button class="btn btn-outline-secondary btn-sm" id="exportHistory" onclick="exportHistory()">Export</button > 
             <a id="exportHistoryLink" style="display: none;">Export</a>
             <br>
             <!-- <label for="FileInputLabel"><b>Import</b></label> -->
-            <!-- style="display: none;" -->
             <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="circle-size"></input>
     </div>
-    <div style="position: absolute;margin-top: 45px;">
+    <div style="margin-top: 45px;border-style: solid; border-width: 1px; padding-left: 0%;">
         <!-- list elements -->
-        <ul id="purge_list" style="list-style: none;">
+        <ul id="purge_list" style="list-style: none;padding-left: 5%;">
         </ul>
     </div>
 </nav>
