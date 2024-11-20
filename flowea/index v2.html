@@ -149,11 +149,197 @@ ul {
     margin: 0; /* To remove default bottom margin */ 
     padding: 0; /* To remove default left padding */
 }
+/* menus */
+.topnav {
+    height:40px;
+    width: 55%;
+    border-radius: 25px 5px;
+    background-color: #333;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+    margin:100px auto 100px auto;
+    padding:10px 0px 0px 20px;
+}
+
+/*
+https://www.w3schools.com/howto/howto_css_dropup.asp
+*/
+.bottomnav {
+    height:40px;
+    width: 50%;
+    border-radius: 5px 25px;;
+    background-color: #333;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+    margin:auto;
+    padding:10px 0px 0px 20px;
+}
+
+.dropbtn {
+    background-color: #252827;
+    width: 100px;   
+    text-transform: uppercase;
+    padding: 8px 0 8px 0;
+    color: white;
+    border: 5px;
+    border-color: coral;
+    border-radius: 5px 5px 0 0;
+    margin-left:15px;
+}
+
+.dropdown {
+    display: inline-block;
+    color: #f2f2f2;
+    white-space: nowrap;  
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    border-radius: 5px 5px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 111;
+    padding: 2px; 
+}
+.dropdown-content a {
+    color: black;
+    padding: 8px 26px;
+    display: block;
+}
+
+.dropup-content {
+    display: none;
+    position: absolute;
+    bottom: 40px;
+    background-color: #f1f1f1;
+    border-radius: 5px 5px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    padding: 2px; 
+}
+
+.dropup-content a {
+    color: black;
+    padding: 8px 26px;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: coral;
+}
+
+.dropup-content a:hover {
+    background-color: coral;
+}
+
+.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropup-content {display: block;}
+
+.dropdown:hover .dropbtn {background-color: #3e6a8e;}
 </style>
 </head>
 
 <body>
+<!-- Top navigation -->
+<div class="topnav">
+    <!-- Life -->
+    <!-- <div class="dropdown">
 
+        <button class="dropbtn"><a href="https://workflowy.com/" target="_blank">Life</a></button>
+        <div class="dropdown-content">
+            <a href="https://streamsquid.com/#/playlists/spotify/cat/chill" target="_blank">Stream squid</a>
+            <a href="https://www.youtube.com/watch?v=svLzmFuSBhk" target="_blank">3D fractals</a>
+            <a href="https://www.zooniverse.org/projects/zookeeper/galaxy-zoo/classify" target="_blank">Zooniverse galaxy classifier</a>
+            <a href="https://www.youtube.com/user/shiffman" target="_blank">The coding train</a>
+<hr>Kring
+https://m.co/se/sv-SE/stationer/
+            <a href="https://www.twitch.tv/videos/307268441" target="_blank">Gassy mexican Twitch</a>
+
+            <a href="https://acko.net/blog/occupy-www-street-en/" target="_blank">acko design</a>
+        </div>
+    </div> -->
+        <!-- Hobby -->
+        <div class="dropdown">
+            <button class="dropbtn"><a href="https://www.sverigehuset.se/projekt/jarntorgsgatanxbrogatan">Hobby</a></button>
+            <div class="dropdown-content">
+                
+                <a href="http://www.kobbs.se/main.htm">te</a>
+                <a href="http://www.omte.se/">Om te</a>
+                <a href="http://www.nyfikenvital.org/?q=node/144">Nyfiken</a>
+                <a href="http://home.swipnet.se/~w-58525/te/">Tedrickarnas hörna</a>
+                <hr>
+                
+            </div>
+    
+        </div>
+    <!-- Work -->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="http://catiadoc.free.fr/online/CATIAfr_C2/stlugCATIAfrs.htm" target="_blank">Work</a></button>
+        <div class="dropdown-content">
+            <a href="https://dined.io.tudelft.nl/en/about">Dined ergo database</a>
+            <a href="http://catiadoc.free.fr/online/CATIAfr_C2/stlugCATIAfrs.htm">STL rapid prototyping</a>
+            <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A42010X0731%2803%29">Eurlex</a>
+<hr>Ergonomics
+            <a href="http://www2.me.rochester.edu/courses/ME204/nx_help/index.html#uid:index">NX manual</a>
+            <a href="https://resources.rand3d.com/videos-webcasts/making-sense-of-catia-v5-v6-and-the-transition-to-the-3dexperience">V5 to v6 transition</a>
+            <a href="https://www.fictiv.com/articles/gdt-101-an-introduction-to-geometric-dimensioning-and-tolerancing">GDnT</a>
+        </div>
+    </div>
+<!-- News SE-->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="http://www.gp.se/">News SE</a></button>
+        <div class="dropdown-content">
+            
+            <a href="http://www.svt.se/">SVT</a>
+            <a href="http://www.sr.se/">SR</a>
+            <a href="http://www.ur.se/">UR</a>
+            <hr>På gång
+            <a href="http://www.gp.se/">GP</a>            
+            <a href="http://www.goteborg.se/">Göteborg/Hanoi/LA/SF</a>
+            
+        </div>
+    </div>
+    <!-- News -->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="https://www.sfgate.com/">News US</a></button>
+        <div class="dropdown-content">
+            
+            <a href="https://www.noevalleyvoice.com/">Noe Valley Voice</a>
+            <a href="https://sfstandard.com/">SF Standard</a>
+            <a href="https://missionlocal.org/">Mission local</a>
+            <a href="https://48hills.org/">48 hills</a>
+            <a href="https://riniart.com/index.html">riniart</a>
+            <a href="https://thefrisc.com/">the frisc</a>
+            <a href="https://www.axios.com/local/san-francisco/things-to-do">axios</a>
+            <a href="https://sf.eater.com/">sf.eater</a>
+            <a href="https://sfist.com/">sfist</a>
+            https://hoodline.com/news/san-francisco/hayes-valley/
+            
+            Hoodline, Broke Ass Stuart, DotheBay, SF.funcheap, SF Station, SF Examiner, 7x7, NextDoor , LA Times
+            <hr>På gång
+            https://www.eventbrite.com/d/ca--san-francisco/all-events/
+            
+            <a href="https://www.kqed.org/podcasts">kqed</a>
+            <a href="https://www.theatlantic.com/world/">The Atlantic</a>
+            <a href="http://www.newyorker.com/">The New Yorker</a>
+            <a href="https://boingboing.net/">Boingboing</a>l
+        </div>
+    </div>
+        <!-- Bostad -->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="https://www.sverigehuset.se/projekt/jarntorgsgatanxbrogatan">Bostad</a></button>
+        <div class="dropdown-content">
+            <a href="https://www.goteborgenergi.se/">Goteborg energi</a>
+            <a href="https://www.sbc.se/">SBC</a>
+            <hr>På gång
+            <a href="http://www.boplats.se/">Boplats</a>
+            <a href="http://lexin.nada.kth.se/sve-eng.html" target="_blank">LexinKon</a>
+            <a href="http://www.gotlib.goteborg.se/" target="_blank">GOTLIB</a>
+            <a href="http://www.lib.chalmers.se/" target="_blank">Chalmers bibliotek</a>
+        </div>
+    </div>
+
+    
+</div>
 <!-- Mid navigation -->
 <div class="mid">
     <div class="circle" title="FOvea, a small depression within the retina where visual acuity is the highest.">
