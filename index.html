@@ -9,15 +9,20 @@
 <link rel="stylesheet" href="w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <style>
-body,h1 {font-family: "Raleway", sans-serif}
-body, html {height: 100%}
+body,h1,h2 {font-family: "Raleway", sans-serif}
+/* body, html {height: 10%} */
 .bgimg {
   background-image: url('img/excavator_2.jpg');
-  min-height: 100%;
+  /* min-height: 10%; */
   background-position: center;
   background-size: cover;
   
 }
+.product {
+
+  cursor: zoom-in;
+
+  }
 .w3-quarter img{margin-bottom: -6px}
 .w3-quarter img:hover{opacity: 0.6; transition: 0.3s}
 model-viewer {
@@ -105,7 +110,7 @@ pre {
   <!-- First Grid: Logo & BG  cursor: pointer-->
   <div class="w3-row">
 
-    <div class="w3-half w3-transparent w3-container" style="height:600px">
+    <div class="w3-half w3-transparent w3-container" style="height:150px">
       <div class="w3-padding-64 w3-center">
         <h1> </h1>
 
@@ -114,24 +119,21 @@ pre {
     </div>
   </div>
       <!-- Top menu on small screens -->
-      <div class="w3-container w3-white w3-xlarge w3-padding-16">
-        <span class="w3-left w3-padding">Work projects</span>
-        <a href="javascript:void(0)" class="w3-left w3-button w3-white" onclick="w3_openWork()">></a>
-        <span class="w3-left w3-padding">Personal projects</span>
-        <a href="javascript:void(0)" class="w3-left w3-button w3-white" onclick="w3_openPrivate()">></a>
+      <div class="w3-container w3-white w3-xlarge w3-padding-8" style="margin-top: 0%;">
+        
+        <a href="javascript:void(0)" class="w3-left w3-button w3-white" onclick="w3_openWork()"><span class="w3-left w3-padding">Work projects</span></a>
+        <a href="javascript:void(0)" class="w3-left w3-button w3-white" onclick="w3_openPrivate()"><span class="w3-left w3-padding">Personal projects</span></a>
       </div>
       <!-- Top menu on small screens -->
-      <div class="w3-container w3-white w3-xlarge w3-padding-16">
-
-      </div>
+      <!--div class="w3-container w3-white w3-xlarge w3-padding-10">
+      </div-->
 <!-- Second Grid: Work & Resume -->
 <div class="w3-row">
-  <div class="w3-half w3-light-grey w3-center" style="min-height:900px" id="work">
-    <div class="w3-padding-64">
-      <h2>My Work</h2>
-      <p>Past projects.</p><br>
+  <div class="w3-half w3-light-grey w3-center" style="min-height:700px" id="work">
+    <div class="w3-padding-8">
+      <!-- <h2>My Work</h2>p>Past projects.</p<br> -->
     </div>
-    <div class="w3-row" style="margin-top:-11%;">
+    <div class="w3-row" style="margin-top:5%;">
       <div class="w3-third"><br>
         <a href="https://www.volvo.com/"><img src="logos/Volvo_logo.jpg" style="width:35%;margin-top:8%;"></a><br><br><br>
         <a href="https://www.zeekrtech.eu/"><img src="logos/zeekr.jpg" style="width:60%"></a><br><br><br>
@@ -140,33 +142,31 @@ pre {
         <a href="https://www.cevt.se/"><img src="logos/cevt.png" style="width:35%"></a><br><br><br>
       </div>
       <div class="w3-third">
-        <br><a href="https://www.canoo.com/"><img src="logos/scout1.png" style="width:100%"></a><br><br>
-        <a href="https://www.canoo.com/"><img src="logos/canoo.png" style="width:100%"></a><br><br><br>
-        <a href="https://vinfastauto.us/"><img src="logos/vinfast.png" style="width:45%"></a><br><br><br>
+        <br><a href="https://www.scoutmotors.com/"><img src="logos/scout1.png" style="width:70%;margin-top:10%;"></a><br><br>
+        <a href="https://www.canoo.com/"><img src="logos/canoo.png" style="width:80%;margin-top:30%;"></a><br><br>
+        <a href="https://vinfastauto.us/"><img src="logos/vinfast.png" style="width:35%;margin-top:30%;"></a><br><br><br>
         
       </div>
 
-      <div class="w3-third"><br>
-        <a href="https://www.vw.com/"><img src="logos/vw.svg" style="width:30%;margin-top:8%;"></a><br><br><br><br>
-        <a href="https://vwiecc.com/"><img src="logos/iccgroup.svg" style="width:80%"></a><br><br><br>
-        <a href="https://vwiecc.com/"><img src="logos/icc.svg" style="width:40%"></a><br><br><br>
+      <div class="w3-third"><br><br>
+        <a href="https://vwiecc.com/"><img src="logos/iccgroup.svg" style="width:80%; margin-top:0%;"></a><br>
+        <a href="https://vwiecc.com/"><img src="logos/icc.svg" style="width:25%; margin-top:8%;"></a><br><br>
+        <a href="https://www.vw.com/"><img src="logos/vw.svg" style="width:25%;margin-top:7%;"></a><br><br>
         
         <a href="https://www.audi.com/"><img src="logos/audi_logo.jpg" style="width:40%"></a><br><br><br>
-        <a href="https://www.porsche.com/"><img src="logos/crest.svg" style="width:20%; filter: invert(100%);"></a><br><br><br>
-        <a href="https://www.bentleymotors.com/en.html"><img src="logos/bentley1.png" style="width:50%;"></a><br><br><br>
+        <a href="https://www.porsche.com/"><img src="logos/crest.svg" style="width:20%; filter: invert(100%);margin-top:-7%;"></a><br><br><br>
+        <a href="https://www.bentleymotors.com/en.html"><img src="logos/bentley1.png" style="width:50%;margin-top:-7%;"></a><br><br><br>
         
       </div>
+      
     </div>
+    
     <br><br><br><br>
-    
-
-    
-    
-    <div class="w3-row w3-hide-small">
+    <!--div class="w3-row w3-hide-small">
       <div class="w3-half">
         
       </div>
-    </div>   
+    </div-->   
   </div>
     <!-- Modal for full size images on click-->
     <div id="modal01" class="w3-modal w3-black" style="padding-top:0" onclick="this.style.display='none'">
@@ -176,30 +176,100 @@ pre {
         <p id="caption"></p>
       </div>
     </div>
-  <div class="w3-half w3-white w3-container" style="min-height:900px">
-    <div class="w3-padding-64 w3-center">
-      <h2>Resume</h2>
-      <p>An outline</p>
+  <div class="w3-half w3-white w3-container" style="min-height:800px;margin-top:-3.5%;">
+    <div class="w3-padding-8 w3-center">
+      <div class="w3-container w3-white w3-xlarge w3-padding-8" style="margin-top: 0%;"> <a><span class="w3-left w3-padding">Resume</span></a></div>
+      
+     
       <div class="w3-container w3-responsive">
         <table class="w3-table">
-          <tr class="w3-indigo">
+          <tr class="w3-light-grey">
             <th>When</th>
             <th>What</th>
             <th>Where</th>
           </tr>
           <tr>
-            <td>2023</td>
-            <td>VW Innovation Center California - Studio Design Specialist </td>
-            <td>California, U.S.</td>
+            <td>
+  <div class="product">
+            <!-- <table class="w3-table">
+              <tr>
+              <td>2023</td>
+              <td><span class="product-description">VW IECC&nbsp; </span></td>
+              <td>California, U.S.</td>
+            </tr>
+          </table> 
+            <tr>
+              <td>
+                
+                    <div class="product-content"><span class="table-content-1">Studio Design Specialist</span>                      
+                      <td class="table-content-2">Aug.2024</td><td class="table-content-1">
+                        ID.Workzz 
+                        working in capacity of studio engineer 
+                        performing package study
+                        critical analysis of concept design, feasibility
+                        at concept and mobility design studio
+                        ergonomics analysis design check
+                        internal projects, vwg facing
+                        patent pending
+                        locking mechanism
+                        active suspension trailing arm
+                        interactive surface
+                        dual vision
+VW Group brands  
+1.Scout
+L4/5 user interaction concepts hardware and software, vehicle integration
+addressing travel comfort, 
+2.Go.City.UMAS - short duration and distance, shared mobility, addressing last mile problem 
+3.Go.Far.Wanderer - response to digital nomad lifestyle, exploreing user journeys of
+long duration and long distance trasvel, mobile home/home on the road - focusing on productivity, modularity and safety/security
+                      </td></tr>
+                      <tr><td class="table-content-2">Sep.2023</td><td class="table-content-1">Packaging/Ergonomics - UMAS</td></tr>
+                      <tr><td class="table-content-1">Jul.2022</td><td class="table-content-2">Studio engineering - Scout</td></tr>
+                      </table>                 -->
+                    </div>              
+                </div>
+
+            </td>
+            
+            
           </tr>
           <tr class="w3-light-grey">
             <td>2021</td>
-            <td>CANOO - Studio Engineer</td>
+            <td>
+              <div id="section" style="border:1px;border-color: aqua;">        
+                <div class="product"><span class="product-description"> CANOO &nbsp; </span>
+                    <div class="product-content"><span class="table-content-1">Studio Engineer </span>                      
+                      <table>
+                      <tr><td class="table-content-2">Aug.2024</td><td class="table-content-1">
+                        Responsible for ergonomics
+                      </td></tr>
+                      <tr><td class="table-content-2">Sep.2023</td><td class="table-content-1">Packaging/Ergonomics - UMAS</td></tr>
+                      <tr><td class="table-content-1">Jul.2022</td><td class="table-content-2">Studio engineering - Scout</td></tr>
+                      </table>                
+                    </div>              
+                </div>
+              </div>
+            </td>
             <td>California, U.S.</td>
           </tr>
           <tr>
             <td>2020</td>
-            <td>VINFAST LLC - Concept, Package and Ergonomics Group Leader</td>
+            <td>
+
+              <div id="section" style="border:1px;border-color: aqua;">        
+                <div class="product"><span class="product-description"> VINFAST LLC &nbsp; </span>
+                    <div class="product-content"><span class="table-content-1">Concept, Package and Ergonomics Group Leader </span>                      
+                      <table>
+                      <tr><td class="table-content-2">Aug.2024</td><td class="table-content-1">
+                        Responsible for ergonomics
+                      </td></tr>
+                      <tr><td class="table-content-2">Sep.2023</td><td class="table-content-1">Packaging/Ergonomics - UMAS</td></tr>
+                      <tr><td class="table-content-1">Jul.2022</td><td class="table-content-2">Studio engineering - Scout</td></tr>
+                      </table>                
+                    </div>              
+                </div>
+              </div>
+            </td>
             <td>Ha Noi, Vietnam</td>
           </tr>
           <tr class="w3-light-grey">
@@ -237,15 +307,34 @@ pre {
     </div>
   </div>
 </div>
-  <div class="w3-display-bottomleft w3-padding-large">
-    Powered by <a href="https://0sevn.github.io/" target="_blank">Armin</a>
-  </div>
+
 </div>
 <div class="w3-black w3-center w3-padding-24">
-  <p>Just call me awesome / human.</p>
+  Powered by <a href="https://0sevn.github.io/" target="_blank">Armin</a>
+  <!--p>Just call me awesome / human.</p-->
 </div>
-
+<div class="w3-padding-large">
+  
+</div>
+<!-- jQuery -->
+<script type="text/javascript" src="jquery.min.js"></script>
 <script>
+	$(function () {
+    var $body = $('body');
+    InitializeEvents();
+    function InitializeEvents() {
+        $body.on("click", ".product", function () {
+            var options = {};
+            $('div:first', this).slideToggle("slow");
+            return false;
+        });
+    }
+});
+
+</script>
+<script>
+
+  
   // Script to open and close sidebar
   function w3_openWork() {
     document.getElementById("mySidebarWork").style.display = "block";
