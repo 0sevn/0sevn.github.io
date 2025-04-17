@@ -9,22 +9,18 @@
 <link rel="stylesheet" href="w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <style>
-body,h1,h2 {font-family: "Raleway", sans-serif}
+
 /* body, html {height: 10%} */
+/* .w3-quarter img{margin-bottom: -6px}
+.w3-quarter img:hover{opacity: 0.6; transition: 0.3s} */
+
+body,h1,h2 {font-family: "Raleway", sans-serif}
 .bgimg {
   background-image: url('img/excavator_2.jpg');
-  /* min-height: 10%; */
   background-position: center;
   background-size: cover;
-  
 }
-.product {
 
-  cursor: zoom-in;
-
-  }
-.w3-quarter img{margin-bottom: -6px}
-.w3-quarter img:hover{opacity: 0.6; transition: 0.3s}
 model-viewer {
   width:200px;
   height:200px;
@@ -32,109 +28,240 @@ model-viewer {
 }
 
 pre {
-        overflow-x: auto;
-        white-space: pre-wrap;
-        white-space: -moz-pre-wrap;
-        white-space: -pre-wrap;
-        white-space: -o-pre-wrap;
-        word-wrap: break-word;
-      }
-</style>
-<body onload="myFunction()" style="margin:0;">
+  overflow-x: auto;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
 
-  <!-- Sidebar work/menu -->
+.gallery {
+  width: 100%;
+  height: 350px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gallery img {
+  width: 10%;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 0px;
+  border: 2px solid #2c2525;
+  transition: all ease-out 0.5s;
+  cursor: e-resize;
+  overflow: hidden;
+}
+
+.gallery img:hover {
+  width: 30%;
+}
+
+/* ---- projects ----- */
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+:root {
+	--bg: #222;
+	--terminal-bg: #000;
+	--logo-pill: #333;
+	--white: #fff;
+	--yellow: #f4be4f;
+	--green: #63c856;
+	--red: #ed6b5f;
+	--dark-gary: #646464;
+	--gray-text: #8b8b8b;
+	--orange: #fead06;
+	--black: #111;
+}
+
+.green-mark {
+	color: var(--green);
+}
+
+.orange-mark {
+	color: var(--orange);
+}
+
+.product {
+  cursor: zoom-in;
+  }
+.product-content {
+  display:none;
+  /* height:auto;overflow: auto; */
+  /* background-color :#121212; */
+  /* padding-bottom:2px;
+  padding-bottom:10px; */
+ 
+  /* -moz-border-bottom-left-radius: 5px; */
+  /* border-bottom-right-radius: 5px; */
+  border-radius: 5px;
+  border: 1px solid rgb(185, 185, 185);
+} 
+
+.project-container {
+  display: flex;
+  padding: 0;
+  /* gap: 0.5em; */  /* margin-top: 1em; */  /* flex-direction: column; */  /* width: 100%; */  /* border: 2px solid var(--black); */	/* height: calc(100% - 50px); */
+	/* overflow-y: scroll; */	/* scrollbar-width: none; */	/* position: relative; */
+  /* Stack elements in reverse order */	/* flex-direction: column-reverse;  */
+}
+.project-header {
+  /* border: 1px solid var(--green); */
+  display: flex;
+	/* flex: 1; */
+  padding: 0.5em;
+	/* color: var(--terminal-bg); */
+  font-weight: bold;
+}
+.project-row {
+  border: 2px solid var(--yellow);
+  /* display: flex; */
+	/* flex-basis: 1; */
+	/* gap: 1em; */
+}
+
+.table-content-1 {
+  padding: 0.5em;
+  font-size: 13px;
+  border: 1px;
+  text-align: left;
+}
+
+.table-content-2 {
+  padding: 0.5em;
+  font-size: 13px;
+  border: 1px;
+  text-align: left;
+}
+
+.title {
+  font-size: 14px;
+  /* visibility: hidden; */
+}
+.company {
+  text-transform: uppercase;
+  font-size: 14px;
+  border: 1px;
+}
+.project-value {
+	flex: 2;
+  border: 1px solid var(--red);
+}
+</style>
+
+<body onload="myFunction()">
+  <!-- <body onload="myFunction()"> -->
+
+<!-- Sidebar work/menu -->
 <nav class="w3-sidebar w3-bar-block w3-black w3-animate-left w3-top w3-text-light-grey w3-large" style="z-index:3;width:90%;font-weight:bold;display:none;left:0;" id="mySidebarWork">
   <a href="javascript:void()" onclick="w3_closeWork()" class="w3-bar-item w3-button w3-center w3-padding-32">CLOSE</a> 
+  <div class="gallery">
+    <img src="img/zooxv1.png" onclick="onClick(this)" alt="Benchmarking <br>(2022)">
+    <img src="img/go_near.png" onclick="onClick(this)" alt="Modular vehicle concept<br>(2022)">
+    <img src="img/silhouettes.png" onclick="onClick(this)" alt="Benchmark silhouettes<br>(2023)">
+      
+      <img src="img/SNA_obesi2.png" onclick="onClick(this)" alt="US obesity projection and higher BMI considerations<br>(2023)">
+      <!-- <img src="img/SNA_obesi.png" onclick="onClick(this)" alt="US obesity projections <br>(2023)"> -->
+      <img src="img/SNA.png" onclick="onClick(this)" alt="Size North America anthropometry - 95th percentile large male<br>(2023)">
+  </div><br>
+  <div class="gallery">
+    <img src="img/CV.png" onclick="onClick(this)" alt="Complete vehicle layout, occupant package of manikin familiy, physical buck preparation<br>(Lynk&Co)">
+    <img src="img/fc2.png" onclick="onClick(this)" alt="Occupant accommodation, floor console <br>(Lynk&Co)">
+      <img src="img/lights.png" onclick="onClick(this)" alt="DLR study<br>(Lynk&Co)">
+      <img src="img/gsb.gif" onclick="onClick(this)" alt="GSB<br>(Lynk&Co 2015)">
+  </div><br>
+
+
+  <div class="gallery">
+    
+    <img src="img/armrest.png" onclick="onClick(this)" alt="Armrest<br>(Lynk&Co)">
+    <img src="img/hand reach1.png" onclick="onClick(this)" alt="Hand clearance 95th%-ile, wireless charger accessibility<br>(Lynk&Co)">
+    <img src="img/handreach2.jpg" onclick="onClick(this)" alt="Hand clearance 95th%-ile <br>(Lynk&Co)">
+    <img src="img/motor.png" onclick="onClick(this)" alt="Motor package<br>(Lynk&Co)">
+    <img src="img/cowl.png" onclick="onClick(this)" alt="Cowl sections<br>(Lynk&Co)">
+    <img src="img/intmirror.png" onclick="onClick(this)" alt="FMVSS111, ECE R46<br>(Lynk&Co)">
+    
+  </div>
+  <br><video width=100% controls>
+    <source src="img/buss.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video><br>
+</nav>
+
+<!-- Sidebar personal/menu -->
+<nav class="w3-sidebar w3-bar-block w3-black w3-animate-left w3-top w3-text-light-grey w3-large" style="z-index:3;width:90%;font-weight:bold;display:none;left:0;" id="mySidebarPrivate">
+  <a href="javascript:void()" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-32">CLOSE</a> 
   <div class="w3-row">
     <div class="w3-half w3-quarter">
-      <img src="img/CV.png" style="width:100%" onclick="onClick(this)" alt="Complete vehicle layout, occupant package of manikin familiy, physical buck preparation<br>(Lynk&Co)">
-      <br><video width=100% controls>
-        <source src="img/buss.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-      </video><br>
-      <img src="img/jalusi.png" style="width:100%" onclick="onClick(this)" alt="Jalusi section<br>(Lynk&Co)">
-      <img src="img/motor.png" style="width:100%" onclick="onClick(this)" alt="Motor package<br>(Lynk&Co)">
-      <img src="img/lights.png" style="width:100%" onclick="onClick(this)" alt="DLR study<br>(Lynk&Co)">
-      <img src="img/gsb.gif" style="width:100%" onclick="onClick(this)" alt="GSB<br>(Lynk&Co 2015)">
+      <model-viewer style="width:100%; height:400px;" src="img/apterab.glb" camera-controls auto-rotate></model-viewer>
+      <model-viewer style="width:100%; height:400px;" src="img/skateboard.glb" camera-controls auto-rotate></model-viewer>
+      <model-viewer style="width:100%; height:400px;" src="img/speaker10.glb" camera-controls auto-rotate></model-viewer>
+    
 
     </div>
     <div class="w3-half w3-quarter">
-      <img src="img/fc2.png" style="width:100%" onclick="onClick(this)" alt="Occupant accommodation, floor console <br>(Lynk&Co)">
-      <img src="img/armrest.png" style="width:100%" onclick="onClick(this)" alt="Armrest<br>(Lynk&Co)">
-      <img src="img/hand reach1.png" style="width:100%" onclick="onClick(this)" alt="Hand clearance 95th%-ile, wireless charger accessibility<br>(Lynk&Co)">
-      <img src="img/handreach2.jpg" style="width:100%" onclick="onClick(this)" alt="Hand clearance 95th%-ile <br>(Lynk&Co)">
-      <img src="img/cowl.png" style="width:100%" onclick="onClick(this)" alt="Cowl sections<br>(Lynk&Co)">
-      <img src="img/intmirror.png" style="width:100%" onclick="onClick(this)" alt="FMVSS111, ECE R46<br>(Lynk&Co)">
-      
+      <div class="gallery">
+      <img src="img/CV2.png" onclick="onClick(this)" alt="Concept vehicle layout<br>(2018)">
+      <img src="img/bugatti.png" onclick="onClick(this)" alt="Bugatti ext mesh model<br>(2014)">
+      <img src="img/fixie.png" onclick="onClick(this)" alt="Fixie bike <br>(2014)">
+      <img src="img/mandelbulb2.png" onclick="onClick(this)" alt="Mandelbulb <br>(2015)">
+      </div>
+      <video width=100% controls>
+        <source src="img/yogi3.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <video width=100% controls>
+        <source src="img/mcopt.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
     </div>
-    
   </div>
 </nav>
 
-  <!-- Sidebar personal/menu -->
-  <nav class="w3-sidebar w3-bar-block w3-black w3-animate-left w3-top w3-text-light-grey w3-large" style="z-index:3;width:90%;font-weight:bold;display:none;left:0;" id="mySidebarPrivate">
-    <a href="javascript:void()" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-32">CLOSE</a> 
-    <div class="w3-row">
-      <div class="w3-half w3-quarter">
-        <model-viewer style="width:100%; height:400px;" src="img/apterab.glb" camera-controls auto-rotate></model-viewer>
-        <model-viewer style="width:100%; height:400px;" src="img/skateboard.glb" camera-controls auto-rotate></model-viewer>
-        <img src="img/CV2.png" style="width:100%" onclick="onClick(this)" alt="Concept vehicle layout<br>(2018)">
-        <video width=100% controls>
-          <source src="img/yogi3.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <img src="img/mandelbulb2.png" style="width:100%" onclick="onClick(this)" alt="Mandelbulb <br>(2015)">
-
-      </div>
-      <div class="w3-half w3-quarter">
-        <model-viewer style="width:100%; height:400px;" src="img/speaker10.glb" camera-controls auto-rotate></model-viewer>
-
-        <img src="img/bugatti.png" style="width:100%" onclick="onClick(this)" alt="Bugatti ext mesh model<br>(2014)">
-        <img src="img/fixie.png" style="width:100%" onclick="onClick(this)" alt="Fixie bike <br>(2014)">
-        <video width=100% controls>
-          <source src="img/mcopt.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        
-        
-
-                
-      </div>
-    </div>
-  </nav>
-<div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
-  <div class="w3-display-topleft w3-padding-large w3-xlarge" >
-    <pre><mark id="demoa"> </mark></pre>
+<!-- Container for full size images on click-->
+<div id="modal01" class="w3-modal w3-black" style="padding-top:0" onclick="this.style.display='none'">
+  <span class="w3-button w3-black w3-xlarge w3-display-topright">&times;</span>
+  <div class="w3-modal-content w3-animate-zoom w3-center w3-transparent w3-padding-64">
+    <img id="img01" class="w3-image">
+    <p id="caption"></p>
   </div>
+</div>
 
-  <!-- First Grid: Logo & BG  cursor: pointer-->
-  <div class="w3-row">
-
-    <div class="w3-half w3-transparent w3-container" style="height:150px">
-      <div class="w3-padding-64 w3-center">
-        <h1> </h1>
-
-        </div>
+<!-- First Grid: Logo & BG  cursor: pointer-->
+<div class="bgimg w3-display-container w3-animate-opacity">
+  <div class="w3-row"style="height:180px">
+    <div class="w3-half w3-transparent w3-container" >
+      <div class="w3-display-topleft w3-padding-large w3-xlarge" >
+        <pre><mark id="typetext"> </mark></pre>
       </div>
     </div>
   </div>
-      <!-- Top menu on small screens -->
-      <div class="w3-container w3-white w3-xlarge w3-padding-8" style="margin-top: 0%;">
-        
-        <a href="javascript:void(0)" class="w3-left w3-button w3-white" onclick="w3_openWork()"><span class="w3-left w3-padding">Work projects</span></a>
-        <a href="javascript:void(0)" class="w3-left w3-button w3-white" onclick="w3_openPrivate()"><span class="w3-left w3-padding">Personal projects</span></a>
-      </div>
-      <!-- Top menu on small screens -->
-      <!--div class="w3-container w3-white w3-xlarge w3-padding-10">
-      </div-->
+</div>
+
+<!-- Top menu on small screens -->
+<div class="w3-container w3-white w3-xlarge w3-padding-8" style="margin-top: 0%;">
+  
+  <a href="javascript:void(0)" class="w3-left w3-button w3-white" onclick="w3_openWork()"><span class="w3-left w3-padding">Work projects</span></a>
+  <a href="javascript:void(0)" class="w3-left w3-button w3-white" onclick="w3_openPrivate()"><span class="w3-left w3-padding">Personal projects</span></a>
+</div>
+
 <!-- Second Grid: Work & Resume -->
-<div class="w3-row">
-  <div class="w3-half w3-light-grey w3-center" style="min-height:700px" id="work">
-    <div class="w3-padding-8">
-      <!-- <h2>My Work</h2>p>Past projects.</p<br> -->
-    </div>
-    <div class="w3-row" style="margin-top:5%;">
-      <div class="w3-third"><br>
+<div class="w3-row w3-light-grey">
+<!-- Work grid -->
+  <div class="w3-half w3-light-grey w3-center" style="min-height:300px" id="work">
+    <!-- <div class="w3-padding-8">
+      <h2>My Work</h2>p>Past projects.</p<br>
+    </div> -->
+  <!-- Work content -->
+    <div class="w3-row" style="margin-top:0%;">
+      <div class="w3-third">
         <a href="https://www.volvo.com/"><img src="logos/Volvo_logo.jpg" style="width:35%;margin-top:8%;"></a><br><br><br>
         <a href="https://www.zeekrtech.eu/"><img src="logos/zeekr.jpg" style="width:60%"></a><br><br><br>
         <a href="https://www.lynkco.com/en/"><img src="logos/lynco.png" style="width:45%"></a><br><br><br>
@@ -142,13 +269,13 @@ pre {
         <a href="https://www.cevt.se/"><img src="logos/cevt.png" style="width:35%"></a><br><br><br>
       </div>
       <div class="w3-third">
-        <br><a href="https://www.scoutmotors.com/"><img src="logos/scout1.png" style="width:70%;margin-top:10%;"></a><br><br>
+        <br><a href="https://www.scoutmotors.com/"><img src="logos/scout1.png" style="width:70%;margin-top:2%;"></a><br><br>
         <a href="https://www.canoo.com/"><img src="logos/canoo.png" style="width:80%;margin-top:30%;"></a><br><br>
         <a href="https://vinfastauto.us/"><img src="logos/vinfast.png" style="width:35%;margin-top:30%;"></a><br><br><br>
         
       </div>
 
-      <div class="w3-third"><br><br>
+      <div class="w3-third"><br>
         <a href="https://vwiecc.com/"><img src="logos/iccgroup.svg" style="width:80%; margin-top:0%;"></a><br>
         <a href="https://vwiecc.com/"><img src="logos/icc.svg" style="width:25%; margin-top:8%;"></a><br><br>
         <a href="https://www.vw.com/"><img src="logos/vw.svg" style="width:25%;margin-top:7%;"></a><br><br>
@@ -160,164 +287,291 @@ pre {
       </div>
       
     </div>
-    
-    <br><br><br><br>
-    <!--div class="w3-row w3-hide-small">
-      <div class="w3-half">
-        
-      </div>
-    </div-->   
   </div>
-    <!-- Modal for full size images on click-->
-    <div id="modal01" class="w3-modal w3-black" style="padding-top:0" onclick="this.style.display='none'">
-      <span class="w3-button w3-black w3-xlarge w3-display-topright">&times;</span>
-      <div class="w3-modal-content w3-animate-zoom w3-center w3-transparent w3-padding-64">
-        <img id="img01" class="w3-image">
-        <p id="caption"></p>
-      </div>
-    </div>
-  <div class="w3-half w3-white w3-container" style="min-height:800px;margin-top:-3.5%;">
+
+<!-- Resume grid -->
+  <div class="w3-half w3-white w3-container" style="min-height:800px;margin-top:-3.7%;">
     <div class="w3-padding-8 w3-center">
-      <div class="w3-container w3-white w3-xlarge w3-padding-8" style="margin-top: 0%;"> <a><span class="w3-left w3-padding">Resume</span></a></div>
-      
-     
+        <div class="w3-container w3-white w3-xlarge w3-padding-8" style="margin-top: 0%;"> 
+          <span class="w3-left w3-padding">Resume</span>
+        </div>
+        
+    <!-- Resume content 2.0 -->
       <div class="w3-container w3-responsive">
-        <table class="w3-table">
-          <tr class="w3-light-grey">
-            <th>When</th>
-            <th>What</th>
-            <th>Where</th>
-          </tr>
-          <tr>
-            <td>
-  <div class="product">
-            <!-- <table class="w3-table">
-              <tr>
-              <td>2023</td>
-              <td><span class="product-description">VW IECC&nbsp; </span></td>
-              <td>California, U.S.</td>
-            </tr>
-          </table> 
-            <tr>
-              <td>
-                
-                    <div class="product-content"><span class="table-content-1">Studio Design Specialist</span>                      
-                      <td class="table-content-2">Aug.2024</td><td class="table-content-1">
-                        ID.Workzz 
-                        working in capacity of studio engineer 
-                        performing package study
-                        critical analysis of concept design, feasibility
-                        at concept and mobility design studio
-                        ergonomics analysis design check
-                        internal projects, vwg facing
-                        patent pending
-                        locking mechanism
-                        active suspension trailing arm
-                        interactive surface
-                        dual vision
-VW Group brands  
-1.Scout
-L4/5 user interaction concepts hardware and software, vehicle integration
-addressing travel comfort, 
-2.Go.City.UMAS - short duration and distance, shared mobility, addressing last mile problem 
-3.Go.Far.Wanderer - response to digital nomad lifestyle, exploreing user journeys of
-long duration and long distance trasvel, mobile home/home on the road - focusing on productivity, modularity and safety/security
-                      </td></tr>
-                      <tr><td class="table-content-2">Sep.2023</td><td class="table-content-1">Packaging/Ergonomics - UMAS</td></tr>
-                      <tr><td class="table-content-1">Jul.2022</td><td class="table-content-2">Studio engineering - Scout</td></tr>
-                      </table>                 -->
-                    </div>              
-                </div>
+          <!-- <div class="project-name">
+              <span class="green-mark">✓</span>
+          </div> -->
+          <!--flex container-->
+          <div class="project-container">
+            <!-- <div class="project-row"> -->
+              <div class="project-header w3-light-grey" style="width:15%">When</div>
+              <div class="project-header w3-light-grey" style="width:50%">What</div>
+              <div class="project-header w3-light-grey" style="width:35%">Where</div>
+            <!-- </div> -->
+          </div>
+          <!-- 1 -->
+              <div class="product">
+                <table class="w3-table">
+                  <tr>
+                  <td width="15%">2022</td>
+                  <td width="50%">
+                  <span class="title">Studio Design Specialist</span> -
+                  <span class="company">VW</span>
+                  </td>
+                  <td>Belmont, CA - USA</td>
+                  </tr></table>
+                <div class="product-content">
+    
+    <br>
+                  <table>
+                  <tr><td class="table-content-1">&nbsp;</td>
+                  <td class="table-content-2">
+                  Principal responsible for ergonomics, packaging and studio engineering at the Mobility Design and Concept department of VW Innovation Center California. 
+                  Supporting R&D initiatives across VW Group.
+                  </td></tr>
+                  <tr><td class="table-content-1">2024</td>
+                  <td class="table-content-2">
+                  Looking ahead, exploration levraging self driving in urban environments for people transportation and delivery services.
+                  Packaging, ergonomics, mechanism developement of multi-purpose, modular prototype. 
+                  Built to scale and presented, patent applications filed for mechanisms.
+                  <br><i>Mentoring </i>- industry liasion for Stanford ME170 Capstone projects (class of 2023 & 2024)
+                  </td></tr>
+                  <tr><td class="table-content-1">2023</td>
+                  <td class="table-content-2">
+                  Mobile home - focusing on productivity, safety and security.
+                  Anticipating technological trends and as a response to evolving markets, user journeys created around long duration and long distance travel.
+                  Research concerning inclusivity and accessiblity of a changing North America population.
+                  <br>Patent applications filed for interactive surface solutions.
+                  </td></tr>
 
-            </td>
-            
-            
-          </tr>
-          <tr class="w3-light-grey">
-            <td>2021</td>
-            <td>
-              <div id="section" style="border:1px;border-color: aqua;">        
-                <div class="product"><span class="product-description"> CANOO &nbsp; </span>
-                    <div class="product-content"><span class="table-content-1">Studio Engineer </span>                      
-                      <table>
-                      <tr><td class="table-content-2">Aug.2024</td><td class="table-content-1">
-                        Responsible for ergonomics
-                      </td></tr>
-                      <tr><td class="table-content-2">Sep.2023</td><td class="table-content-1">Packaging/Ergonomics - UMAS</td></tr>
-                      <tr><td class="table-content-1">Jul.2022</td><td class="table-content-2">Studio engineering - Scout</td></tr>
-                      </table>                
-                    </div>              
+                  <tr><td class="table-content-1">2022</td>
+                  <td class="table-content-2">
+                    Predevelopment of North America region focused vehicles (full-size SUV and off-road pickup truck).
+                    Complete vehicle studio engineering and ergonomics support, up until official brand launch.
+                  </td></tr>           
+                  </table>    
                 </div>
               </div>
-            </td>
-            <td>California, U.S.</td>
-          </tr>
-          <tr>
-            <td>2020</td>
-            <td>
-
-              <div id="section" style="border:1px;border-color: aqua;">        
-                <div class="product"><span class="product-description"> VINFAST LLC &nbsp; </span>
-                    <div class="product-content"><span class="table-content-1">Concept, Package and Ergonomics Group Leader </span>                      
-                      <table>
-                      <tr><td class="table-content-2">Aug.2024</td><td class="table-content-1">
-                        Responsible for ergonomics
-                      </td></tr>
-                      <tr><td class="table-content-2">Sep.2023</td><td class="table-content-1">Packaging/Ergonomics - UMAS</td></tr>
-                      <tr><td class="table-content-1">Jul.2022</td><td class="table-content-2">Studio engineering - Scout</td></tr>
-                      </table>                
-                    </div>              
+              <!-- 2 -->
+              <div class="product w3-light-grey">
+                <table class="w3-table">
+                  <tr>
+                  <td width="15%">2021</td>
+                  <td width="50%">
+                  <span class="title">Studio Engineer</span> -
+                      <span class="company">CANOO &nbsp;</span>
+                  </td>
+                  <td>Torrance, CA - USA</td>
+                  </tr></table>
+                <div class="product-content"><br>
+                <table>
+                <tr><td class="table-content-1">2021</td>
+                <td class="table-content-2">
+                  Advising on competitive ergonomics and occupant packaging targets in studio department. 
+                  Providing inputs for class A surfaces and guiding theme development to ensure compliance with homologation requirements and program hardpoints. 
+                  Evaluating feasibility and performance targets for lifestyle, delivery and pickup vehicles.
+                  Conducting clinics, VR reviews and supporting various prototype builds. (Catia V6, CAVA, RAMSIS, A2mac1/Caresoft, Polarion)
+                </td></tr>
+                </table>
                 </div>
               </div>
-            </td>
-            <td>Ha Noi, Vietnam</td>
-          </tr>
-          <tr class="w3-light-grey">
-            <td>2018</td>
-            <td>CEVT AB - Attribute leader Ergonomics - User Experience</td>
-            <td>Gothenburg, Sweden</td>
-          </tr>
-          <tr>
-            <td>2017</td>
-            <td>CEVT AB - Packaging engineer - Architecture - Occupant package</td>
-            <td>Gothenburg, Sweden</td>
-          </tr>
-          <tr class="w3-light-grey">
-            <td>2015</td>
-            <td>CEVT AB - Packaging engineer - Interior</td>
-            <td>Gothenburg, Sweden</td>
-          </tr>
-          <tr>
-            <td>2014</td>
-            <td>MSc - Volvo Buses</td>
-            <td>Chalmers University of Technology, Sweden</td>
-          </tr>
-          <tr class="w3-light-grey">
-            <td>2013</td>
-            <td>BSc - Volvo Trucks</td>
-            <td>Chalmers University of Technology, Sweden</td>
-          </tr>
-          <tr>
-            <td>2010</td>
-            <td>Music and sound design</td>
-            <td>Mid University Sweden, Sundsvall, Sweden</td>
-          </tr>
-        </table>
+              <!-- 3 -->
+              <div class="product">
+                <table class="w3-table">
+                  <tr>
+                  <td width="15%">2020</td>
+                  <td width="50%">
+                  <span class="title">Concept and Ergonomics Lead</span> -
+                      <span class="company">VINFAST &nbsp;</span>  
+                  </td>
+                  <td>Hà Nội, Vietnam</td>
+                  </tr></table>
+                <div class="product-content"><br>
+                <table>
+                <tr><td class="table-content-1">2020</td>
+                <td class="table-content-2">
+                  Worked in a small team at Vietnam’s first automotive start-up company. 
+                  <br>Ownership of complete vehicle package for occupant position/roominess, in-/egress, usage of controls, visibility, stowage & luggage and user maintenance requirements. 
+                  Defining and balancing technical criteria of portfolio to be built on nextgen electric platform. 
+                  Lead responsible, defining department processes and best practices for evaluations using digital tools (RAMSIS, CAVA, CATIA v5, A2mac1).
+                </td></tr>
+                </table>
+                </div>
+              </div>
+              <!-- 4 -->
+              <div class="product w3-light-grey">
+                <table class="w3-table">
+                  <tr>
+                  <td width="15%">2018</td>
+                  <td width="50%">
+                  <span class="title">Attribute Lead Ergonomics</span> -
+                    <span class="company">CEVT &nbsp;</span> 
+                  </td>
+                  <td>Gothenburg, Sweden</td>
+                  </tr></table>
+                <div class="product-content">
+                  <br>
+                <table>
+                <tr><td class="table-content-1">2018</td>
+                <td class="table-content-2">
+                  Defined competitive occupant accommodation targets for range of new products in the Lynk&CO product portfolio. 
+                  Evaluated attribute performance with anthropometric simulations, benchmarking and user clinics. 
+                  Developed a flexible buck with VR capability for future trend and Autonomous Drive evaluations. 
+                  Designed experiments and conducted usability assessments for driver and passenger comfort and presented conclusions to project.
+                  </td></tr>
+                </table>
+                </div>
+              </div>
+              <!-- 5 -->
+              <div class="product">
+                <table class="w3-table">
+                  <tr>
+                  <td width="15%">2017</td>
+                  <td width="50%">
+                  <span class="title">Packaging Engineer Architecture</span> -
+                  <span class="company">CEVT &nbsp;</span> 
+                  </td>
+                  <td>Gothenburg, Sweden</td>
+                  </tr></table>
+                <div class="product-content">
+                 <br>
+                <table>
+                  <tr><td class="table-content-1">2017</td>
+                  <td class="table-content-2">
+                  Responsible for Front end packaging in CEVT & Geely joint vehicle project. 
+                  Developed technical input for hood, bumper, fender, lamps, wind shield and wipers. 
+                  Balanced pedestrian protection strategy and design theme with engineering requirements and ensured solutions complied with global NCAP safety standards, regulations, and insurance demands. 
+                  Worked closely with design and engineering, locally and in China, to secure concept feasibility through project phases.
+                  </td></tr>
+                  <tr><td class="table-content-1">2016</td>
+                  <td class="table-content-2">
+                  Executed packaging work for several vehicle areas on multiple platforms. 
+                  Facilitated development through layout creation which adhered to homologation, safety, NVH and ergonomic prerequisites (CAVA). 
+                  Responsible for occupant package, including floors, pedals, steering and seats concept maturity. 
+                  Aligned efforts between process objectives and project targets in close collaboration with component owners and across disciplines. 
+                  Supported weekly packaging meetings with agendas and minutes.
+                  </td></tr> 
+                  <tr><td class="table-content-1">2016</td>
+                  <td class="table-content-2">
+                  Worked with tailgate, glazing, claddings, and bumper. 
+                  Generated CATIA templates and technical input that complied with legal and RCAR insurance requirements.
+                  </td></tr>
+                </table>
+                </div>
+              </div>
+              <!-- 6 -->
+              <div class="product w3-light-grey">
+                <table class="w3-table">
+                  <tr>
+                  <td width="15%">2015</td>
+                  <td width="50%">
+                  <span class="title">Packaging engineer</span> -
+                    <span class="company">CEVT &nbsp;</span>  
+                  </td>
+                  <td>Gothenburg, Sweden</td>
+                  </tr></table>
+                <div class="product-content">
+                <br>
+                  <table>
+                  <tr><td class="table-content-1">2015</td>
+                    <td class="table-content-2">
+                    Created packaging concepts for IP, floor console and seats. 
+                    Highlighted issues and proposed resolution through technical input and RAMSIS simulations of usability scenarios. 
+                    Relocated to design studio during six months as part of taskforce doing extensive interior redesign. 
+                    Used rapid prototyping to evaluate concept feasibility and ergonomic target fulfilment for HMI and posture models.
+                    </td></tr>
+                  </table>
+                </div>
+              </div>
+              <!-- 7 -->
+              <div class="product">
+                <table class="w3-table">
+                  <tr>
+                  <td width="15%">2014</td>
+                  <td width="50%">
+                  <span class="title">MSc - Volvo Buses</span> -
+                  <span class="company">CTH &nbsp;</span> 
+                  </td>
+                  <td>Gothenburg, Sweden</td>
+                  </tr></table>
+                <div class="product-content ">
+                  <br>
+                  <table>
+                  <tr><td class="table-content-1">2015</td>
+                    <td class="table-content-2">
+                    Developed an instructor’s workplace for driving school buses on behalf of Volvo’s customer in Belgium. 
+                    Using anthropometric simulation tools (Human Manikin, CAVA): a secondary driver position was designed, consisting of an elevated instructor’s seat on a platform with dual command pedals, control panel and supplementing mirrors - ready to be integrated into a city bus.
+                    </td></tr>
+                  </table>
+                </div>
+              </div>
+              <!-- 8 -->
+              <div class="product w3-light-grey">
+                <table class="w3-table">
+                  <tr>
+                  <td width="15%">2013</td>
+                  <td width="50%">
+                  <span class="title">BSc - Volvo Trucks</span> -
+                  <span class="company">CTH &nbsp;</span> 
+                  </td>
+                  <td>Gothenburg, Sweden</td>
+                  </tr></table>
+                <div class="product-content ">
+                  <br>
+                  <table>
+                  <tr><td class="table-content-1">2013</td>
+                    <td class="table-content-2">
+                    Analysed and proposed measures for handling high frequency noise and vibrations in heavy duty vehicle transmissions on behalf of Volvo Trucks.
+                  
+                    </td></tr>
+                  </table>
+                </div>
+              </div>
+                        <!-- 9 -->
+              <div class="product">
+                <table class="w3-table">
+                  <tr>
+                  <td width="15%">2010</td>
+                  <td width="50%">
+                  <span class="title">Music and sound design</span> -
+                  <span class="company"> Miun&nbsp;</span> 
+                  </td>
+                  <td>Sundsvall, Sweden</td>
+                  </tr></table>
+                <div class="product-content ">
+                    <table>
+                  <tr><td class="table-content-1">2010</td>
+                    <td class="table-content-2">
+                    Sound design, recoriding, mixing and mastring programme
+                  
+                    </td></tr>
+                  </table>
+                </div>
+              </div>
       </div>
     </div>
   </div>
 </div>
-
-</div>
-<div class="w3-black w3-center w3-padding-24">
+<!-- Footer -->
+<div class="w3-light-grey w3-center w3-padding-8">
+  <div class="w3-padding-large w3-light-grey">
   Powered by <a href="https://0sevn.github.io/" target="_blank">Armin</a>
-  <!--p>Just call me awesome / human.</p-->
+    <!-- <p>Just call me awesome / human.</p> -->
+<!-- </div> -->
+  </div>
 </div>
-<div class="w3-padding-large">
-  
-</div>
+
 <!-- jQuery -->
 <script type="text/javascript" src="jquery.min.js"></script>
+<!-- Expand resume -->
+<!-- <script>
+	$(function () {
+    $body.on("click", ".product", function () {
+        $(this).find('product-content').slideToggle("slow");
+        return false;
+    });
+});
+</script> -->
 <script>
 	$(function () {
     var $body = $('body');
@@ -330,11 +584,9 @@ long duration and long distance trasvel, mobile home/home on the road - focusing
         });
     }
 });
-
 </script>
+<!-- Side nav -->
 <script>
-
-  
   // Script to open and close sidebar
   function w3_openWork() {
     document.getElementById("mySidebarWork").style.display = "block";
@@ -362,7 +614,7 @@ long duration and long distance trasvel, mobile home/home on the road - focusing
     var captionText = document.getElementById("caption");
     captionText.innerHTML = element.alt;
   }
-
+// type writer script
   var i = 0;
   var txta = "California based product developer / Multi-disciplinary engineer."+"\n"+" Human-centred design, human factors and ergonomics specialist."; /* The text */
   var speed = 50; /* The speed/duration of the effect in milliseconds */
@@ -372,9 +624,8 @@ long duration and long distance trasvel, mobile home/home on the road - focusing
   }
 
   function showPage() {
-
     if (i < txta.length) {
-      document.getElementById("demoa").innerHTML += txta.charAt(i);
+      document.getElementById("typetext").innerHTML += txta.charAt(i);
       i++;
       setTimeout(showPage, speed);
     }
