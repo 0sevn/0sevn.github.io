@@ -338,47 +338,50 @@ ul {
         activeTabPurgeList = activeTab + 'PurgeList'; // Default active tab Purge list
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
-        displayData();
         
+        displayData();
+        const list =  [];
+        const plistElement = document.getElementById("purge_list");
+        plistElement.innerHTML = list.map(item => `<li>${item}</li>`).join("");
+    var purgeList = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
+                // Append each item from the parsed JSON to the list
+                purgeList.forEach(item => {
+                const purgedWeek = item.purgedWeek || getWeekNumber(new Date(item.purgedAt));
+
+                // Check if the week header already exists, otherwise create it
+                if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
+                    var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:16px; color:#f2f;">Week ${purgedWeek} - ${new Date().getFullYear()}</li>`);
+                    $('#purge_list').append(weekHeadline);
+                }
+
+                var newPurgeItem = $('<li><span style="font-size:13px; color:light-grey;">' + item.text + ' <p class="time"> ' +' '+ item.timestamp + '</p></span></li>');
+                $(`.week-${purgedWeek}`).after(newPurgeItem);
+
+                // console.log('new purge item:', newPurgeItem);
+            });
     }
 
-    // function storeData() {
-    //     const inputField = document.getElementById("inputField");
-    //     const value = inputField.value.trim();
-
-    //     if (!value) return;
-
-    //     let list = JSON.parse(localStorage.getItem(activeTabList)) || [];
-    //     list.push(value);
-    //     localStorage.setItem(activeTabList, JSON.stringify(list));
-
-    //     inputField.value = "";
-    //     displayData();
-    // }
+ 
 
     function displayData() {
         //reset list to refresh display
         const list =  [];
         const listElement = document.getElementById("todo_list");
         listElement.innerHTML = list.map(item => `<li>${item}</li>`).join("");
-        // const plistElement = document.getElementById("purge_list");
-        // listElement.innerHTML = list.map(item => `<li>${item}</li>`).join("");
         
-
-    // Load tasks from local storage on page load
-    var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
-    // counter = todoList.length;
-    
-    i=0;
-    todoList.forEach(item => {
-        const category = item.category;
-        var newListItem = $('<li id="item-'+i+'"><span><input type="checkbox" class="task-checkbox" ' + (item.checked ? 'checked' : '') + '> <span class="task-text"> ' + item.text + ' '+'</span> <p class="time"> ' + item.timestamp + ' </p></span><input type="submit" class="icon edit" value="" title="Edit task"><input type="submit" class="icon delete" value=" " title="Delete task"></li>');
-        $('#todo_list').append(newListItem);
-        // Append the task to the correct category's list
-        // $(`#${category}-list`).append(newListItem);
-        i++;
-    });
-    
+        // Load tasks from local storage on page load
+        var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+        // counter = todoList.length;
+        
+        i=0;
+        todoList.forEach(item => {
+            const category = item.category;
+            var newListItem = $('<li id="item-'+i+'"><span><input type="checkbox" class="task-checkbox" ' + (item.checked ? 'checked' : '') + '> <span class="task-text"> ' + item.text + ' '+'</span> <p class="time"> ' + item.timestamp + ' </p></span><input type="submit" class="icon edit" value="" title="Edit task"><input type="submit" class="icon delete" value=" " title="Delete task"></li>');
+            $('#todo_list').append(newListItem);
+            // Append the task to the correct category's list
+            // $(`#${category}-list`).append(newListItem);
+            i++;
+        });
     }
 
     displayData(); // Load initial data
@@ -494,7 +497,6 @@ $(function() {
     }
 
     function purgeList() {
-        displayData();
         // Get the todoList from localStorage
         var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
         // Get the purgeList from localStorage
@@ -525,8 +527,8 @@ $(function() {
 
             // Add the removed task to purgeList
             purgeList.push(removedItem);
-
-            // Check if a week header already exists for this week
+            
+            // Check if a week header already exists for current week
             if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
                 // Add a headline for the week if it doesn't exist
                 var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:12px">Week: ${purgedWeek} - ${new Date().getFullYear()}</li>`);
@@ -638,7 +640,7 @@ $(function() {
     //     i++;
     // });
 
-    //Load purged list from local storage
+    // Load purged list from local storage
     var purgeList = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
 
         // Check if jsonContent is an array
@@ -724,8 +726,9 @@ document.getElementById('jsonFileInput').addEventListener('change', function(eve
 
 function w3_openPrivate() {
     document.getElementById("mySidebarPrivate").style.display = "block";
-    displayData();
-    console.log('activetab', activeTab);
+    console.log('activetablist', activeTabList);
+    // displayData();
+
 }
   
 function w3_closePrivate() {
