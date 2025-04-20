@@ -13,17 +13,16 @@ body {
     position: relative;
 
 }
-/*
-https://www.w3schools.com/css/css3_shadows_box.asp
-*/
-.mid {
-    margin:100px auto 100px auto;
-    color: #f2f2f2;
-    width: 90%;
+
+.mid-container {
+    margin:100px auto 10px auto;
+    color: #e6e6e6;
+    width: 75%;
     border-radius: 25px 5px;
     background-color: #454545;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
-    padding:10px 0px 10px 20px;
+    /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); */
+    box-shadow: 0 2rem 2rem #00000080;
+    padding:20px 0px 20px 20px;
     z-index: -99;
     font-size: 18px;
     /* opacity: 50%; */
@@ -35,6 +34,43 @@ a {
     font-size: 14px;
 }
 
+.icon {
+    background-position: center;
+    background-size: cover;
+    filter: invert(100%);
+    width: 30px;
+    margin: 5px;
+    padding: 5px;
+    /* border: 3px solid rgb(255, 255, 255); */
+    
+}
+.add {
+background-image:url(add_pen.png);
+}
+.purge {
+background-image:url(purge.png);
+}
+.export {
+background-image:url(export.png);
+height:25px;
+margin-right:25px;
+}
+.import {
+/* background-image:url(import.png);
+height:25px;*/
+width:200px; 
+/* margin-right:66px; */
+}
+.edit {
+background-image:url(edit.png);
+}
+.delete {
+background-image:url(delete.png);
+}
+.icon:hover{
+    opacity: 0.6; transition: 0.1s
+}
+
 .time {
     font-size: 10px;
     color:rgb(154, 153, 150);
@@ -42,15 +78,28 @@ a {
 }
 
 .circle {
-  background-color:rgba(226, 90, 90, 0.687);
+  background-color:rgba(226, 90, 90, 0.686);
   width: var(--circle-size, 20px);
   height: var(--circle-size, 20px); 
   border-radius: 50%;
-  position:fixed;
-  display:inline-block;
+  /* position:fixed; */
+  /* display:inline-block; */
  
-  margin-top:5px;
+  
   transition: 0.5s width, 0.5s height;
+  z-index: 1;
+}
+.healthbar {
+    background-color:var(--health-color,rgba(106, 226, 90, 0.686));
+    opacity: 70%;
+  width: var(--circle-size, 10px);
+  height: 10px;
+  border-radius: 10px;
+  /* position:fixed; */
+  display:block;
+  margin-top:-15px;
+  padding: 0px;
+  transition: 0.5s width;
   z-index: 1;
 }
 
@@ -61,7 +110,7 @@ a {
 /* Tooltip container 
 https://www.w3schools.com/css/css_tooltip.asp 
 */
-.overlay {
+.main-container {
     position: relative;
     display: inline-block;
     z-index: 1;
@@ -70,7 +119,7 @@ https://www.w3schools.com/css/css_tooltip.asp
   position: relative;
   display: inline-block;
   z-index: 100;
- border-bottom: 1px dotted black; /*  If you want dots under the hoverable text */
+ /* border-bottom: 1px dotted black;  If you want dots under the hoverable text */
 }
 
 /* Tooltip text */
@@ -88,9 +137,10 @@ https://www.w3schools.com/css/css_tooltip.asp
   /* Position the tooltip text */
   position: absolute;
   z-index: -100;
-  bottom: 80%;
+  /* bottom: 80%; */
+  top:-10px;
   left: 0%;
-  margin-left: -60px;
+  margin-left: 120px;
 }
 .tooltip .tooltiptext::after {
   content: "";
@@ -106,11 +156,9 @@ https://www.w3schools.com/css/css_tooltip.asp
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
-/*
-https://www.w3docs.com/snippets/css/how-to-style-input-and-submit-buttons.html
-*/
+
 input[type=submit] {
-        background-color: rgb(79, 79, 79);
+        background-color: rgb(79, 79, 79, 0);
         border: none;
         color: #fff;
         padding: 5px 8px;
@@ -118,10 +166,11 @@ input[type=submit] {
         margin: 4px 2px;
         border-radius: 6px;
         cursor: pointer;
-        font-size:12px;
+        font-size:14px;
         font-weight: bold;
       }
 
+/* import export json files */
 .fileops {
   background-color: rgb(79, 79, 79);
   color: #fff;
@@ -130,11 +179,27 @@ input[type=submit] {
   text-align: right;
 
   position: absolute;
- 
+ width:200px;
   /* padding: 5px; */
   border-radius: 6px;
-  top: 5%;
+  top: 55px;
+  right: 5px;
+  /* margin-right:10%; */
+}
+.history-button {
+  background-color: rgb(79, 79, 79);
+  color: #fff;
+  font-weight: normal;
+  font-size: 14px;
+  text-align: right;
+  box-shadow: 0 2rem 2rem #00000080;
+  position: absolute;
+ width:130px;
+  /* padding: 5px; */
+  border-radius: 6px;
+  top: 25px;
   right: 8%;
+  margin-right:10%;
 }
 .bold {
   font-weight: bold;
@@ -149,118 +214,88 @@ ul {
     margin: 0; /* To remove default bottom margin */ 
     padding: 0; /* To remove default left padding */
 }
-/* menus */
-.topnav {
-    height:40px;
-    width: 55%;
-    border-radius: 25px 5px;
-    background-color: #333;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
-    margin:100px auto 100px auto;
-    padding:10px 0px 0px 20px;
+
+/* tabs */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  margin-top: -67px;
+  /* background-color: rgb(245, 222, 179, 100%); */
+  /* border: 1px solid black; */
+  /* align-items: center; */
 }
 
-/*
-https://www.w3schools.com/howto/howto_css_dropup.asp
-*/
-.bottomnav {
-    height:40px;
-    width: 50%;
-    border-radius: 5px 25px;;
-    background-color: #333;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
-    margin:auto;
-    padding:10px 0px 0px 20px;
+.panels {
+  background: rgb(255, 255, 255, 0);
+  box-shadow: 0 2rem 2rem #00000080;
+  min-height: 50px;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 3px;
+  overflow: hidden;
+  padding: 20px;
 }
 
-.dropbtn {
-    background-color: #252827;
-    width: 100px;   
-    text-transform: uppercase;
-    padding: 8px 0 8px 0;
-    color: white;
-    border: 5px;
-    border-color: coral;
-    border-radius: 5px 5px 0 0;
-    margin-left:15px;
+.panel {
+  display: none;
 }
 
-.dropdown {
-    display: inline-block;
-    color: #f2f2f2;
-    white-space: nowrap;  
+.tabs {
+    display: flex;
+    /* gap: 10px; */
+    /* margin-bottom: 0px; */
 }
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f1f1f1;
-    border-radius: 5px 5px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 111;
-    padding: 2px; 
+.tab {
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px 5px 0px 0px;
+  /* box-shadow: 0 0.5rem 0.8rem #00000080; */
+  /* font-size: 1em; */
+    /* border: 1px solid #ccc; */
+    /* background-color: #f4f4f4; */
 }
-.dropdown-content a {
-    color: black;
-    padding: 8px 26px;
-    display: block;
+.tab:hover{
+    opacity: 0.6; transition: 0.1s
 }
-
-.dropup-content {
-    display: none;
-    position: absolute;
-    bottom: 40px;
-    background-color: #f1f1f1;
-    border-radius: 5px 5px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    padding: 2px; 
+.tab.active {
+    background-color: #454545;
 }
-
-.dropup-content a {
-    color: black;
-    padding: 8px 26px;
-    display: block;
-}
-
-.dropdown-content a:hover {
-    background-color: coral;
-}
-
-.dropup-content a:hover {
-    background-color: coral;
-}
-
-.dropdown:hover .dropdown-content {display: block;}
-.dropdown:hover .dropup-content {display: block;}
-
-.dropdown:hover .dropbtn {background-color: #3e6a8e;}
 </style>
 </head>
 
 <body>
-
 <!-- Mid navigation -->
-<div class="mid">
-    <div class="circle" title="FOvea, a small depression within the retina where visual acuity is the highest.">
-    </div>  
-    <div class="tooltip">
-        <h1>Flowea </h1>
-        <span class="tooltiptext">Fovea, small region of the retina which produces the sharpest vision.</span>
-    </div>
+<div class="mid-container">
+    <div class="wrap">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('workTab')">Work</div>
+            <div class="tab" onclick="switchTab('personalTab')">Personal</div>
+        </div>    
+        <div>
+            <div class="tooltip">
+                <h1>Flowea </h1>
+                <span class="tooltiptext">Fovea, small region of the retina which produces the sharpest vision.</span>
+            </div> 
+            <div class="circle healthbar" title="FOvea, a small depression within the retina where visual acuity is the highest.">
+                &nbsp;
+            </div>
+        </div>
 
-    <!-- Purge list -->
-<div class="fileops" style="width: 130px;">
-    <a href="javascript:void(0)" class="w3-left w3-button w3-text-light-grey" onclick="w3_openPrivate()" style="font-size: 12px; width: 100%;">< History</a>
-</div>
+    </div>
+    
+    
+    <!-- History button - Purge history list  & file operations -->
+    <div class="history-button">
+        <a href="javascript:void(0)" class="w3-left w3-button w3-text-light-grey" onclick="w3_openPrivate()" style="font-size: 12px; width: 100%;">< History</a>
+    </div>
     <br>
-    <div class="overlay">
+    <div class="main-container">
         <input type="text" id="enter_task" placeholder="Enter Task">
-        <input type="submit" id="add" value="&#43;" class="circle-size">
-        <input type="submit" id="purge" value="Purge List" class="circle-size">
+        <input type="submit" id="add" value=" " class="icon add" title="Add task">
+        <input type="submit" id="purge" value=" " class="icon purge" title="Purge checked tasks">
 <!-- <p style="font-size: 8px; padding-left: 3px; border-style: solid; border-width: 0 0 1px 0 ; border-color: red;">Urgent__</p> -->
             <!-- list elements -->
-            <div id="sort_list" style="padding-left: 5%;">
+            <div id="sort_list" style="padding: 5px;">
                 
                 <ul id="todo_list" style="list-style: none;" class="connected-sortable">
                     
@@ -273,17 +308,17 @@ https://www.w3schools.com/howto/howto_css_dropup.asp
 
 <!-- Purged list -->
 <nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:65%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
-    <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-8" style="text-align: right;">CLOSE</a> 
-
-    <div class="fileops" style="width: 200px;">
-        <button class="btn btn-outline-secondary btn-sm" id="exportHistory" onclick="exportHistory()">Export</button > 
+    <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-16" style="text-align: right;">CLOSE</a> 
+    <!-- Import export buttons -->
+    <div class="fileops">
+        <button class="icon export" id="exportHistory" onclick="exportHistory()"> </button > 
             <a id="exportHistoryLink" style="display: none;">Export</a>
             <br>
             <!-- <label for="FileInputLabel"><b>Import</b></label> -->
-            <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="circle-size"></input>
+            <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input>
     </div>
+    <!-- Purge history list -->
     <div style="margin-top: 65px;">
-        <!-- list elements -->
         <ul id="purge_list" style="list-style: none;padding-left: 5%;">
         </ul>
     </div>
@@ -293,21 +328,70 @@ https://www.w3schools.com/howto/howto_css_dropup.asp
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
+    let activeTab = 'workTab'; // Default active tab personalTab
+    let activeTabList = activeTab + 'List';
+    let activeTabPurgeList = activeTab + 'PurgeList'; // Default active tab Purge list
 
-/*todo list script at bottom
+    function switchTab(tab) {
+        activeTab = tab;
+        activeTabList = activeTab + 'List';
+        activeTabPurgeList = activeTab + 'PurgeList'; // Default active tab Purge list
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+        displayData();
+        
+    }
 
-The dollar function, $(), can be used as shorthand for the getElementById function
-${} multiline string /string interpolation
-*/
+    // function storeData() {
+    //     const inputField = document.getElementById("inputField");
+    //     const value = inputField.value.trim();
+
+    //     if (!value) return;
+
+    //     let list = JSON.parse(localStorage.getItem(activeTabList)) || [];
+    //     list.push(value);
+    //     localStorage.setItem(activeTabList, JSON.stringify(list));
+
+    //     inputField.value = "";
+    //     displayData();
+    // }
+
+    function displayData() {
+        //reset list to refresh display
+        const list =  [];
+        const listElement = document.getElementById("todo_list");
+        listElement.innerHTML = list.map(item => `<li>${item}</li>`).join("");
+        // const plistElement = document.getElementById("purge_list");
+        // listElement.innerHTML = list.map(item => `<li>${item}</li>`).join("");
+        
+
+    // Load tasks from local storage on page load
+    var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+    // counter = todoList.length;
+    
+    i=0;
+    todoList.forEach(item => {
+        const category = item.category;
+        var newListItem = $('<li id="item-'+i+'"><span><input type="checkbox" class="task-checkbox" ' + (item.checked ? 'checked' : '') + '> <span class="task-text"> ' + item.text + ' '+'</span> <p class="time"> ' + item.timestamp + ' </p></span><input type="submit" class="icon edit" value="" title="Edit task"><input type="submit" class="icon delete" value=" " title="Delete task"></li>');
+        $('#todo_list').append(newListItem);
+        // Append the task to the correct category's list
+        // $(`#${category}-list`).append(newListItem);
+        i++;
+    });
+    
+    }
+
+    displayData(); // Load initial data
+    
 $(function() {
-
+// sortable list
     $("#sort_list").sortable({
         axis: "y",
         connectWith: ".connected-sortable",
         cursor: "move",
         opacity: 0.5,
         update: function(event, ui) {
-            const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+            const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
 
     // Get the new order of tasks from the DOM
     const newOrder = $('#todo_list li').map(function() {
@@ -320,44 +404,7 @@ $(function() {
     });
 
     // Update local storage with the reordered todoList
-    localStorage.setItem('todoList', JSON.stringify(todoList));
-//             const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
-
-// // Get the new index of the moved item
-// const newIndex = $('#todo_list li').index(ui.item);
-
-// // Remove the item from its original position in the array
-// const movedItem = todoList.splice(ui.item.index(), 1)[0];
-
-// // Insert the item at its new position in the array
-// todoList.splice(newIndex, 0, movedItem);
-
-// // Update local storage with the reordered todoList
-// localStorage.setItem('todoList', JSON.stringify(todoList));
-            // // // // // // // // // // /// /// / // // / / / / / 
-            // // Get the updated order of tasks from the DOM
-            // const newOrder = $('#todo_list li').map(function() {
-            //     return $(this).attr('id');
-            // }).get();
-
-            // // Update the task order in local storage
-            // const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
-            // const reorderedTodoList = newOrder.map(taskId => {
-            //     return todoList.find(task => task.id === taskId);
-            // });
-            // localStorage.setItem('todoList', JSON.stringify(reorderedTodoList));
-            // // // // // // // // // // /// /// / // // / / / / / 
-            // Update local storage with the new list order
-            // const taskId = ui.item.attr('id');
-            // const newCategory = ui.item.closest('.category').attr('id');
-
-            // Update the task's category in local storage
-        // const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
-        //     const taskIndex = todoList.findIndex(task => task.id === taskId);
-        //     if (taskIndex !== -1) {
-        //         todoList[taskIndex].category = newCategory;
-        //         localStorage.setItem('todoList', JSON.stringify(todoList));
-        //     }
+    localStorage.setItem(activeTabList, JSON.stringify(todoList));
         }
     }).disableSelection(); // Prevent text selection on mobile
 
@@ -369,19 +416,23 @@ $(function() {
         
         // var text = $('#enter_task').val();
         var text = $('#enter_task').val().trim();
+        const date = new Date();
+        const options = { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'};
+        const formattedDate = date.toLocaleString('en-GB', options);
+        // en-US
         var time = new Date().toLocaleString();
         if (text !== '') {  // Ensure the input isn't empty
             var newListItem = $(
                 '<li id="item-'+counter+'"><span><input type="checkbox" class="task-checkbox"> ' +
                 '<span class="task-text">' + text + ' '+'</span>' +
-                ' <p class="time">' + time + '</p></span>' +
-                '<input type="submit" class="edit" value="Edit">' +
-                '<input type="submit" class="delete" value="Delete"></li>'
+                ' <p class="time">' +formattedDate + '</p></span>' +
+                '<input type="submit" class="icon edit" value=" " title="Edit task">' +
+                '<input type="submit" class="icon delete" value=" " title="Delete task"></li>'
             );
             
-            var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+            var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
             todoList.push({ text: text, timestamp: time });
-            localStorage.setItem('todoList', JSON.stringify(todoList));
+            localStorage.setItem(activeTabList, JSON.stringify(todoList));
 
             $('#todo_list').append(newListItem);
 
@@ -397,10 +448,10 @@ $(function() {
     }
 
     function updateTaskInStorage(index, newText, checked) {
-        var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+        var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
         todoList[index].text = newText;
         todoList[index].checked = checked;
-        localStorage.setItem('todoList', JSON.stringify(todoList));
+        localStorage.setItem(activeTabList, JSON.stringify(todoList));
     }
 
     function deleteTask() {
@@ -412,20 +463,18 @@ $(function() {
         updateCircleSize();
 
         // Remove the task from local storage
-        var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+        var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
         todoList.splice(index, 1); // Remove the task at the corresponding index
-        localStorage.setItem('todoList', JSON.stringify(todoList));
+        localStorage.setItem(activeTabList, JSON.stringify(todoList));
     }
 
     function updateCircleSize() {
         // Retrieve tasks from local storage
-        const tasks = JSON.parse(localStorage.getItem('todoList') || '[]');
+        const tasks = JSON.parse(localStorage.getItem(activeTabList) || '[]');
 
         // Count unchecked tasks
         const uncheckedTasks = tasks.filter(task => !task.checked).length;
 
-        // var taskCount = $('#todo_list li').length; // Get the number of tasks in the list
-        // var uncheckedTasks = $('#todo_list input[type="checkbox"]:not(:checked)').length;
         var baseSize = 10; // Base size of the circle
         var sizeIncrement = 6; // Increase size per task
 
@@ -434,16 +483,24 @@ $(function() {
 
         // Update the --circle-size CSS variable for the circle element
         document.querySelector('.circle').style.setProperty('--circle-size', newSize + 'px');
-
+        document.querySelector('.healthbar').style.setProperty('--circle-size', newSize + 'px');
+        if (uncheckedTasks>7) {
+            document.querySelector('.healthbar').style.setProperty('--health-color', '#e25a5aaf');
+        }
+        else {
+            document.querySelector('.healthbar').style.setProperty('--health-color', '#6ae25aaf');
+        }
         console.log('Circle size updated. New size:', newSize + 'px');
     }
 
     function purgeList() {
+        displayData();
         // Get the todoList from localStorage
-        var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+        var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
         // Get the purgeList from localStorage
-        var purgeList = JSON.parse(localStorage.getItem('purgeList') || '[]');
-
+        var purgeList = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
+        console.log('activetablist', activeTabList); // Log the counter value
+        console.log('activePurgelist', activeTabPurgeList); // Log the counter value
         // Select all checked list items from #todo_list
         $('#todo_list input[type="checkbox"]:checked').each(function() {
             var listItem = $(this).closest('li');
@@ -482,14 +539,14 @@ $(function() {
         });
 
         // Update the localStorage after modification
-        localStorage.setItem('todoList', JSON.stringify(todoList)); // Update todoList in local storage
-        localStorage.setItem('purgeList', JSON.stringify(purgeList)); // Store the new purgeList in local storage
+        localStorage.setItem(activeTabList, JSON.stringify(todoList)); // Update todoList in local storage
+        localStorage.setItem(activeTabPurgeList, JSON.stringify(purgeList)); // Store the new purgeList in local storage
 
         // Update counter and circle size
         counter = $('#todo_list li').length; // Update the counter based on remaining tasks
         updateCircleSize();
 
-        alert('Checked tasks moved to purge list!');
+        alert('Checked tasks moved to purge history list!');
     }
 
     // Function to get the week number of a given date
@@ -524,9 +581,9 @@ $(function() {
     // Attach a delegated event listener to handle checkbox changes for existing and new tasks
     $('#todo_list').on('change', '.task-checkbox', function() {
     const index = $(this).closest('li').index();
-    const tasks = JSON.parse(localStorage.getItem('todoList') || '[]');
+    const tasks = JSON.parse(localStorage.getItem(activeTabList) || '[]');
     tasks[index].checked = $(this).is(':checked');
-    localStorage.setItem('todoList', JSON.stringify(tasks));
+    localStorage.setItem(activeTabList, JSON.stringify(tasks));
 
     updateCircleSize();
     $(this).closest('li').toggleClass('bold', !$(this).is(':checked'));
@@ -567,22 +624,22 @@ $(function() {
     // Event delegation for delete button
     $('#todo_list').on('click', '.delete', deleteTask);
 
-    // Load tasks from local storage on page load
-    var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
-    // counter = todoList.length;
+    // // Load tasks from local storage on page load
+    // var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+    // // counter = todoList.length;
     
-    i=0;
-    todoList.forEach(item => {
-        const category = item.category;
-        var newListItem = $('<li id="item-'+i+'"><span><input type="checkbox" class="task-checkbox" ' + (item.checked ? 'checked' : '') + '> <span class="task-text"> ' + item.text + ' '+'</span> <p class="time"> ' + item.timestamp + ' </p></span><input type="submit" class="edit" value="Edit"><input type="submit" class="delete" value="Delete"></li>');
-        $('#todo_list').append(newListItem);
-        // Append the task to the correct category's list
-        // $(`#${category}-list`).append(newListItem);
-        i++;
-    });
+    // i=0;
+    // todoList.forEach(item => {
+    //     const category = item.category;
+    //     var newListItem = $('<li id="item-'+i+'"><span><input type="checkbox" class="task-checkbox" ' + (item.checked ? 'checked' : '') + '> <span class="task-text"> ' + item.text + ' '+'</span> <p class="time"> ' + item.timestamp + ' </p></span><input type="submit" class="icon edit" value=""><input type="submit" class="icon delete" value=" "></li>');
+    //     $('#todo_list').append(newListItem);
+    //     // Append the task to the correct category's list
+    //     // $(`#${category}-list`).append(newListItem);
+    //     i++;
+    // });
 
     //Load purged list from local storage
-    var purgeList = JSON.parse(localStorage.getItem('purgeList') || '[]');
+    var purgeList = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
 
         // Check if jsonContent is an array
         if (Array.isArray(purgeList)) {
@@ -615,7 +672,7 @@ $(function() {
 //https://stackoverflow.com/questions/61586888/javascript-export-local-storage
 function exportHistory() {  
     console.log("started"); 
-    const purgeHistory = JSON.stringify(localStorage.getItem('purgeList') , null, 2); //indentation in json format, human readable
+    const purgeHistory = JSON.stringify(localStorage.getItem(activeTabPurgeList) , null, 2); //indentation in json format, human readable
     var filetime = new Date().toLocaleString();
 
     const blob = new Blob([purgeHistory], {type: 'application/json'});
@@ -646,7 +703,7 @@ document.getElementById('jsonFileInput').addEventListener('change', function(eve
                 // Parse the file content as JSON
                 const jsonContent = JSON.parse(e.target.result);
                 // Store JSON content in local storage
-                localStorage.setItem('purgeList', jsonContent);
+                localStorage.setItem(activeTabPurgeList, jsonContent);
 
                 // Clear the current list before appending new items
                 // $('#todo_list').empty();
@@ -667,6 +724,8 @@ document.getElementById('jsonFileInput').addEventListener('change', function(eve
 
 function w3_openPrivate() {
     document.getElementById("mySidebarPrivate").style.display = "block";
+    displayData();
+    console.log('activetab', activeTab);
 }
   
 function w3_closePrivate() {
