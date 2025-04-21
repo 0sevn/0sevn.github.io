@@ -15,9 +15,31 @@
       }
     </script>
 <style>
+
+:root {
+  --bg-color: #454545;
+  --text-color: #e6e6e6;
+  --card-bg: #454545;
+  --accent-color: #6ae25aaf;
+  --box-shadow: 0 2rem 2rem #00000080;
+  --invert-icon:100%;
+  --active-tab:#2d2d2d;
+}
+body.light-mode {
+  --bg-color: #f4f4f4;
+  --text-color: #333;
+  --card-bg: #ffffff;
+  --accent-color: #0077ff;
+  --box-shadow: 0 1rem 1rem rgba(0, 0, 0, 0.2);
+  --invert-icon:15%;
+  --active-tab:#c2c2c2;
+}
+
 body {
     font-family: "Lato", sans-serif;
-    background-color: rgb(107, 107, 107);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    /* #6b6b6b; */
     text-align: left;
     text-decoration: none;
     position: relative;
@@ -25,16 +47,20 @@ body {
 
 .mid-container {
     margin:10% auto 0px auto;
-    color: #e6e6e6;
+    /* background-color: #454545; */
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    box-shadow: var(--box-shadow);
     width: 95% !important;
     border-radius: 25px 5px;
-    background-color: #454545;
+    
     /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); */
     /* border: 3px solid rgb(255, 255, 255); */
     box-shadow: 0 2rem 2rem #00000080;
     padding:20px 20px 0px 20px;
     z-index: -99;
     font-size: 18px;
+    max-width: 600px;
     
     /* opacity: 50%; */
 }
@@ -45,7 +71,7 @@ body {
     
 } */
 a {
-    color: white;
+    color: var(--text-color);
     border-radius: 15px;
     font-size: 14px;
 }
@@ -55,7 +81,7 @@ a {
     background-position: right;
     background-size: contain;
     background-repeat: no-repeat;
-    filter: invert(100%);
+    filter: invert(var(--invert-icon));
     width: 35px;
     margin: 1px;
     padding: 0px;
@@ -73,6 +99,9 @@ background-image:url(delete.png);
 }
 .purge {
 background-image:url(purge.png);
+}
+.darklight_mode {
+background-image:url(dark_mode.png);
 }
 .export {
 background-image:url(export.png);
@@ -93,31 +122,34 @@ width:240px;
 }
 
 .fileops {
-  background-color: rgb(79, 79, 79);
-  color: #fff;
+  /* background-color: rgb(79, 79, 79); */
+  background-color: var(--card-bg);
+  /* color: #fff; */
+  color: var(--text-color);
   font-weight: normal;
   font-size: 14px;
   text-align: right;
   position: absolute;
 width:250px;
   border-radius: 6px;
-  top: 5px;
+  bottom: 5px;
   right: 5px;
 }
 .history-button {
-  background-color: rgb(79, 79, 79);
-  color: #fff;
+  /* background-color: rgb(79, 79, 79); */
+  background-color: var(--card-bg);
+  /* color: #fff; */
+  color: var(--text-color);
   text-align: center;
   /* font-weight: normal; */
   /* font-size: 16px; */
   /* text-align: right; */
-  
   position: relative;
  width:100px;
   padding: 5px;
   border-radius: 6px;
   /* top: 25px; */
-left: 100px;
+    left: 100px;
   /* margin-right:10%; */
   box-shadow: 0 1rem 1rem #00000080;
 }
@@ -129,8 +161,8 @@ left: 100px;
 
 .healthbar {
     background-color:var(--health-color,rgba(106, 226, 90, 0.686));
-    /* border-top: 3px solid rgb(140, 237, 145);
-    border-bottom: 4px solid rgb(37, 117, 41); */
+    border-top: 3px solid var(--accent);
+    /* border-bottom: 4px solid rgb(37, 117, 41); */
     opacity: 70%;
     border-radius: 50%;
   width: var(--healthbar-size, 10px);
@@ -142,6 +174,7 @@ left: 100px;
   padding: 0px;
   transition: 0.5s width;
   z-index: 1;
+  /* background-color: var(--accent); */
   box-shadow: 0 1rem 0.7rem #00000080;
 }
 
@@ -188,7 +221,7 @@ ul {
 .tab-wrap {
   display: flex;
   flex-direction: column;
-  margin-top: -60px;
+  margin-top: -65px;
   /* background-color: rgb(245, 222, 179, 100%); */
   /* border: 1px solid black; */
   /* align-items: center; */
@@ -202,7 +235,7 @@ ul {
     /* margin-bottom: 0px; */
 }
 .tab {
-    padding: 10px 15px 10px 15px;
+    padding: 10px 15px 0px 15px;
     cursor: pointer;
     border-radius: 5px 5px 0px 0px;
   /* box-shadow: 0 0.5rem 0.8rem #00000080; */
@@ -214,7 +247,7 @@ ul {
     opacity: 0.6; transition: 0.1s
 }
 .tab.active {
-    background-color: #454545;
+    background-color: var(--active-tab);
 }
 
 </style>
@@ -228,6 +261,9 @@ ul {
             <div class="tab active" onclick="switchTab('workTab')">Work</div>
             <div class="tab" onclick="switchTab('personalTab')">Personal</div>
             <div class="tab" onclick="w3_openPrivate()" style="margin-left:15px; padding-left: 10px; font-size: 14px;">< History</div>
+            <div class="tab">
+                <input type="submit" value=" " class="icon darklight_mode" title="Toggle light/dark mode" onclick="toggleTheme()">
+            </div>
         </div>    
         <div class="healthbar" title="FOvea, a small depression within the retina where visual acuity is the highest.">
             &nbsp;
@@ -235,7 +271,7 @@ ul {
     </div>
     
     <br>
-    <div class="main-container">
+    <div>
         <input type="text" id="enter_task" placeholder="Enter Task">
         <input type="submit" id="add" value=" " class="icon add" title="Add task">
         <input type="submit" id="purge" value=" " class="icon purge" title="Purge checked tasks">
@@ -251,7 +287,7 @@ ul {
 
 <!-- Purged list -->
 <nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:75%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
-    <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-left w3-padding-32">CLOSE</a> 
+    <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-32">CLOSE</a> 
     <!-- Import/export buttons -->
     <div class="fileops">
         <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
@@ -677,6 +713,25 @@ function w3_openPrivate() {
 function w3_closePrivate() {
     document.getElementById("mySidebarPrivate").style.display = "none";
 }
+
+// Toggle light/dark mode
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    // Change icon image
+    document.querySelector('.darklight_mode').style.backgroundImage = isLight 
+        ? 'url(light_mode.png)' 
+        : 'url(dark_mode.png)';
+}
+
+// On page load, apply saved theme
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+    }
+});
 </script>
 </body>
 </html>
