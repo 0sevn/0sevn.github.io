@@ -61,7 +61,7 @@ body {
     border-radius: 25px 5px;
     
     /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); */
-    /* border: 3px solid rgb(255, 255, 255); */
+    /* border: 3px solid rgb(11, 10, 10); */
     box-shadow: 0 2rem 2rem #00000080;
     padding:20px 20px 0px 20px;
     z-index: -99;
@@ -228,6 +228,7 @@ ul {
   display: flex;
   flex-direction: column;
   margin-top: -65px;
+  
   /* background-color: rgb(245, 222, 179, 100%); */
   /* border: 1px solid black; */
   /* align-items: center; */
@@ -239,6 +240,7 @@ ul {
     display: flex;
     /* gap: 10px; */
     /* margin-bottom: 0px; */
+    /* border: 3px solid rgb(11, 10, 10); */
 }
 .tab {
     padding: 10px 15px 0px 15px;
@@ -280,7 +282,8 @@ ul {
     <div>
         <input type="text" id="enter_task" placeholder="Enter Task">
         <input type="submit" id="add" value=" " class="icon add" title="Add task">
-        <input type="submit" id="purge" value=" " class="icon purge" title="Purge checked tasks">
+        <input type="submit" id="purge" value=" " class="icon purge" title="Purge checked tasks" disabled>
+
 <!-- <p style="font-size: 8px; padding-left: 3px; border-style: solid; border-width: 0 0 1px 0 ; border-color: red;">Urgent__</p> -->
             <!-- list elements -->
             <div id="sort_list" style="padding: 5px;">
@@ -347,7 +350,10 @@ ul {
     }
 
  
-
+    function togglePurgeButton() {
+  const anyChecked = $('#todo_list input[type="checkbox"]:checked').length > 0;
+  $('#purge').prop('disabled', !anyChecked);
+}
     function displayData() {
         //reset list to refresh display
         const list =  [];
@@ -367,6 +373,7 @@ ul {
             // $(`#${category}-list`).append(newListItem);
             i++;
         });
+        togglePurgeButton();
     }
 
     displayData(); // Load initial data
@@ -482,6 +489,7 @@ $(function() {
         }
         console.log('healthBar updated. New size:', newSize + 'px');
     }
+    
     const purgeMessages = [
   "Letting go of completed tasks feels good. 🎉",
   "Cleared with purpose. ✨",
@@ -547,8 +555,8 @@ $(function() {
 
         // alert('Checked tasks moved to purge history list!');
         const randomMessage = purgeMessages[Math.floor(Math.random() * purgeMessages.length)];
-showToast(randomMessage);
-    }
+        showToast(randomMessage);
+        }
 
     // Function to get the week number of a given date
     function getWeekNumber(date) {
@@ -586,10 +594,14 @@ showToast(randomMessage);
     tasks[index].checked = $(this).is(':checked');
     localStorage.setItem(activeTabList, JSON.stringify(tasks));
 
+    
+
     updateHealthBar();
+    togglePurgeButton();
     $(this).closest('li').toggleClass('bold', !$(this).is(':checked'));
     console.log('Checkbox changed:')
     });
+    
 
     // Edit functionality
     $('#todo_list').on('click', '.edit', function() {
