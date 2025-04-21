@@ -4,6 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FloWea</title>
 <link rel="stylesheet" href="w3.css">
+<meta name="theme-color" content="#454545">
 <!-- in your <head> -->
     <link rel="manifest" href="manifest.json">
     <script>
@@ -26,17 +27,24 @@ body {
 .mid-container {
     margin:100px auto 10px auto;
     color: #e6e6e6;
-    width: 90%;
+    width: 90% !important;
     border-radius: 25px 5px;
     background-color: #454545;
     /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); */
+    /* border: 3px solid rgb(255, 255, 255); */
     box-shadow: 0 2rem 2rem #00000080;
-    padding:15px;
+    padding:20px 20px 0px 20px;
     z-index: -99;
     font-size: 18px;
+    
     /* opacity: 50%; */
 }
-
+.main-container {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+    
+}
 a {
     color: white;
     border-radius: 15px;
@@ -119,11 +127,7 @@ background-image:url(delete.png);
 /* Tooltip container 
 https://www.w3schools.com/css/css_tooltip.asp 
 */
-.main-container {
-    position: relative;
-    display: inline-block;
-    z-index: 1;
-}
+
 .tooltip {
   position: relative;
   display: inline-block;
@@ -166,9 +170,9 @@ https://www.w3schools.com/css/css_tooltip.asp
   visibility: visible;
 }
 input[type=text] {
-    font-size: 16px;
-    padding: 10px;
-    width: 90%;
+    /* font-size: 16px; */
+    /* padding: 10px; */
+    /* width: 90%; */
     margin-bottom: 10px;
 }
 input[type=submit] {
@@ -208,11 +212,11 @@ input[type=submit] {
   text-align: right;
   box-shadow: 0 2rem 2rem #00000080;
   position: absolute;
- width:330px;
+ width:130px;
   /* padding: 5px; */
   border-radius: 6px;
   top: 25px;
-  right: 28%;
+  right: 48%;
   /* margin-right:10%; */
 }
 .bold {
