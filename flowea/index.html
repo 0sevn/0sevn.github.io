@@ -5,7 +5,7 @@
 <title>FloWea</title>
 <link rel="stylesheet" href="w3.css">
 <meta name="theme-color" content="#454545">
-<!-- in your <head> -->
+<!-- in your <head> <zombies> -->
     <link rel="manifest" href="manifest.json">
     <script>
       if ('serviceWorker' in navigator) {
@@ -21,13 +21,12 @@ body {
     text-align: left;
     text-decoration: none;
     position: relative;
-
 }
 
 .mid-container {
-    margin:100px auto 10px auto;
+    margin:10% auto 0px auto;
     color: #e6e6e6;
-    width: 90% !important;
+    width: 95% !important;
     border-radius: 25px 5px;
     background-color: #454545;
     /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); */
@@ -39,12 +38,12 @@ body {
     
     /* opacity: 50%; */
 }
-.main-container {
+/* .main-container {
     position: relative;
     display: inline-block;
     z-index: 1;
     
-}
+} */
 a {
     color: white;
     border-radius: 15px;
@@ -52,31 +51,19 @@ a {
 }
 
 .icon {
-    background-position: center;
-    background-size: cover;
+    background-color: rgb(69, 69, 69, 0);
+    background-position: right;
+    background-size: contain;
+    background-repeat: no-repeat;
     filter: invert(100%);
-    width: 30px;
-    margin: 5px;
-    padding: 5px;
+    width: 35px;
+    margin: 1px;
+    padding: 0px;
+    border: none;
     /* border: 3px solid rgb(255, 255, 255); */
-    
 }
 .add {
 background-image:url(add_pen.png);
-}
-.purge {
-background-image:url(purge.png);
-}
-.export {
-background-image:url(export.png);
-height:25px;
-margin-right:25px;
-}
-.import {
-/* background-image:url(import.png);
-height:25px;*/
-width:200px; 
-/* margin-right:66px; */
 }
 .edit {
 background-image:url(edit.png);
@@ -84,91 +71,84 @@ background-image:url(edit.png);
 .delete {
 background-image:url(delete.png);
 }
+.purge {
+background-image:url(purge.png);
+}
+.export {
+background-image:url(export.png);
+background-position-x: 200px;
+height:35px;
+width:240px;
+/* margin-right:25px; */
+}
+.import {
+background-image:url(import.png);
+background-position-x: 200px;
+height:35px;
+width:240px; 
+}
+
 .icon:hover{
     opacity: 0.6; transition: 0.1s
 }
 
+.fileops {
+  background-color: rgb(79, 79, 79);
+  color: #fff;
+  font-weight: normal;
+  font-size: 14px;
+  text-align: right;
+  position: absolute;
+width:250px;
+  border-radius: 6px;
+  top: 5px;
+  right: 5px;
+}
+.history-button {
+  background-color: rgb(79, 79, 79);
+  color: #fff;
+  text-align: center;
+  /* font-weight: normal; */
+  /* font-size: 16px; */
+  /* text-align: right; */
+  
+  position: relative;
+ width:100px;
+  padding: 5px;
+  border-radius: 6px;
+  /* top: 25px; */
+left: 100px;
+  /* margin-right:10%; */
+  box-shadow: 0 1rem 1rem #00000080;
+}
 .time {
     font-size: 10px;
     color:rgb(154, 153, 150);
     display: inline-block;
 }
 
-.circle {
-  background-color:rgba(226, 90, 90, 0.686);
-  width: var(--circle-size, 20px);
-  height: var(--circle-size, 20px); 
-  border-radius: 50%;
-  /* position:fixed; */
-  /* display:inline-block; */
- 
-  
-  transition: 0.5s width, 0.5s height;
-  z-index: 1;
-}
 .healthbar {
     background-color:var(--health-color,rgba(106, 226, 90, 0.686));
+    /* border-top: 3px solid rgb(140, 237, 145);
+    border-bottom: 4px solid rgb(37, 117, 41); */
     opacity: 70%;
-  width: var(--circle-size, 10px);
-  height: 10px;
+    border-radius: 50%;
+  width: var(--healthbar-size, 10px);
+  height: 15px;
   border-radius: 10px;
   /* position:fixed; */
   display:block;
-  margin-top:-15px;
+  margin-top:10px;
   padding: 0px;
   transition: 0.5s width;
   z-index: 1;
+  box-shadow: 0 1rem 0.7rem #00000080;
 }
 
 [type=number] {
   display: block;
 }
 
-/* Tooltip container 
-https://www.w3schools.com/css/css_tooltip.asp 
-*/
-
-.tooltip {
-  position: relative;
-  display: inline-block;
-  z-index: 100;
- /* border-bottom: 1px dotted black;  If you want dots under the hoverable text */
-}
-
-/* Tooltip text */
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: 220px;
-  background-color: rgb(79, 79, 79);
-  color: #fff;
-  text-align: center;
-  padding: 5px;
-  border-radius: 6px;
-  font-weight: normal;
-  font-size:14px;
-
-  /* Position the tooltip text */
-  position: absolute;
-  z-index: -100;
-  /* bottom: 80%; */
-  top:-10px;
-  left: 0%;
-  margin-left: 120px;
-}
-.tooltip .tooltiptext::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-top: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: transparent transparent transparent rgb(79, 79, 79);;
-}
-/* Show the tooltip text when you mouse over the tooltip container */
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}
 input[type=text] {
     /* font-size: 16px; */
     /* padding: 10px; */
@@ -189,36 +169,7 @@ input[type=submit] {
       }
 
 /* import export json files */
-.fileops {
-  background-color: rgb(79, 79, 79);
-  color: #fff;
-  font-weight: normal;
-  font-size: 14px;
-  text-align: right;
 
-  position: absolute;
- width:200px;
-  /* padding: 5px; */
-  border-radius: 6px;
-  top: 55px;
-  right: 5px;
-  /* margin-right:10%; */
-}
-.history-button {
-  background-color: rgb(79, 79, 79);
-  color: #fff;
-  font-weight: normal;
-  font-size: 14px;
-  text-align: right;
-  box-shadow: 0 2rem 2rem #00000080;
-  position: absolute;
- width:130px;
-  /* padding: 5px; */
-  border-radius: 6px;
-  top: 25px;
-  right: 48%;
-  /* margin-right:10%; */
-}
 .bold {
   font-weight: bold;
 }
@@ -234,29 +185,16 @@ ul {
 }
 
 /* tabs */
-.wrap {
+.tab-wrap {
   display: flex;
   flex-direction: column;
-  margin-top: -67px;
+  margin-top: -60px;
   /* background-color: rgb(245, 222, 179, 100%); */
   /* border: 1px solid black; */
   /* align-items: center; */
 }
 
-.panels {
-  background: rgb(255, 255, 255, 0);
-  box-shadow: 0 2rem 2rem #00000080;
-  min-height: 50px;
-  width: 100%;
-  max-width: 500px;
-  border-radius: 3px;
-  overflow: hidden;
-  padding: 20px;
-}
 
-.panel {
-  display: none;
-}
 
 .tabs {
     display: flex;
@@ -264,7 +202,7 @@ ul {
     /* margin-bottom: 0px; */
 }
 .tab {
-    padding: 10px;
+    padding: 10px 15px 10px 15px;
     cursor: pointer;
     border-radius: 5px 5px 0px 0px;
   /* box-shadow: 0 0.5rem 0.8rem #00000080; */
@@ -278,34 +216,24 @@ ul {
 .tab.active {
     background-color: #454545;
 }
+
 </style>
 </head>
 
 <body>
 <!-- Mid navigation -->
 <div class="mid-container">
-    <div class="wrap">
+    <div class="tab-wrap">
         <div class="tabs">
             <div class="tab active" onclick="switchTab('workTab')">Work</div>
             <div class="tab" onclick="switchTab('personalTab')">Personal</div>
+            <div class="tab" onclick="w3_openPrivate()" style="margin-left:15px; padding-left: 10px; font-size: 14px;">< History</div>
         </div>    
-        <div>
-            <div class="tooltip">
-                <h1>Flowea </h1>
-                <span class="tooltiptext">Fovea, small region of the retina which produces the sharpest vision.</span>
-            </div> 
-            <div class="circle healthbar" title="FOvea, a small depression within the retina where visual acuity is the highest.">
-                &nbsp;
-            </div>
+        <div class="healthbar" title="FOvea, a small depression within the retina where visual acuity is the highest.">
+            &nbsp;
         </div>
-
     </div>
     
-    
-    <!-- History button - Purge history list  & file operations -->
-    <div class="history-button">
-        <a href="javascript:void(0)" class="w3-left w3-button w3-text-light-grey" onclick="w3_openPrivate()" style="font-size: 12px; width: 100%;">< History</a>
-    </div>
     <br>
     <div class="main-container">
         <input type="text" id="enter_task" placeholder="Enter Task">
@@ -314,22 +242,19 @@ ul {
 <!-- <p style="font-size: 8px; padding-left: 3px; border-style: solid; border-width: 0 0 1px 0 ; border-color: red;">Urgent__</p> -->
             <!-- list elements -->
             <div id="sort_list" style="padding: 5px;">
-                
                 <ul id="todo_list" style="list-style: none;" class="connected-sortable">
                     
                 </ul>
             </div>
-
-
     </div>
 </div>
 
 <!-- Purged list -->
-<nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:65%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
-    <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-16" style="text-align: right;">CLOSE</a> 
-    <!-- Import export buttons -->
+<nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:75%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
+    <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-left w3-padding-32">CLOSE</a> 
+    <!-- Import/export buttons -->
     <div class="fileops">
-        <button class="icon export" id="exportHistory" onclick="exportHistory()"> </button > 
+        <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
             <a id="exportHistoryLink" style="display: none;">Export</a>
             <br>
             <!-- <label for="FileInputLabel"><b>Import</b></label> -->
@@ -356,7 +281,7 @@ ul {
         activeTabPurgeList = activeTab + 'PurgeList'; // Default active tab Purge list
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
-        
+        // updateHealthBar();
         displayData();
         const list =  [];
         const plistElement = document.getElementById("purge_list");
@@ -432,7 +357,7 @@ $(function() {
     var counter = 0;
 
 //Create a new task
-//render to page, local storage and update circle size
+//render to page, local storage and update healthBar
     function enterTask() {
         
         // var text = $('#enter_task').val();
@@ -460,8 +385,8 @@ $(function() {
             counter++;
             console.log('Counter after adding task:', counter); // Log the counter value
 
-            // Update the circle size after adding a new task
-            updateCircleSize();
+            // Update the update HealthBar after adding a new task
+            updateHealthBar();
 
             // Clear the input box
             $('#enter_task').val('');
@@ -481,37 +406,37 @@ $(function() {
         listItem.remove();
         counter--;
         console.log('Counter after deleting task:', counter); // Log the counter value
-        updateCircleSize();
+        updateHealthBar();
 
         // Remove the task from local storage
         var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
         todoList.splice(index, 1); // Remove the task at the corresponding index
         localStorage.setItem(activeTabList, JSON.stringify(todoList));
+        updateHealthBar();
     }
 
-    function updateCircleSize() {
+    function updateHealthBar() {
         // Retrieve tasks from local storage
         const tasks = JSON.parse(localStorage.getItem(activeTabList) || '[]');
 
         // Count unchecked tasks
         const uncheckedTasks = tasks.filter(task => !task.checked).length;
 
-        var baseSize = 10; // Base size of the circle
+        var baseSize = 10; // Base size of the healthbar
         var sizeIncrement = 6; // Increase size per task
 
         // Calculate new size based on task count
         var newSize = baseSize + (uncheckedTasks * sizeIncrement*sizeIncrement);
 
-        // Update the --circle-size CSS variable for the circle element
-        document.querySelector('.circle').style.setProperty('--circle-size', newSize + 'px');
-        document.querySelector('.healthbar').style.setProperty('--circle-size', newSize + 'px');
+        // Update the --healthbar-size CSS variable for the healthbar element
+        document.querySelector('.healthbar').style.setProperty('--healthbar-size', newSize + 'px');
         if (uncheckedTasks>7) {
             document.querySelector('.healthbar').style.setProperty('--health-color', '#e25a5aaf');
         }
         else {
             document.querySelector('.healthbar').style.setProperty('--health-color', '#6ae25aaf');
         }
-        console.log('Circle size updated. New size:', newSize + 'px');
+        console.log('healthBar updated. New size:', newSize + 'px');
     }
 
     function purgeList() {
@@ -562,9 +487,9 @@ $(function() {
         localStorage.setItem(activeTabList, JSON.stringify(todoList)); // Update todoList in local storage
         localStorage.setItem(activeTabPurgeList, JSON.stringify(purgeList)); // Store the new purgeList in local storage
 
-        // Update counter and circle size
+        // Update counter and healthBar
         counter = $('#todo_list li').length; // Update the counter based on remaining tasks
-        updateCircleSize();
+        updateHealthBar();
 
         alert('Checked tasks moved to purge history list!');
     }
@@ -605,7 +530,7 @@ $(function() {
     tasks[index].checked = $(this).is(':checked');
     localStorage.setItem(activeTabList, JSON.stringify(tasks));
 
-    updateCircleSize();
+    updateHealthBar();
     $(this).closest('li').toggleClass('bold', !$(this).is(':checked'));
     console.log('Checkbox changed:')
     });
@@ -685,7 +610,7 @@ $(function() {
             $('#purge_list').append(newListItem);
             console.log('new list item:', newListItem);
         }
-    updateCircleSize();
+    updateHealthBar();
 });
 
 //Exports the contents of local storage to a file in JSON format
@@ -701,7 +626,7 @@ function exportHistory() {
     console.log(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'working_history_' + filetime + '.json';
+    a.download = activeTab+'_working_history_' + filetime + '.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
