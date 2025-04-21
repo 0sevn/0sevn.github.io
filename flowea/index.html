@@ -24,6 +24,8 @@
   --box-shadow: 0 2rem 2rem #00000080;
   --invert-icon:100%;
   --active-tab:#2d2d2d;
+  --toast-bg: #333;
+  --toast-color: #fff;
 }
 body.light-mode {
   --bg-color: #f4f4f4;
@@ -33,6 +35,8 @@ body.light-mode {
   --box-shadow: 0 1rem 1rem rgba(0, 0, 0, 0.2);
   --invert-icon:15%;
   --active-tab:#c2c2c2;
+  --toast-bg: #f0f0f0;
+  --toast-color: #333;
 }
 
 body {
@@ -48,7 +52,7 @@ body {
     color: var(--text-color);
 }
 .mid-container {
-    margin:10% auto 0px auto;
+    margin:100px auto 0px auto;
     /* background-color: #454545; */
     background-color: var(--card-bg);
     color: var(--text-color);
@@ -478,7 +482,16 @@ $(function() {
         }
         console.log('healthBar updated. New size:', newSize + 'px');
     }
-
+    const purgeMessages = [
+  "Letting go of completed tasks feels good. 🎉",
+  "Cleared with purpose. ✨",
+  "You’re crushing it. 🚀",
+  "Nothing like a clean slate. 🌿",
+  "You made space for new ideas. 🧠",
+  "Progress feels good, doesn’t it? 😌",
+  "Done and dusted. 💨",
+  "Refreshed and recharged. 🔋",
+];
     function purgeList() {
         // Get the todoList from localStorage
         var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
@@ -532,7 +545,9 @@ $(function() {
         counter = $('#todo_list li').length; // Update the counter based on remaining tasks
         updateHealthBar();
 
-        alert('Checked tasks moved to purge history list!');
+        // alert('Checked tasks moved to purge history list!');
+        const randomMessage = purgeMessages[Math.floor(Math.random() * purgeMessages.length)];
+showToast(randomMessage);
     }
 
     // Function to get the week number of a given date
@@ -737,6 +752,43 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('light-mode');
     }
 });
+
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.style.visibility = "visible";
+    toast.style.opacity = "1";
+    toast.style.bottom = "50px";
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.bottom = "30px";
+        setTimeout(() => {
+            toast.style.visibility = "hidden";
+        }, 500);
+    }, 3000);
+}
 </script>
+<div id="toast" style="
+  visibility: hidden;
+  min-width: 250px;
+  height:50px;
+  margin-left: -125px;
+  background-color: var(--toast-bg, #333);
+  color: var(--toast-color, #fff);
+  text-align: center;
+  border-radius: 8px;
+  padding: 16px;
+  position: fixed;
+  z-index: 999;
+  left: 50%;
+  top: 5px;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.5s, bottom 0.5s;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+">
+-
+</div>
 </body>
 </html>
