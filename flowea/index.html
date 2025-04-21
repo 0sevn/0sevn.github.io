@@ -44,7 +44,9 @@ body {
     text-decoration: none;
     position: relative;
 }
-
+.week-header {
+    color: var(--text-color);
+}
 .mid-container {
     margin:10% auto 0px auto;
     /* background-color: #454545; */
@@ -261,8 +263,8 @@ ul {
             <div class="tab active" onclick="switchTab('workTab')">Work</div>
             <div class="tab" onclick="switchTab('personalTab')">Personal</div>
             <div class="tab" onclick="w3_openPrivate()" style="margin-left:15px; padding-left: 10px; font-size: 14px;">< History</div>
-            <div class="tab">
-                <input type="submit" value=" " class="icon darklight_mode" title="Toggle light/dark mode" onclick="toggleTheme()">
+            <div class="tab  w3-animate-left" style="margin-left:55px;">
+                <input type="submit" value=" " class="w3-right icon darklight_mode" title="Toggle light/dark mode" onclick="toggleTheme()">
             </div>
         </div>    
         <div class="healthbar" title="FOvea, a small depression within the retina where visual acuity is the highest.">
@@ -329,7 +331,7 @@ ul {
 
                 // Check if the week header already exists, otherwise create it
                 if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
-                    var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:16px; color:#f2f;">Week ${purgedWeek} - ${new Date().getFullYear()}</li>`);
+                    var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:16px;">Week ${purgedWeek} - ${new Date().getFullYear()}</li>`);
                     $('#purge_list').append(weekHeadline);
                 }
 
@@ -399,8 +401,10 @@ $(function() {
         // var text = $('#enter_task').val();
         var text = $('#enter_task').val().trim();
         const date = new Date();
+        console.log('date',date)
         const options = { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'};
         const formattedDate = date.toLocaleString('en-GB', options);
+        console.log('formattedDate',formattedDate)
         // en-US
         var time = new Date().toLocaleString();
         if (text !== '') {  // Ensure the input isn't empty
@@ -413,7 +417,7 @@ $(function() {
             );
             
             var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
-            todoList.push({ text: text, timestamp: time });
+            todoList.push({ text: text, timestamp: formattedDate });
             localStorage.setItem(activeTabList, JSON.stringify(todoList));
 
             $('#todo_list').append(newListItem);
@@ -492,7 +496,8 @@ $(function() {
             var time = listItem.find('.time').text();
             // console.log(listItem);
             console.log('Purge item index:', index, 'text:', text, 'time:', time);
-
+            const options = { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'};
+            const formattedDate = time.toLocaleString('en-GB', options);
             // Remove the task from the DOM
             listItem.remove();
 
@@ -515,7 +520,7 @@ $(function() {
             }
 
             // Add the purged task under the appropriate week header
-            var newPurgeItem = $('<li><span>' + text + '  '+' <p class="time"> ' +' '+ time + ' </p></span></li>');
+            var newPurgeItem = $('<li><span>' + text + '  '+' <p class="time"> ' +' '+ formattedDate + ' </p></span></li>');
             $(`.week-${purgedWeek}`).after(newPurgeItem);
         });
 
@@ -630,10 +635,10 @@ $(function() {
 
                 // Check if the week header already exists, otherwise create it
                 if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
-                    var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:16px; color:#f2f;">Week ${purgedWeek} - ${new Date().getFullYear()}</li>`);
+                    var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:16px;">Week ${purgedWeek} - ${new Date().getFullYear()}</li>`);
                     $('#purge_list').append(weekHeadline);
                 }
-
+                
                 var newPurgeItem = $('<li><span style="font-size:13px; color:light-grey;">' + item.text + ' <p class="time"> ' +' '+ item.timestamp + '</p></span></li>');
                 $(`.week-${purgedWeek}`).after(newPurgeItem);
 
