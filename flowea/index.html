@@ -4,6 +4,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FloWea</title>
 <link rel="stylesheet" href="w3.css">
+<!-- in your <head> -->
+    <link rel="manifest" href="manifest.json">
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/serviceWorker.js')
+        .then(() => console.log('✅ Service Worker registered!'))
+        .catch(err => console.error('⚠️ Service Worker registration failed:', err));
+      }
+    </script>
 <style>
 body {
     font-family: "Lato", sans-serif;
@@ -17,12 +26,12 @@ body {
 .mid-container {
     margin:100px auto 10px auto;
     color: #e6e6e6;
-    width: 75%;
+    width: 90%;
     border-radius: 25px 5px;
     background-color: #454545;
     /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); */
     box-shadow: 0 2rem 2rem #00000080;
-    padding:20px 0px 20px 20px;
+    padding:15px;
     z-index: -99;
     font-size: 18px;
     /* opacity: 50%; */
@@ -156,7 +165,12 @@ https://www.w3schools.com/css/css_tooltip.asp
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
-
+input[type=text] {
+    font-size: 16px;
+    padding: 10px;
+    width: 90%;
+    margin-bottom: 10px;
+}
 input[type=submit] {
         background-color: rgb(79, 79, 79, 0);
         border: none;
@@ -194,12 +208,12 @@ input[type=submit] {
   text-align: right;
   box-shadow: 0 2rem 2rem #00000080;
   position: absolute;
- width:130px;
+ width:330px;
   /* padding: 5px; */
   border-radius: 6px;
   top: 25px;
-  right: 8%;
-  margin-right:10%;
+  right: 28%;
+  /* margin-right:10%; */
 }
 .bold {
   font-weight: bold;
