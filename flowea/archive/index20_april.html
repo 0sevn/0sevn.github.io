@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FloWea</title>
+<link rel="stylesheet" href="w3.css">
+<style>
+body {
+    font-family: "Lato", sans-serif;
+    background-color: rgb(107, 107, 107);
+    text-align: left;
+    text-decoration: none;
+    position: relative;
+
+}
+/*
+https://www.w3schools.com/css/css3_shadows_box.asp
+*/
+.mid-container {
+    margin:100px auto 10px auto;
+    color: #e6e6e6;
+    width: 75%;
+    border-radius: 25px 5px;
+    background-color: #454545;
+    /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); */
+    box-shadow: 0 2rem 2rem #00000080;
+    padding:20px 0px 20px 20px;
+    z-index: -99;
+    font-size: 18px;
+    /* opacity: 50%; */
+}
+
+a {
+    color: white;
+    border-radius: 15px;
+    font-size: 14px;
+}
+
+.icon {
+    background-position: center;
+    background-size: cover;
+    filter: invert(100%);
+    width: 30px;
+    margin: 5px;
+    padding: 5px;
+    /* border: 3px solid rgb(255, 255, 255); */
+    
+}
+.add {
+background-image:url(add_pen.png);
+}
+.purge {
+background-image:url(purge.png);
+}
+.export {
+background-image:url(export.png);
+height:25px;
+margin-right:25px;
+}
+.import {
+/* background-image:url(import.png);
+height:25px;*/
+width:200px; 
+/* margin-right:66px; */
+}
+.edit {
+background-image:url(edit.png);
+}
+.delete {
+background-image:url(delete.png);
+}
+.icon:hover{
+    opacity: 0.6; transition: 0.1s
+}
+
+.time {
+    font-size: 10px;
+    color:rgb(154, 153, 150);
+    display: inline-block;
+}
+
+.circle {
+  background-color:rgba(226, 90, 90, 0.686);
+  width: var(--circle-size, 20px);
+  height: var(--circle-size, 20px); 
+  border-radius: 50%;
+  position:fixed;
+  display:inline-block;
+ 
+  margin-top:5px;
+  transition: 0.5s width, 0.5s height;
+  z-index: 1;
+}
+.healthbar {
+    background-color:var(--health-color,rgba(106, 226, 90, 0.686));
+    opacity: 70%;
+  width: var(--circle-size, 10px);
+  height: 10px;
+  border-radius: 10px;
+  position:fixed;
+  display:inline-block;
+ 
+  margin-top:60px;
+  transition: 0.5s width;
+  z-index: 1;
+}
+
+[type=number] {
+  display: block;
+}
+
+/* Tooltip container 
+https://www.w3schools.com/css/css_tooltip.asp 
+*/
+.main-container {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+}
+.tooltip {
+  position: relative;
+  display: inline-block;
+  z-index: 100;
+ /* border-bottom: 1px dotted black;  If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 220px;
+  background-color: rgb(79, 79, 79);
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+  font-weight: normal;
+  font-size:14px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: -100;
+  /* bottom: 80%; */
+  top:-10px;
+  left: 0%;
+  margin-left: 120px;
+}
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent transparent rgb(79, 79, 79);;
+}
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+/*
+https://www.w3docs.com/snippets/css/how-to-style-input-and-submit-buttons.html
+*/
+input[type=submit] {
+        background-color: rgb(79, 79, 79, 0);
+        border: none;
+        color: #fff;
+        padding: 5px 8px;
+        text-decoration: none;
+        margin: 4px 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size:14px;
+        font-weight: bold;
+      }
+
+/* import export json files */
+.fileops {
+  background-color: rgb(79, 79, 79);
+  color: #fff;
+  font-weight: normal;
+  font-size: 14px;
+  text-align: right;
+
+  position: absolute;
+ width:200px;
+  /* padding: 5px; */
+  border-radius: 6px;
+  top: 55px;
+  right: 5px;
+  /* margin-right:10%; */
+}
+.history-button {
+  background-color: rgb(79, 79, 79);
+  color: #fff;
+  font-weight: normal;
+  font-size: 14px;
+  text-align: right;
+
+  position: absolute;
+ width:130px;
+  /* padding: 5px; */
+  border-radius: 6px;
+  top: 25px;
+  right: 8%;
+  margin-right:10%;
+}
+.bold {
+  font-weight: bold;
+}
+
+.connected-sortable {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+ul {
+    margin: 0; /* To remove default bottom margin */ 
+    padding: 0; /* To remove default left padding */
+}
+
+/* tabs */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  /* border: 1px solid black; */
+  align-items: center;
+}
+
+.tab {
+    /* border: 1px solid black; */
+  cursor: pointer;
+  padding: 10px 20px;
+  margin: 0px 2px;
+  background: #32557f;
+  display: inline-block;
+  color: #fff;
+  border-radius: 5px 5px 0px 0px;
+  /* box-shadow: 0 0.5rem 0.8rem #00000080; */
+  font-size: 1em;
+}
+.tab:hover{
+    opacity: 0.6; transition: 0.1s
+}
+
+.panels {
+  background: #fff;
+  box-shadow: 0 2rem 2rem #00000080;
+  min-height: 200px;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 3px;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.panel {
+  display: none;
+  /* animation: fadein 0.8s; */
+}
+
+/* @keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+} */
+
+
+.panel-title {
+  font-size: 3em;
+  font-weight: bold;
+}
+
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 0px;
+}
+.tab {
+    padding: 10px;
+    cursor: pointer;
+    /* border: 1px solid #ccc; */
+    /* background-color: #f4f4f4; */
+}
+.tab.active {
+    background-color: #aeaeae;
+}
+</style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('workTab')">Work</div>
+            <div class="tab" onclick="switchTab('personalTab')">Personal</div>
+        </div>    
+        <div class="panels">
+            
+            <div class="circle healthbar" title="FOvea, a small depression within the retina where visual acuity is the highest.">
+                &nbsp;
+           </div>
+           
+           <div class="tooltip">
+            Flowea
+            <span class="tooltiptext">Fovea, small region of the retina which produces the sharpest vision.</span>
+            </div>
+            <input type="text" id="inputField" placeholder="Enter item">
+            <button onclick="storeData()">Save</button>
+            <ul id="list"></ul>
+        </div>
+
+      </div>
+
+    <script>
+        let activeTab = 'workTab'; // Default active tab
+    
+        function switchTab(tab) {
+            activeTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            displayData();
+        }
+    
+        function storeData() {
+            const inputField = document.getElementById("inputField");
+            const value = inputField.value.trim();
+            if (!value) return;
+    
+            let list = JSON.parse(localStorage.getItem(activeTab)) || [];
+            list.push(value);
+            localStorage.setItem(activeTab, JSON.stringify(list));
+    
+            inputField.value = "";
+            displayData();
+        }
+    
+        function displayData() {
+            const list = JSON.parse(localStorage.getItem(activeTab)) || [];
+            const listElement = document.getElementById("list");
+            listElement.innerHTML = list.map(item => `<li>${item}</li>`).join("");
+        }
+    
+        displayData(); // Load initial data
+    </script>
+<!-- Mid navigation -->
+<div class="mid-container">
+    <!-- <div class="circle" title="FOvea, a small depression within the retina where visual acuity is the highest.">
+    </div> -->
+    
+    <div class="tooltip">
+        <h1>Flowea </h1>
+        <span class="tooltiptext">Fovea, small region of the retina which produces the sharpest vision.</span>
+    </div>
+    <div class="circle healthbar" title="FOvea, a small depression within the retina where visual acuity is the highest.">
+        &nbsp;
+   </div>  
+    <!-- History button - Purge history list  & file operations -->
+    <div class="history-button">
+        <a href="javascript:void(0)" class="w3-left w3-button w3-text-light-grey" onclick="w3_openPrivate()" style="font-size: 12px; width: 100%;">< History</a>
+    </div>
+    <br>
+    <div class="main-container">
+        <input type="text" id="enter_task" placeholder="Enter Task">
+        <input type="submit" id="add" value=" " class="icon add">
+        <input type="submit" id="purge" value=" " class="icon purge">
+<!-- <p style="font-size: 8px; padding-left: 3px; border-style: solid; border-width: 0 0 1px 0 ; border-color: red;">Urgent__</p> -->
+            <!-- list elements -->
+            <div id="sort_list" style="padding: 5px;">
+                
+                <ul id="todo_list" style="list-style: none;" class="connected-sortable">
+                    
+                </ul>
+            </div>
+
+
+    </div>
+</div>
+
+<!-- Purged list -->
+<nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:65%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
+    <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-16" style="text-align: right;">CLOSE</a> 
+    <!-- Import export buttons -->
+    <div class="fileops">
+        <button class="icon export" id="exportHistory" onclick="exportHistory()"> </button > 
+            <a id="exportHistoryLink" style="display: none;">Export</a>
+            <br>
+            <!-- <label for="FileInputLabel"><b>Import</b></label> -->
+            <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input>
+    </div>
+    <!-- Purge history list -->
+    <div style="margin-top: 65px;">
+        <ul id="purge_list" style="list-style: none;padding-left: 5%;">
+        </ul>
+    </div>
+</nav>
+
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script>
+
+/*todo list script at bottom
+
+The dollar function, $(), can be used as shorthand for the getElementById function
+${} multiline string /string interpolation
+*/
+$(function() {
+
+    $("#sort_list").sortable({
+        axis: "y",
+        connectWith: ".connected-sortable",
+        cursor: "move",
+        opacity: 0.5,
+        update: function(event, ui) {
+            const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+
+    // Get the new order of tasks from the DOM
+    const newOrder = $('#todo_list li').map(function() {
+        return $(this).attr('id');
+    }).get();
+
+    // Update the `id` property of each task in the todoList to match the new order
+    newOrder.forEach((id, index) => {
+        todoList.find(task => task.id === id).id = index + 1;
+    });
+
+    // Update local storage with the reordered todoList
+    localStorage.setItem('todoList', JSON.stringify(todoList));
+//             const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+
+// // Get the new index of the moved item
+// const newIndex = $('#todo_list li').index(ui.item);
+
+// // Remove the item from its original position in the array
+// const movedItem = todoList.splice(ui.item.index(), 1)[0];
+
+// // Insert the item at its new position in the array
+// todoList.splice(newIndex, 0, movedItem);
+
+// // Update local storage with the reordered todoList
+// localStorage.setItem('todoList', JSON.stringify(todoList));
+            // // // // // // // // // // /// /// / // // / / / / / 
+            // // Get the updated order of tasks from the DOM
+            // const newOrder = $('#todo_list li').map(function() {
+            //     return $(this).attr('id');
+            // }).get();
+
+            // // Update the task order in local storage
+            // const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+            // const reorderedTodoList = newOrder.map(taskId => {
+            //     return todoList.find(task => task.id === taskId);
+            // });
+            // localStorage.setItem('todoList', JSON.stringify(reorderedTodoList));
+            // // // // // // // // // // /// /// / // // / / / / / 
+            // Update local storage with the new list order
+            // const taskId = ui.item.attr('id');
+            // const newCategory = ui.item.closest('.category').attr('id');
+
+            // Update the task's category in local storage
+        // const todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+        //     const taskIndex = todoList.findIndex(task => task.id === taskId);
+        //     if (taskIndex !== -1) {
+        //         todoList[taskIndex].category = newCategory;
+        //         localStorage.setItem('todoList', JSON.stringify(todoList));
+        //     }
+        }
+    }).disableSelection(); // Prevent text selection on mobile
+
+    var counter = 0;
+
+//Create a new task
+//render to page, local storage and update circle size
+    function enterTask() {
+        
+        // var text = $('#enter_task').val();
+        var text = $('#enter_task').val().trim();
+        const date = new Date();
+        const options = { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'};
+        const formattedDate = date.toLocaleString('en-GB', options);
+        // en-US
+        var time = new Date().toLocaleString();
+        if (text !== '') {  // Ensure the input isn't empty
+            var newListItem = $(
+                '<li id="item-'+counter+'"><span><input type="checkbox" class="task-checkbox"> ' +
+                '<span class="task-text">' + text + ' '+'</span>' +
+                ' <p class="time">' +formattedDate+ ' ' + time + '</p></span>' +
+                '<input type="submit" class="icon edit" value=" ">' +
+                '<input type="submit" class="icon delete" value=" "></li>'
+            );
+            
+            var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+            todoList.push({ text: text, timestamp: time });
+            localStorage.setItem('todoList', JSON.stringify(todoList));
+
+            $('#todo_list').append(newListItem);
+
+            counter++;
+            console.log('Counter after adding task:', counter); // Log the counter value
+
+            // Update the circle size after adding a new task
+            updateCircleSize();
+
+            // Clear the input box
+            $('#enter_task').val('');
+        }
+    }
+
+    function updateTaskInStorage(index, newText, checked) {
+        var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+        todoList[index].text = newText;
+        todoList[index].checked = checked;
+        localStorage.setItem('todoList', JSON.stringify(todoList));
+    }
+
+    function deleteTask() {
+        var listItem = $(this).closest('li');
+        var index = $('#todo_list li').index(listItem);
+        listItem.remove();
+        counter--;
+        console.log('Counter after deleting task:', counter); // Log the counter value
+        updateCircleSize();
+
+        // Remove the task from local storage
+        var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+        todoList.splice(index, 1); // Remove the task at the corresponding index
+        localStorage.setItem('todoList', JSON.stringify(todoList));
+    }
+
+    function updateCircleSize() {
+        // Retrieve tasks from local storage
+        const tasks = JSON.parse(localStorage.getItem('todoList') || '[]');
+
+        // Count unchecked tasks
+        const uncheckedTasks = tasks.filter(task => !task.checked).length;
+
+        // var taskCount = $('#todo_list li').length; // Get the number of tasks in the list
+        // var uncheckedTasks = $('#todo_list input[type="checkbox"]:not(:checked)').length;
+        var baseSize = 10; // Base size of the circle
+        var sizeIncrement = 6; // Increase size per task
+
+        // Calculate new size based on task count
+        var newSize = baseSize + (uncheckedTasks * sizeIncrement*sizeIncrement);
+        
+        
+
+        // Update the --circle-size CSS variable for the circle element
+        document.querySelector('.circle').style.setProperty('--circle-size', newSize + 'px');
+        document.querySelector('.healthbar').style.setProperty('--circle-size', newSize + 'px');
+        if (uncheckedTasks>7) {
+            document.querySelector('.healthbar').style.setProperty('--health-color', '#e25a5aaf');
+        }
+        else {
+            document.querySelector('.healthbar').style.setProperty('--health-color', '#6ae25aaf');
+        }
+        console.log('Circle size updated. New size:', newSize + 'px');
+    }
+
+    function purgeList() {
+        // Get the todoList from localStorage
+        var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+        // Get the purgeList from localStorage
+        var purgeList = JSON.parse(localStorage.getItem('purgeList') || '[]');
+
+        // Select all checked list items from #todo_list
+        $('#todo_list input[type="checkbox"]:checked').each(function() {
+            var listItem = $(this).closest('li');
+            var index = $('#todo_list li').index(listItem);
+
+            // Get task details
+            var text = listItem.find('span .task-text').text();
+            var time = listItem.find('.time').text();
+            // console.log(listItem);
+            console.log('Purge item index:', index, 'text:', text, 'time:', time);
+
+            // Remove the task from the DOM
+            listItem.remove();
+
+            // Remove the corresponding task from todoList
+                const removedItem = todoList.splice(index, 1)[0];
+                const purgedAt = new Date().toLocaleString(); // Record the purge time
+                const purgedWeek = getWeekNumber(new Date(purgedAt)); // Get the week number
+                removedItem.purgedAt = purgedAt;
+                removedItem.purgedWeek = purgedWeek; // Store the week number
+                console.log(purgedWeek);
+
+            // Add the removed task to purgeList
+            purgeList.push(removedItem);
+
+            // Check if a week header already exists for this week
+            if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
+                // Add a headline for the week if it doesn't exist
+                var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:12px">Week: ${purgedWeek} - ${new Date().getFullYear()}</li>`);
+                $('#purge_list').append(weekHeadline);
+            }
+
+            // Add the purged task under the appropriate week header
+            var newPurgeItem = $('<li><span>' + text + '  '+' <p class="time"> ' +' '+ time + ' </p></span></li>');
+            $(`.week-${purgedWeek}`).after(newPurgeItem);
+        });
+
+        // Update the localStorage after modification
+        localStorage.setItem('todoList', JSON.stringify(todoList)); // Update todoList in local storage
+        localStorage.setItem('purgeList', JSON.stringify(purgeList)); // Store the new purgeList in local storage
+
+        // Update counter and circle size
+        counter = $('#todo_list li').length; // Update the counter based on remaining tasks
+        updateCircleSize();
+
+        alert('Checked tasks moved to purge history list!');
+    }
+
+    // Function to get the week number of a given date
+    function getWeekNumber(date) {
+        
+        var firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+        var pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+        return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+
+        // //read week text
+        // var weekText = $('#enter_week').val();
+        // return weekText
+    }
+
+    $(".connected-sortable").sortable({
+        connectWith: ".connected-sortable",
+        cursor: "move",
+        opacity: 0.5,
+        // ... other options
+    });
+
+    $('#add').on('click', enterTask);
+    $('#purge').on('click', purgeList);
+
+    // Trigger add task when pressing Enter key
+    $('#enter_task').on('keypress', function(e) {
+        if (e.which === 13) {  // Enter key code
+            enterTask();
+        }
+    });
+
+    // Attach a delegated event listener to handle checkbox changes for existing and new tasks
+    $('#todo_list').on('change', '.task-checkbox', function() {
+    const index = $(this).closest('li').index();
+    const tasks = JSON.parse(localStorage.getItem('todoList') || '[]');
+    tasks[index].checked = $(this).is(':checked');
+    localStorage.setItem('todoList', JSON.stringify(tasks));
+
+    updateCircleSize();
+    $(this).closest('li').toggleClass('bold', !$(this).is(':checked'));
+    console.log('Checkbox changed:')
+    });
+
+    // Edit functionality
+    $('#todo_list').on('click', '.edit', function() {
+        var taskText = $(this).siblings('span').find('.task-text');
+        var originalText = taskText.text();
+
+        // Make the task text editable
+        taskText.attr('contenteditable', 'true').focus();
+
+        // Disable editing when Enter is pressed or focus is lost
+        taskText.on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent new line creation
+                taskText.attr('contenteditable', 'false');
+
+        // Save the updated text to local storage // Update local storage when the task content changes
+                var index = $(this).closest('li').index();
+                updateTaskInStorage(index, $(this).text());
+        
+            }
+        });
+
+        // Also stop editing when the text field loses focus
+        taskText.on('blur', function() {
+        taskText.attr('contenteditable', 'false');
+        
+        // Save the updated text to local storage
+        var index = $(this).closest('li').index();
+        updateTaskInStorage(index, $(this).text());
+        });
+    });
+
+    // Event delegation for delete button
+    $('#todo_list').on('click', '.delete', deleteTask);
+
+    // Load tasks from local storage on page load
+    var todoList = JSON.parse(localStorage.getItem('todoList') || '[]');
+    // counter = todoList.length;
+    
+    i=0;
+    todoList.forEach(item => {
+        const category = item.category;
+        var newListItem = $('<li id="item-'+i+'"><span><input type="checkbox" class="task-checkbox" ' + (item.checked ? 'checked' : '') + '> <span class="task-text"> ' + item.text + ' '+'</span> <p class="time"> ' + item.timestamp + ' </p></span><input type="submit" class="icon edit" value=""><input type="submit" class="icon delete" value=" "></li>');
+        $('#todo_list').append(newListItem);
+        // Append the task to the correct category's list
+        // $(`#${category}-list`).append(newListItem);
+        i++;
+    });
+
+    //Load purged list from local storage
+    var purgeList = JSON.parse(localStorage.getItem('purgeList') || '[]');
+
+        // Check if jsonContent is an array
+        if (Array.isArray(purgeList)) {
+            // Append each item from the parsed JSON to the list
+            purgeList.forEach(item => {
+                const purgedWeek = item.purgedWeek || getWeekNumber(new Date(item.purgedAt));
+
+                // Check if the week header already exists, otherwise create it
+                if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
+                    var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:16px; color:#f2f;">Week ${purgedWeek} - ${new Date().getFullYear()}</li>`);
+                    $('#purge_list').append(weekHeadline);
+                }
+
+                var newPurgeItem = $('<li><span style="font-size:13px; color:light-grey;">' + item.text + ' <p class="time"> ' +' '+ item.timestamp + '</p></span></li>');
+                $(`.week-${purgedWeek}`).after(newPurgeItem);
+
+                console.log('new purge item:', newPurgeItem);
+            });
+        } else {
+            // Handle case where jsonContent is an object
+            console.warn('JSON content is not an array, handling as a single object.');
+            var newListItem = $('<li>').text('Text: ' + purgeList.text + ', Timestamp: ' + purgeList.timestamp);
+            $('#purge_list').append(newListItem);
+            console.log('new list item:', newListItem);
+        }
+    updateCircleSize();
+});
+
+//Exports the contents of local storage to a file in JSON format
+//https://stackoverflow.com/questions/61586888/javascript-export-local-storage
+function exportHistory() {  
+    console.log("started"); 
+    const purgeHistory = JSON.stringify(localStorage.getItem('purgeList') , null, 2); //indentation in json format, human readable
+    var filetime = new Date().toLocaleString();
+
+    const blob = new Blob([purgeHistory], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+
+    console.log(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'working_history_' + filetime + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    console.log("finished");    
+}
+
+//import to local storage**/
+document.getElementById('jsonFileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0]; // Get the selected file
+
+    if (file) {
+        const reader = new FileReader();
+
+        // Define what happens when the file is loaded
+        reader.onload = function(e) {
+
+            try {
+                // Parse the file content as JSON
+                const jsonContent = JSON.parse(e.target.result);
+                // Store JSON content in local storage
+                localStorage.setItem('purgeList', jsonContent);
+
+                // Clear the current list before appending new items
+                // $('#todo_list').empty();
+                console.log('JSON data successfully stored in local storage:', jsonContent);
+                alert('JSON data has been stored in local storage.');
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+                alert('Invalid JSON file. Please try again.');
+            }
+        };
+
+        // Read the file as a text (which should be JSON)
+        reader.readAsText(file);
+    } else {
+        console.log('No file selected.');
+    }
+});
+
+function w3_openPrivate() {
+    document.getElementById("mySidebarPrivate").style.display = "block";
+}
+  
+function w3_closePrivate() {
+    document.getElementById("mySidebarPrivate").style.display = "none";
+}
+</script>
+</body>
+</html>
