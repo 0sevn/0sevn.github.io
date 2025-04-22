@@ -19,7 +19,7 @@
 :root {
   --bg-color: #454545;
   --text-color: #e6e6e6;
-  --card-bg: #454545;
+  --card-bg: #373737;
   --accent-color: #6ae25aaf;
   --box-shadow: 0 2rem 2rem #00000080;
   --invert-icon:100%;
@@ -255,7 +255,7 @@ ul {
     opacity: 0.6; transition: 0.1s
 }
 .tab.active {
-    background-color: var(--active-tab);
+    background-color: var(--card-bg);
 }
 
 </style>
@@ -295,7 +295,7 @@ ul {
 </div>
 
 <!-- Purged list -->
-<nav class="w3-sidebar w3-bar-block w3-black w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:75%;font-weight:bold;display:none;right:0;" id="mySidebarPrivate">
+<nav class="w3-sidebar w3-bar-block w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:75%;font-weight:bold;display:none;right:0;background-color: var(--card-bg);" id="mySidebarPrivate">
     <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-32">CLOSE</a> 
     <!-- Import/export buttons -->
     <div class="fileops">
@@ -306,7 +306,7 @@ ul {
             <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input>
     </div>
     <!-- Purge history list -->
-    <div style="margin-top: 65px;">
+    <div style="margin-top: 65px;  color: var(--text-color);">
         <ul id="purge_list" style="list-style: none;padding-left: 5%;">
         </ul>
     </div>
