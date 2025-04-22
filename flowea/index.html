@@ -298,9 +298,17 @@ ul {
 </div>
 
 <!-- Purged list -->
-<nav class="w3-sidebar w3-bar-block w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:75%;font-weight:bold;display:none;right:0;background-color: var(--card-bg); margin-top: 120px;" id="mySidebarPrivate">
-    <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-32">CLOSE</a> 
-    <input type="submit" id="##connect" value=" " class="icon connect" title="Connect">
+<nav class="w3-sidebar w3-bar-block w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:75%;font-weight:bold;display:none;right:0;background-color: var(--card-bg); margin-top: 135px;" id="mySidebarPrivate">
+    <a href="javascript:void(0)" onclick="w3_closePrivate()" class="w3-bar-item w3-button w3-center w3-padding-32" style="background-color:slategray";>CLOSE</a> 
+    <div style="margin-top:5px; text-align: right;">
+        <input type="submit" id="##connect" value=" " class="icon connect" title="Connect">
+    </div>
+    <!-- Purge history list -->
+        <div style="margin-top: -15px;  color: var(--text-color);">
+            <ul id="purge_list" style="list-style: none;padding-left: 5%;">
+            </ul>
+        </div>
+    
     <!-- Import/export buttons -->
     <div class="fileops">
         <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
@@ -309,11 +317,7 @@ ul {
             <!-- <label for="FileInputLabel"><b>Import</b></label> -->
             <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input>
     </div>
-    <!-- Purge history list -->
-    <div style="margin-top: 65px;  color: var(--text-color);">
-        <ul id="purge_list" style="list-style: none;padding-left: 5%;">
-        </ul>
-    </div>
+
 </nav>
 
 <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
