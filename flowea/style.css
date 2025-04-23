@@ -249,18 +249,38 @@
   .tab.active {
       background-color: var(--card-bg);
   }
-  .howto {
-      position:fixed;
-      text-align: center;
-      background-color: rgb(69, 69, 69, 0);
-      background-position: center;
-      background-size: contain;
-      background-repeat: no-repeat;
-      filter: invert(var(--invert-icon));
-      width: 500px;
-      height: 500px;
-      margin: 1px;
-      padding: 0px;
-      border: solid 1px black;
-      background-image:url(img/help2.png);
+
+  .toast{
+    visibility: hidden;
+  min-width: 250px;
+  height:50px;
+  margin-left: -125px;
+  background-color: var(--toast-bg, #333);
+  color: var(--toast-color, #fff);
+  text-align: center;
+  border-radius: 8px;
+  padding: 16px;
+  position: fixed;
+  z-index: 999;
+  left: 50%;
+  top: 5px;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.5s, bottom 0.5s;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+  }
+  .howto{
+    display: none;
+    width: 280px;
+    height:370px;
+    background-color: rgb(138, 138, 138);
+    border-radius: 5px 5px 5px 5px;
+    text-align: center;
+    margin-left: auto;
+    position: fixed;
+    left: auto;
+    top: 5px;
+    /* /* opacity: 1; */
+    z-index: 999;
+    /* box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4); */
   }
