@@ -649,9 +649,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-document.querySelector('#saveActionBtn').addEventListener('click', () => {
-  if (user) saveUserData(user.uid, { lastAction: new Date().toISOString() });
-});
+// document.querySelector('#saveActionBtn').addEventListener('click', () => {
+//   if (user) saveUserData(user.uid, { lastAction: new Date().toISOString() });
+// });
 
 function showToast(message) {
     const toast = document.getElementById("toast");
