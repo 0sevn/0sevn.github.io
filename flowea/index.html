@@ -635,17 +635,29 @@ function toggleTheme() {
     const isLight = document.body.classList.contains('light-mode');
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
     // Change icon image
-    document.querySelector('.darklight_mode').style.backgroundImage = isLight 
-        ? 'url(img/light_mode.png)' 
-        : 'url(img/dark_mode.png)';
-
+    const themeToggleIcon = document.querySelector('.darklight_mode');
+    if (themeToggleIcon) {
+        themeToggleIcon.style.backgroundImage = isLight
+            ? 'url(img/dark_mode.png)'
+            : 'url(img/light_mode.png)';
+    }
 }
 
 // On page load, apply saved theme
 document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme');
+    const themeToggleIcon = document.querySelector('.darklight_mode'); // Declare it here
+
     if (savedTheme === 'light') {
         document.body.classList.add('light-mode');
+        if (themeToggleIcon) {
+            themeToggleIcon.style.backgroundImage = 'url(img/dark_mode.png)';
+        }
+    } else {
+        // Optionally set light mode icon if no theme is saved or it's 'dark'
+        if (themeToggleIcon) {
+            themeToggleIcon.style.backgroundImage = 'url(img/light_mode.png)';
+        }
     }
 });
 
