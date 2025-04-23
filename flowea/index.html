@@ -140,10 +140,12 @@
       });
 
     const App = () => {
+        console.log('App component rendered');
       const [user, setUser] = useState(null);
       const [userData, setUserData] = useState(null);
 
       useEffect(() => {
+        console.log('useEffect hook ran')
         let unsubscribeFirestore = () => {}; // default noop
 
         const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -251,6 +253,7 @@
 };
       return (
         <div>
+            {console.log('JSX rendering')} {/* Add a log here */}
           {user ? (
             <div>
               <h1>Welcome, {user.uid}</h1>
@@ -269,8 +272,9 @@
 
 
   </script>
+  
 <!-- <script type="module" src="js/main.js"></script> -->
-<div id="root"></div> asdf
+<div id="root"></div>
 <script>
     console.log('other script running');
     let activeTab = 'workTab'; // Default active tab personalTab
