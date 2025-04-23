@@ -82,7 +82,7 @@
     <!-- Import/export buttons -->
     <div class="fileops">
         <div style="margin-top:5px; text-align: right;">
-            <input type="submit" id="##connect" value=" " class="icon connect" title="Connect">
+            <input type="submit" id="connect" value=" " class="icon connect" title="Connect">
         </div>
         <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
             <a id="exportHistoryLink" style="display: none;">Export</a>
@@ -107,9 +107,9 @@
     import React, { useState, useEffect } from 'https://esm.sh/react@18.2.0';
     import ReactDOM from 'https://esm.sh/react-dom@18.2.0';
 
-    import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
-    const root = createRoot(document.getElementById('root'));
-    root.render(<App />);
+    // import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
+    // const root = createRoot(document.getElementById('root'));
+    // root.render(<App />);
 
 
     // Your web app's Firebase configuration
@@ -205,6 +205,50 @@
         }
       }, [user]);
 
+      const handleSyncToFirestore = async () => {
+    if (!user) {
+        console.warn('User not authenticated. Cannot sync.');
+        // Optionally display a message to the user
+        return;
+    }
+
+    const activeTabList = 'todo_list_default'; // Assuming a default tab for now
+    const tasks = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+
+    if (tasks.length === 0) {
+        console.log('No local tasks to sync.');
+        // Optionally display a message
+        return;
+    }
+
+    console.log('Attempting to sync local tasks:', tasks);
+
+    try {
+        for (const task of tasks) {
+            // Adjust the collection and document structure as needed
+            const taskDocRef = doc(collection(db, 'tasks'), user.uid + '_' + task.timestamp.replace(/[\s\/:]/g, '_')); // Unique doc ID
+            await setDoc(taskDocRef, {
+                text: task.text,
+                timestamp: task.timestamp,
+                checked: task.checked || false, // Assuming a 'checked' property might exist
+                userId: user.uid,
+                syncedAt: new Date().toISOString()
+            });
+            console.log('Task synced:', task.text);
+        }
+        console.log('All local tasks synced to Firestore successfully!');
+        // Optionally clear local storage after successful sync
+        localStorage.removeItem(activeTabList);
+        // Optionally update your local task state if you're managing it in React
+        // setLocalTasks([]);
+        // Optionally provide user feedback (e.g., a toast message)
+        alert('Tasks synced to Firestore!');
+    } catch (error) {
+        console.error('Error syncing tasks to Firestore:', error);
+        // Optionally display an error message to the user
+        alert('Failed to sync tasks to Firestore.');
+    }
+};
       return (
         <div>
           {user ? (
@@ -212,6 +256,7 @@
               <h1>Welcome, {user.uid}</h1>
               {userData && <pre>{JSON.stringify(userData, null, 2)}</pre>}
               {/* You can add your app's content here */}
+              <button onClick={handleSyncToFirestore}>Sync Tasks to Firestore</button>
             </div>
           ) : (
             <h1>Loading...</h1>
@@ -224,6 +269,7 @@
 
 
   </script>
+<!-- <script type="module" src="js/main.js"></script> -->
 
 <script>
     let activeTab = 'workTab'; // Default active tab personalTab
@@ -629,6 +675,7 @@ document.getElementById('jsonFileInput').addEventListener('change', function(eve
         console.log('No file selected.');
     }
 });
+
 
 // Toggle light/dark mode
 function toggleTheme() {
