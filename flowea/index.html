@@ -11,7 +11,7 @@
     
     <script>
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/serviceWorker.js')
+        navigator.serviceWorker.register('./serviceWorker.js')
         .then(() => console.log('✅ Service Worker registered!'))
         .catch(err => console.error('⚠️ Service Worker registration failed:', err));
       }
@@ -97,9 +97,9 @@
 <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-<div id="root"></div> 
 
   <script type="module">
+    console.log('module running');
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
     import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
@@ -264,14 +264,15 @@
         </div>
       );
     };
-
+    console.log('React script running');
     ReactDOM.render(<App />, document.getElementById('root'));
 
 
   </script>
 <!-- <script type="module" src="js/main.js"></script> -->
-
+<div id="root"></div> asdf
 <script>
+    console.log('other script running');
     let activeTab = 'workTab'; // Default active tab personalTab
     let activeTabList = activeTab + 'List';
     let activeTabPurgeList = activeTab + 'PurgeList'; // Default active tab Purge list
