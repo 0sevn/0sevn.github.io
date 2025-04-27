@@ -9,7 +9,9 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#454545">
 <!-- in your <head> <zombies> -->
-    
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script>
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./serviceWorker.js')
@@ -78,7 +80,7 @@
             </ul>
         </div>
 
-        
+        <div id="qr-reader" style="width: 300px;"></div>
     <!-- Import/export buttons -->
     <div class="fileops">
         <div style="margin-top:5px; text-align: right;">
@@ -166,7 +168,14 @@
   
         return () => unsubscribeAuth();
       }, []);
-  
+      useEffect(() => {
+        if (user?.uid && window.QRCode) {
+          QRCode.toCanvas(document.getElementById("qrCanvas"), user.uid, error => {
+            if (error) console.error("QR code error:", error);
+          });
+        }
+      }, [user]);
+
       const saveUserData = async (userId, data) => {
         try {
           await setDoc(doc(db, "users", userId), data, { merge: true });
@@ -258,6 +267,25 @@
         await downloadAndMergeTasksFromFirestore(customUid);
         alert("Tasks from that user ID were merged into your local list.");
       };
+
+        const startQrScan = () => {
+        const qrScanner = new Html5Qrcode("qr-reader");
+        qrScanner.start(
+          { facingMode: "environment" }, // Use back camera
+          {
+            fps: 10,
+            qrbox: 250
+          },
+          (decodedText) => {
+            setCustomUid(decodedText);
+            qrScanner.stop();
+            alert("User ID scanned and filled!");
+          },
+          (error) => {
+            console.warn(`QR scan error: ${error}`);
+          }
+        );
+      };
         
       return React.createElement("div", null, [
         React.createElement("h1", { key: "heading" }, "Welcome to the Firebase App"),
@@ -300,7 +328,16 @@
           { key: "syncBtn", onClick: handleCustomUidSync },
           "Sync from UID"
         )
-      ])
+      ]),
+      React.createElement("div", { key: "qrContainer" }, [
+      React.createElement("p", { key: "qrLabel" }, "Scan to sync this user ID:"),
+      React.createElement("canvas", { id: "qrCanvas", key: "qrCanvas" })
+      ]),
+      React.createElement(
+          "button",
+          { key: "syncBtn", onClick: startQrScan() },
+          "startQrScan"
+        )
       ]);
     };
   
