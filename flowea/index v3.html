@@ -270,6 +270,7 @@
 
         const startQrScan = () => {
         const qrScanner = new Html5Qrcode("qr-reader");
+        console.log('start camera')
         qrScanner.start(
           { facingMode: "environment" }, // Use back camera
           {
@@ -335,7 +336,7 @@
       ]),
       React.createElement(
           "button",
-          { key: "syncBtn", onClick: startQrScan() },
+          { key: "QRBtn", onClick: startQrScan },
           "startQrScan"
         )
       ]);
