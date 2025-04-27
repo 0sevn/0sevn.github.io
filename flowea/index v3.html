@@ -250,7 +250,15 @@
         // await downloadAndMergeTasksFromFirestore(user.uid);
         console.log("uploaded tasks");
       };
-  
+
+      const [customUid, setCustomUid] = useState("");
+
+      const handleCustomUidSync = async () => {
+        if (!customUid) return alert("Enter a UID to sync with.");
+        await downloadAndMergeTasksFromFirestore(customUid);
+        alert("Tasks from that user ID were merged into your local list.");
+      };
+        
       return React.createElement("div", null, [
         React.createElement("h1", { key: "heading" }, "Welcome to the Firebase App"),
         React.createElement(
@@ -262,7 +270,37 @@
           "pre",
           { key: "userdata" },
           JSON.stringify(userData || {}, null, 2)
+        ),
+
+        React.createElement("div", { key: "userIdSection" }, [
+        React.createElement("p", { key: "uid" }, `User ID: ${user?.uid || 'Loading...'}`),
+          React.createElement(
+            "button",
+            {
+              key: "copyBtn",
+              onClick: () => {
+                navigator.clipboard.writeText(user?.uid);
+                alert("User ID copied to clipboard!");
+              }
+            },
+            "Copy User ID"
+            )
+        ]),
+        React.createElement("div", { key: "manualSync" }, [
+        React.createElement("input", {
+          key: "uidInput",
+          type: "text",
+          placeholder: "Enter User ID",
+          value: customUid,
+          onChange: e => setCustomUid(e.target.value),
+          style: { marginRight: "8px" }
+        }),
+        React.createElement(
+          "button",
+          { key: "syncBtn", onClick: handleCustomUidSync },
+          "Sync from UID"
         )
+      ])
       ]);
     };
   
