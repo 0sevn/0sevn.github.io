@@ -9,9 +9,16 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#454545">
 <!-- in your <head> <zombies> -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script> -->
+  <!-- <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script> -->
+
+  <!-- QR Code Generator -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<!-- QR Scanner -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
     <script>
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./serviceWorker.js')
@@ -145,202 +152,148 @@
   
     // --- React App Component ---
     const App = () => {
-      const [user, setUser] = useState(null);
-      const [userData, setUserData] = useState(null);
-  
-      // Replace with your actual tab logic or state
-      const activeTab = "workTab";
-  
-      useEffect(() => {
-        const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
-          setUser(currentUser);
-          if (!currentUser) {
-            try {
-              await signInAnonymously(auth);
-            } catch (error) {
-              console.error("Anonymous sign-in failed:", error);
-            }
-          } else {
-            await saveUserData(currentUser.uid, { lastSignedIn: new Date() });
-            setUserData({ lastSignedIn: new Date() });
-          }
+  const [user, setUser] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [customUid, setCustomUid] = useState("");
+
+  const activeTab = "workTab";
+  const listName = activeTab + "List";
+  const purgeListName = activeTab + "PurgeList";
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (!currentUser) {
+        await signInAnonymously(auth);
+      } else {
+        setUser(currentUser);
+        setUserData({ lastSignedIn: new Date() });
+        await saveUserData(currentUser.uid, { lastSignedIn: new Date() });
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    // Generate QR Code once UID is available
+    if (user?.uid && window.QRCode) {
+      QRCode.toCanvas(document.getElementById("qrCanvas"), user.uid, (error) => {
+        if (error) console.error("QR Code error", error);
+      });
+    }
+  }, [user]);
+
+  const saveUserData = async (userId, data) => {
+    try {
+      await setDoc(doc(db, "users", userId), data, { merge: true });
+    } catch (error) {
+      console.error("Error saving user data:", error);
+    }
+  };
+
+  const uploadTasksToFirestore = async (uid) => {
+    const tasks = JSON.parse(localStorage.getItem(listName) || "[]");
+    const tasksRef = collection(db, listName);
+
+    for (const task of tasks) {
+      try {
+        await addDoc(tasksRef, {
+          ...task,
+          userId: uid,
+          syncedAt: new Date().toISOString()
         });
-  
-        return () => unsubscribeAuth();
-      }, []);
-      useEffect(() => {
-        if (user?.uid && window.QRCode) {
-          QRCode.toCanvas(document.getElementById("qrCanvas"), user.uid, error => {
-            if (error) console.error("QR code error:", error);
-          });
-        }
-      }, [user]);
+      } catch (error) {
+        console.error("Upload error:", error);
+      }
+    }
+  };
 
-      const saveUserData = async (userId, data) => {
-        try {
-          await setDoc(doc(db, "users", userId), data, { merge: true });
-          console.log("User data saved");
-        } catch (error) {
-          console.error("Error saving user data:", error);
-        }
-      };
-  
-      const uploadTasksToFirestore = async (userId) => {
-        const listName = activeTab + "List";
-        const tasks = JSON.parse(localStorage.getItem(listName) || "[]");
-        const tasksRef = collection(db, listName);
-        console.log('get data from', activeTab)
-        console.log('get data from', listName)
-        for (const task of tasks) {
-          try {
-            await addDoc(tasksRef, {
-              ...task,
-              userId,
-              syncedAt: new Date().toISOString()
-            });
-          } catch (error) {
-            console.error("Failed to upload task:", error);
-          }
-        }
-      };
-  
-      const uploadPurgedTasksToFirestore = async (userId) => {
-        const purgeList = activeTab + "PurgeList";
-        const purged = JSON.parse(localStorage.getItem(purgeList) || "[]");
-        const purgedRef = collection(db, purgeList);
-  
-        for (const task of purged) {
-          try {
-            await addDoc(purgedRef, {
-              ...task,
-              userId,
-              purgedAt: task.purgedAt || new Date().toISOString(),
-              syncedAt: new Date().toISOString()
-            });
-          } catch (error) {
-            console.error("Failed to upload purged task:", error);
-          }
-        }
-      };
-  
-      const downloadAndMergeTasksFromFirestore = async (userId) => {
-        const listName = activeTab + "List";
-        const tasksRef = collection(db, listName);
-        const q = query(tasksRef, where("userId", "==", userId));
-  
-        try {
-          const snapshot = await getDocs(q);
-          const remoteTasks = snapshot.docs.map(doc => doc.data());
-          const localTasks = JSON.parse(localStorage.getItem(listName) || "[]");
-  
-          const merged = [...localTasks];
-          for (const task of remoteTasks) {
-            const exists = localTasks.some(
-              t => t.text === task.text && t.timestamp === task.timestamp
-            );
-            if (!exists) merged.push(task);
-          }
-  
-          localStorage.setItem(listName, JSON.stringify(merged));
-          console.log("Tasks merged into localStorage");
-        } catch (error) {
-          console.error("Failed to download tasks:", error);
-        }
-      };
-  
-      const handleSyncToFirestore = async () => {
-        if (!user) {
-          alert("User not authenticated");
-          return;
-        }
-  
-        await uploadTasksToFirestore(user.uid);
-        await uploadPurgedTasksToFirestore(user.uid);
-        // await downloadAndMergeTasksFromFirestore(user.uid);
-        console.log("uploaded tasks");
-      };
+  const uploadPurgedTasksToFirestore = async (uid) => {
+    const purged = JSON.parse(localStorage.getItem(purgeListName) || "[]");
+    const purgedRef = collection(db, purgeListName);
 
-      const [customUid, setCustomUid] = useState("");
+    for (const task of purged) {
+      try {
+        await addDoc(purgedRef, {
+          ...task,
+          userId: uid,
+          purgedAt: task.purgedAt || new Date().toISOString(),
+          syncedAt: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error("Upload purge error:", error);
+      }
+    }
+  };
 
-      const handleCustomUidSync = async () => {
-        if (!customUid) return alert("Enter a UID to sync with.");
-        await downloadAndMergeTasksFromFirestore(customUid);
-        alert("Tasks from that user ID were merged into your local list.");
-      };
+  const handleSyncToFirestore = async () => {
+    const uid = customUid || user?.uid;
+    if (!uid) return alert("User not authenticated.");
 
-        const startQrScan = () => {
-        const qrScanner = new Html5Qrcode("qr-reader");
-        console.log('start camera')
-        qrScanner.start(
-          { facingMode: "environment" }, // Use back camera
-          {
-            fps: 10,
-            qrbox: 250
-          },
-          (decodedText) => {
-            setCustomUid(decodedText);
-            qrScanner.stop();
-            alert("User ID scanned and filled!");
-          },
-          (error) => {
-            console.warn(`QR scan error: ${error}`);
-          }
-        );
-      };
-        
-      return React.createElement("div", null, [
-        React.createElement("h1", { key: "heading" }, "Welcome to the Firebase App"),
-        React.createElement(
-          "button",
-          { key: "sync", onClick: handleSyncToFirestore },
-          "Sync Tasks with Firestore"
-        ),
-        React.createElement(
-          "pre",
-          { key: "userdata" },
-          JSON.stringify(userData || {}, null, 2)
-        ),
+    await uploadTasksToFirestore(uid);
+    await uploadPurgedTasksToFirestore(uid);
+    alert("Tasks synced to Firestore.");
+  };
 
-        React.createElement("div", { key: "userIdSection" }, [
-        React.createElement("p", { key: "uid" }, `User ID: ${user?.uid || 'Loading...'}`),
-          React.createElement(
-            "button",
-            {
-              key: "copyBtn",
-              onClick: () => {
-                navigator.clipboard.writeText(user?.uid);
-                alert("User ID copied to clipboard!");
-              }
-            },
-            "Copy User ID"
-            )
-        ]),
-        React.createElement("div", { key: "manualSync" }, [
-        React.createElement("input", {
-          key: "uidInput",
-          type: "text",
-          placeholder: "Enter User ID",
-          value: customUid,
-          onChange: e => setCustomUid(e.target.value),
-          style: { marginRight: "8px" }
-        }),
-        React.createElement(
-          "button",
-          { key: "syncBtn", onClick: handleCustomUidSync },
-          "Sync from UID"
-        )
-      ]),
-      React.createElement("div", { key: "qrContainer" }, [
+  const handleCustomUidSync = () => {
+    if (!customUid) return alert("Please enter a User ID.");
+    handleSyncToFirestore();
+  };
+
+  const startQrScan = () => {
+    const qrScanner = new Html5Qrcode("qr-reader");
+    qrScanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: 250 },
+      (decodedText) => {
+        setCustomUid(decodedText);
+        qrScanner.stop();
+        alert("User ID scanned and applied!");
+      },
+      (error) => {
+        console.warn("QR scan error:", error);
+      }
+    );
+  };
+
+  return React.createElement("div", null, [
+    React.createElement("h1", { key: "heading" }, "Welcome to the Firebase App"),
+
+    React.createElement("button", { key: "sync", onClick: handleSyncToFirestore }, "Sync Tasks with Firestore"),
+
+    React.createElement("pre", { key: "userdata" }, JSON.stringify(userData || {}, null, 2)),
+
+    React.createElement("div", { key: "userIdSection" }, [
+      React.createElement("p", { key: "uid" }, `User ID: ${user?.uid || 'Loading...'}`),
+      React.createElement("button", {
+        key: "copyBtn",
+        onClick: () => {
+          navigator.clipboard.writeText(user?.uid || "");
+          alert("User ID copied to clipboard!");
+        }
+      }, "Copy User ID")
+    ]),
+
+    React.createElement("div", { key: "manualSync" }, [
+      React.createElement("input", {
+        key: "uidInput",
+        type: "text",
+        placeholder: "Enter User ID",
+        value: customUid,
+        onChange: e => setCustomUid(e.target.value),
+        style: { marginRight: "8px" }
+      }),
+      React.createElement("button", { key: "syncBtn", onClick: handleCustomUidSync }, "Sync from UID")
+    ]),
+
+    React.createElement("div", { key: "qrContainer" }, [
       React.createElement("p", { key: "qrLabel" }, "Scan to sync this user ID:"),
       React.createElement("canvas", { id: "qrCanvas", key: "qrCanvas" })
-      ]),
-      React.createElement(
-          "button",
-          { key: "QRBtn", onClick: startQrScan },
-          "startQrScan"
-        )
-      ]);
-    };
+    ]),
+
+    React.createElement("button", { key: "scanBtn", onClick: startQrScan }, "Start QR Scan")
+  ]);
+};
+
   
     ReactDOM.render(React.createElement(App), document.getElementById("root"));
   </script>
