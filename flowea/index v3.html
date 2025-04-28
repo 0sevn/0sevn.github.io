@@ -240,20 +240,28 @@
   };
 
   const startQrScan = () => {
-    const qrScanner = new Html5Qrcode("qr-reader");
-    qrScanner.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: 250 },
-      (decodedText) => {
-        setCustomUid(decodedText);
-        qrScanner.stop();
-        alert("User ID scanned and applied!");
-      },
-      (error) => {
-        console.warn("QR scan error:", error);
-      }
-    );
-  };
+  const qrScanner = new Html5Qrcode("qr-reader");
+  console.log('start camera');
+
+  qrScanner.start(
+    { facingMode: "environment" }, // Use back camera
+    {
+      fps: 10,
+      qrbox: 250
+    },
+    (decodedText) => {
+      setCustomUid(decodedText);
+      qrScanner.stop();
+      alert("User ID scanned and filled!");
+    },
+    (error) => {
+      console.warn(`QR scan error: ${error}`);
+    }
+  ).catch(err => {
+    console.error("Error starting QR scanner:", err);
+  });
+};
+
 
   return React.createElement("div", null, [
     React.createElement("h1", { key: "heading" }, "Welcome to the Firebase App"),
