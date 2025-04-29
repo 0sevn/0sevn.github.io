@@ -79,7 +79,7 @@
 
 <!-- Purged list -->
 <nav class="w3-sidebar w3-bar-block w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:75%;font-weight:bold;display:none;right:0;background-color: var(--card-bg); margin-top: 135px;" id="historyCard">
-    <a href="javascript:void(0)" onclick="closeHistory()" class="w3-bar-item w3-button w3-center w3-padding-24" style="background-color:var(--active-tab)";>CLOSE</a> 
+    <!-- <a href="javascript:void(0)" onclick="closeHistory()" class="w3-bar-item w3-button w3-center w3-padding-24" style="background-color:var(--active-tab)";>CLOSE</a>  -->
     
     <!-- Purge history list -->
         <div style="margin-top: 0px;  color: var(--text-color);">
@@ -89,10 +89,10 @@
 
         <div id="qr-reader" style="width: 300px;"></div>
     <!-- Import/export buttons -->
+    
     <div class="fileops">
-        <div style="margin-top:5px; text-align: right;">
-            <input type="submit" id="connect" value=" " class="icon connect" title="Connect">
-        </div>
+      <div id="manualSyncUI"></div>
+        
         <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
             <a id="exportHistoryLink" style="display: none;">Export</a>
             <br>
@@ -101,7 +101,7 @@
     </div>
 
 </nav>
-<div id="manualSyncUI"></div>
+
 
 <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
@@ -169,7 +169,7 @@ import ReactDOM from "https://esm.sh/react-dom@18.2.0";
   const showStatus = (message) => {
     syncStatusDiv.innerText = message;
     syncStatusDiv.style.display = "block";
-    setTimeout(() => (syncStatusDiv.style.display = "none"), 4000);
+    setTimeout(() => (syncStatusDiv.style.display = "none"), 5000);
   };
 
   const activeTab = "work";
@@ -177,60 +177,81 @@ import ReactDOM from "https://esm.sh/react-dom@18.2.0";
   const activePurgeList = activeTab + "PurgeList";
 
   const autoSyncOnLoad = async (uid) => {
-    if (!uid) return;
-    const localWorkData = JSON.parse(localStorage.getItem(activeTabList) || "[]");
-    const localPersonalData = JSON.parse(localStorage.getItem("personalList") || "[]");
-    const localWorkPurgeData = JSON.parse(localStorage.getItem(activePurgeList) || "[]");
-    const localSync = localStorage.getItem("LastSync") || null;
+    console.log("start autosyncOnLoad")
+  if (!uid) return;
 
-    try {
-      const userDoc = await getDoc(doc(db, "users", uid));
-      const userData = userDoc.data() || {};
-      const remoteSync = userData.lastSync || null;
+  const localSync = localStorage.getItem("LastSync") || null;
 
-      const localDate = localSync ? new Date(localSync) : null;
-      const remoteDate = remoteSync ? new Date(remoteSync) : null;
-      console.log("Local date:", localDate);
-console.log("Remote date:", remoteDate);
+  try {
+    const userDoc = await getDoc(doc(db, "users", uid));
+    const userData = userDoc.data() || {};
+    const remoteSync = userData.lastSync || null;
 
-      const formatDate = (date) =>
-        date ? date.toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) : "never";
+    const localDate = localSync ? new Date(localSync) : null;
+    const remoteDate = remoteSync ? new Date(remoteSync) : null;
+    console.log("Local date:", localDate);
+    console.log("Remote date:", remoteDate);
 
-      if (remoteDate && (!localDate || remoteDate > localDate)) {
+    const formatDate = (date) =>
+      date
+        ? date.toLocaleString("en-GB", {
+            dateStyle: "medium",
+            timeStyle: "short",
+          })
+        : "never";
+
+    const hasConfirmed = localStorage.getItem("syncConfirmed") === "true";
+console.log("check dates1")
+    if (remoteDate && (!localDate || remoteDate > localDate)) {
+      console.log("newr data in firestore, check confirmed")
+      if (!hasConfirmed) {
         const confirmDownload = confirm(
-          `Newer data found in Firestore (synced ${formatDate(remoteDate)}).\n` +
-          `Local data was last synced ${formatDate(localDate)}.\n\n` +
-          "Load tasks and purged history from Firestore?"
+          `Newer data found in Firestore (synced ${formatDate(
+            remoteDate
+          )}).\nLocal data was last synced ${formatDate(
+            localDate
+          )}.\n\nLoad tasks and purged history from Firestore?`
         );
         if (confirmDownload) {
           await downloadAndMergeTasksFromFirestore(uid);
+          localStorage.setItem("syncConfirmed", "true");
           showStatus("Downloaded and merged from Firestore.");
           return;
         }
       }
-
-      if (localDate && (!remoteDate || localDate > remoteDate)) {
+    }
+    console.log("check dates2")
+    if (localDate && (!remoteDate || localDate > remoteDate)) {
+      
+      console.log("newr data in firestore, check confirmed")
+      if (!hasConfirmed) {
         const confirmUpload = confirm(
-          `Your local data is newer (synced ${formatDate(localDate)}).\n` +
-          `Firestore last sync was ${formatDate(remoteDate)}.\n\n` +
-          "Upload local tasks and purged history to Firestore?"
+          `Your local data is newer (synced ${formatDate(
+            localDate
+          )}).\nFirestore last sync was ${formatDate(
+            remoteDate
+          )}.\n\nUpload local tasks and purged history to Firestore?`
         );
         if (confirmUpload) {
           await uploadTasksToFirestore(uid);
+          localStorage.setItem("syncConfirmed", "true");
           showStatus("Uploaded local data to Firestore.");
         }
       }
-    } catch (error) {
-      console.error("Sync error:", error);
     }
-  };
+  } catch (error) {
+    console.error("Sync error:", error);
+  }
+};
 
+  // Function to upload tasks to Firestore
   const uploadTasksToFirestore = async (uid) => {
     console.log("Uploading tasks for UID:", uid);  // Debug line
     const localWorkData = JSON.parse(localStorage.getItem(activeTabList) || "[]");
     const localPersonalData = JSON.parse(localStorage.getItem("personalList") || "[]");
     const localWorkPurgeData = JSON.parse(localStorage.getItem(activePurgeList) || "[]");
-    const localSync = localStorage.getItem("LastSync") || null;
+
+    // const localSync = localStorage.getItem("LastSync") || null;
 
     await setDoc(doc(db, "users", uid), {
       workListData: localWorkData,
@@ -242,6 +263,7 @@ console.log("Remote date:", remoteDate);
     localStorage.setItem("LastSync", new Date().toISOString());
   };
 
+  // Function to download and merge tasks from Firestore
   const downloadAndMergeTasksFromFirestore = async (uid) => {
     const userDoc = await getDoc(doc(db, "users", uid));
     if (!userDoc.exists()) {
@@ -256,20 +278,12 @@ console.log("Remote date:", remoteDate);
     localStorage.setItem("LastSync", data.lastSync || new Date().toISOString());
   };
 
-  // On load: auth and sync
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      await autoSyncOnLoad(user.uid);
-    } else {
-      await signInAnonymously(auth);
-    }
-  });
 
 //
-//
+//React Component for manual sync controls
 const ManualSyncApp = ({ uid }) => {
-    const [syncing, setSyncing] = React.useState(false);
-    const [lastSync, setLastSync] = React.useState(localStorage.getItem("LastSync"));
+    const [syncing, setSyncing] = useState(false);
+    const [lastSync, setLastSync] = useState(localStorage.getItem("LastSync"));
 
     const handleManualSync = async () => {
       setSyncing(true);
@@ -278,7 +292,8 @@ const ManualSyncApp = ({ uid }) => {
       setSyncing(false);
     };
 
-    return React.createElement("div", {
+    return React.createElement(
+      "div", {
       style: {
         padding: "12px",
         border: "1px solid #ddd",
@@ -288,6 +303,15 @@ const ManualSyncApp = ({ uid }) => {
       }
     }, [
       React.createElement("h3", { key: "title" }, "Sync Controls"),
+      // React.createElement("div", { key: "icon"}
+      //   style: {
+      //     margin-top:"5px",
+      //     text-align: "right"
+      //   }
+      // ),
+      // React.createElement("button", { key: "sync", onClick: handleSyncToFirestore }, "Sync Tasks with Firestore"),
+      //       <input type="submit" id="connect" value=" " class="icon connect" title="Connect">
+
       React.createElement("p", { key: "uid" }, `User ID: ${uid}`),
       React.createElement("p", { key: "lastSync" }, `Last Sync: ${lastSync ? new Date(lastSync).toLocaleString() : "Never"}`),
       React.createElement("button", {
@@ -304,8 +328,8 @@ const ManualSyncApp = ({ uid }) => {
         }
       }, syncing ? "Syncing..." : "Sync Now")
     ]);
-  };
 
+}
   // Wait for auth before rendering
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -313,6 +337,9 @@ const ManualSyncApp = ({ uid }) => {
         React.createElement(ManualSyncApp, { uid: user.uid }),
         document.getElementById("manualSyncUI")
       );
+    }
+     else {
+      signInAnonymously(auth);
     }
   });
   // --- React App Component ---
@@ -555,6 +582,9 @@ $(function() {
         todoList[index].text = newText;
         todoList[index].checked = checked;
         localStorage.setItem(activeTabList, JSON.stringify(todoList));
+
+        // Update LastSync timestamp
+        localStorage.setItem("LastSync", new Date().toISOString());
     }
 
     function deleteTask() {
@@ -563,7 +593,6 @@ $(function() {
         listItem.remove();
         counter--;
         console.log('Counter after deleting task:', counter); // Log the counter value
-        updateHealthBar();
 
         // Remove the task from local storage
         var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
@@ -594,6 +623,9 @@ $(function() {
             document.querySelector('.healthbar').style.setProperty('--health-color', '#6ae25aaf');
         }
         console.log('healthBar updated. New size:', newSize + 'px');
+
+        // Update LastSync timestamp
+        localStorage.setItem("LastSync", new Date().toISOString());
     }
     
     const purgeMessages = [
@@ -887,9 +919,16 @@ function showHelp() {
 }
 
 function showHistory() {
-    document.getElementById("historyCard").style.display = "block";
-    console.log('activetablist', activeTabList);
+    const visibleHist = document.getElementById("historyCard").style.display;
+    console.log('show history running - visibleHist=', visibleHist);
     // displayData();
+    if (visibleHist === 'none') {
+      console.log('visibleHist= none active', visibleHist);
+      document.getElementById("historyCard").style.display = "block";
+    } else if (visibleHist === 'block') {
+      console.log('visibleHist= else active', visibleHist);
+      document.getElementById("historyCard").style.display = "none";
+    }
 } 
 function closeHistory() {
     document.getElementById("historyCard").style.display = "none";
