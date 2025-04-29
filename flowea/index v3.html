@@ -73,7 +73,7 @@
 </div>
 
 <!-- Purged list -->
-<nav class="w3-sidebar w3-bar-block w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:75%;font-weight:bold;display:none;right:0;background-color: var(--card-bg); margin-top: 135px;" id="historyCard">
+<nav class="w3-sidebar w3-bar-block w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:75%;font-weight:bold;display:none;right:0;background-color: var(--card-bg); margin-top: 135px;border: 1px solid #ddd;" id="historyCard">
   <!-- sync controls card -->
   <div style="position:fixed; right:0;text-align:right;margin-top: 20px;">
         <input type="submit" value=" " class="icon rss" title="Sync controls" onclick="showSync()">
@@ -86,7 +86,7 @@
         </div>
 
     <!-- Import/export buttons -->
-    <div class="fileops" id="syncCard" style="display: none;">
+    <div class="fileops" id="syncControls" style="display: none;">
         <div id="manualSyncUI"></div>
       <div id="qr-reader" style="width: 300px;"></div>
         <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
@@ -885,12 +885,12 @@ function showHistory() {
 } 
 
 function showSync() {
-    const visibleSync = document.getElementById("syncCard").style.display;
+    const visibleSync = document.getElementById("syncControls").style.display;
     // displayData();
     if (visibleSync === 'none') {
-      document.getElementById("syncCard").style.display = "block";
+      document.getElementById("syncControls").style.display = "block";
     } else if (visibleSync === 'block') {
-      document.getElementById("syncCard").style.display = "none";
+      document.getElementById("syncControls").style.display = "none";
     }
 } 
 </script>
