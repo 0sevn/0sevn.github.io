@@ -124,7 +124,7 @@
   .icon:hover{
       opacity: 0.6; transition: 0.1s
   }
-  .historycard{
+  /* .historycard{
     z-index:999;
     width:75%;
     font-weight:bold;
@@ -133,7 +133,7 @@
     background-color: var(--card-bg);
     border: 1px solid #ddd;
     margin-top: 135px;
-  }
+  } */
   .fileops {
     /* background-color: rgb(79, 79, 79); */
     background-color: var(--card-bg);
