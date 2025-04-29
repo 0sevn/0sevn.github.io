@@ -27,23 +27,19 @@
       }
     </script>
 </head>
-
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <body>
     <div style="position:fixed; left:0;text-align:right;margin-top: -100px;">
         <input type="submit" value=" " class="icon help w3-animate-right" title="Help" onclick="showHelp()">
     </div>
     <div style="position:fixed; right:0;text-align:right;margin-top: -100px;">
-        
         <div class="">
-            
             <input type="submit" value=" " class="icon darklight_mode w3-animate-left" title="Toggle light/dark mode" onclick="toggleTheme()">
             <br><br>
             <input type="submit" value=" " class="icon history w3-animate-left" title="History" onclick="showHistory()">
-            
-        </div>
-        
-        <!-- <div class="tab" class="icon history"  style="margin-left:25px; padding-left: 5px; font-size: 14px;"></div> -->
-        
+        </div>   
     </div>
 <!-- Mid navigation -->
 <div class="mid-container">
@@ -60,17 +56,16 @@
     
     <br>
     <div>
-        <input type="text" id="enter_task" placeholder="Enter Task">
-        <input type="submit" id="add" value=" " class="icon add" title="Add task">
-        <input type="submit" id="purge" value=" " class="icon purge" title="Purge checked tasks" disabled>
+      <input type="text" id="enter_task" placeholder="Enter Task">
+      <input type="submit" id="add" value=" " class="icon add" title="Add task">
+      <input type="submit" id="purge" value=" " class="icon purge" title="Purge checked tasks" disabled>
 
-<!-- <p style="font-size: 8px; padding-left: 3px; border-style: solid; border-width: 0 0 1px 0 ; border-color: red;">Urgent__</p> -->
-            <!-- list elements -->
-            <div id="sort_list" style="padding: 5px;">
-                <ul id="todo_list" style="list-style: none;" class="connected-sortable">
-                    
-                </ul>
-            </div>
+        <!-- list elements -->
+        <div id="sort_list" style="padding: 5px;">
+            <ul id="todo_list" style="list-style: none;" class="connected-sortable">
+                
+            </ul>
+        </div>
     </div>
 </div>
 <div class="howto" id="helpCard" onclick="closeHelp()">
@@ -79,44 +74,34 @@
 
 <!-- Purged list -->
 <nav class="w3-sidebar w3-bar-block w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:75%;font-weight:bold;display:none;right:0;background-color: var(--card-bg); margin-top: 135px;" id="historyCard">
-    <!-- <a href="javascript:void(0)" onclick="closeHistory()" class="w3-bar-item w3-button w3-center w3-padding-24" style="background-color:var(--active-tab)";>CLOSE</a>  -->
-    
+  <!-- sync controls card -->
+  <div style="position:fixed; right:0;text-align:right;margin-top: 20px;">
+        <input type="submit" value=" " class="icon rss" title="Sync controls" onclick="showSync()">
+    </div>   
+</div>
     <!-- Purge history list -->
-        <div style="margin-top: 0px;  color: var(--text-color);">
+        <div style="margin-top: 20px;  color: var(--text-color);">
             <ul id="purge_list" style="list-style: none;padding-left: 5%;">
             </ul>
         </div>
 
-        <div id="qr-reader" style="width: 300px;"></div>
     <!-- Import/export buttons -->
-    
-    <div class="fileops">
-      <div id="manualSyncUI"></div>
-        
+    <div class="fileops" id="syncCard" style="display: none;">
+        <div id="manualSyncUI"></div>
+      <div id="qr-reader" style="width: 300px;"></div>
         <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
             <a id="exportHistoryLink" style="display: none;">Export</a>
             <br>
             <!-- <label for="FileInputLabel"><b>Import</b></label> -->
             <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input>
     </div>
-
+    <!-- <div id="root"></div> -->
 </nav>
 
-
-<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
-<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-
-<div id="root"></div>
-
-
-<!-- Include these in your HTML -->
 <script type="module">
-  // --- Firebase imports ---
-  // import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-  // import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-  import {
+// --- Firebase imports ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import {
   getFirestore,
   addDoc,
   collection,
@@ -126,8 +111,7 @@
   setDoc,
   doc
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-  // import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-  import {
+import {
   getAuth,
   signInAnonymously,
   onAuthStateChanged
@@ -137,21 +121,35 @@
 import React, { useState, useEffect } from "https://esm.sh/react@18.2.0";
 import ReactDOM from "https://esm.sh/react-dom@18.2.0";
 
-    // --- Firebase config ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyC5IM5dasyavKCHczWIUlqoFThxLUtTZps",
-      authDomain: "flowea-d43ef.firebaseapp.com",
-      projectId: "flowea-d43ef",
-      storageBucket: "flowea-d43ef.appspot.com",
-      messagingSenderId: "701455113224",
-      appId: "1:701455113224:web:1f89c2ae60b37a075605bd",
-      measurementId: "G-JCRVR188LP"
-    };
+// --- Firebase config ---
+const firebaseConfig = {
+  apiKey: "AIzaSyC5IM5dasyavKCHczWIUlqoFThxLUtTZps",
+  authDomain: "flowea-d43ef.firebaseapp.com",
+  projectId: "flowea-d43ef",
+  storageBucket: "flowea-d43ef.appspot.com",
+  messagingSenderId: "701455113224",
+  appId: "1:701455113224:web:1f89c2ae60b37a075605bd",
+  measurementId: "G-JCRVR188LP"
+};
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const handleSyncFromCustomUid = async () => {
+  if (!customUid) return alert("Please enter a User ID.");
+
+  try {
+    localStorage.setItem("customSyncUID", customUid); // ← Store custom UID
+    await downloadAndMergeTasksFromFirestore(customUid);
+    localStorage.setItem("syncConfirmed", "true");
+    alert("Data successfully loaded from Firestore.");
+  } catch (err) {
+    alert("Failed to load data from Firestore.");
+    console.error(err);
+  }
+};
 
   const syncStatusDiv = document.createElement("div");
   syncStatusDiv.id = "syncStatus";
@@ -166,22 +164,20 @@ import ReactDOM from "https://esm.sh/react-dom@18.2.0";
   syncStatusDiv.style.display = "none";
   document.body.appendChild(syncStatusDiv);
 
-  const showStatus = (message) => {
-    syncStatusDiv.innerText = message;
-    syncStatusDiv.style.display = "block";
-    setTimeout(() => (syncStatusDiv.style.display = "none"), 5000);
-  };
+const showStatus = (message) => {
+  syncStatusDiv.innerText = message;
+  syncStatusDiv.style.display = "block";
+  setTimeout(() => (syncStatusDiv.style.display = "none"), 5000);
+};
 
-  const activeTab = "work";
-  const activeTabList = activeTab + "List";
-  const activePurgeList = activeTab + "PurgeList";
+const activeTab = "work";
+const activeTabList = activeTab + "List";
+const activePurgeList = activeTab + "PurgeList";
 
-  const autoSyncOnLoad = async (uid) => {
-    console.log("start autosyncOnLoad")
+const autoSyncOnLoad = async (uid) => {
+console.log("start autosyncOnLoad")
   if (!uid) return;
-
-  const localSync = localStorage.getItem("LastSync") || null;
-
+    const localSync = localStorage.getItem("LastSync") || null;
   try {
     const userDoc = await getDoc(doc(db, "users", uid));
     const userData = userDoc.data() || {};
@@ -192,25 +188,17 @@ import ReactDOM from "https://esm.sh/react-dom@18.2.0";
     console.log("Local date:", localDate);
     console.log("Remote date:", remoteDate);
 
-    const formatDate = (date) =>
-      date
-        ? date.toLocaleString("en-GB", {
-            dateStyle: "medium",
-            timeStyle: "short",
-          })
-        : "never";
+    const formatDate = (date) => date ? date.toLocaleString("en-GB", {dateStyle: "medium", timeStyle: "short", }) : "never";
 
     const hasConfirmed = localStorage.getItem("syncConfirmed") === "true";
-console.log("check dates1")
+    console.log("check dates1")
     if (remoteDate && (!localDate || remoteDate > localDate)) {
       console.log("newr data in firestore, check confirmed")
       if (!hasConfirmed) {
         const confirmDownload = confirm(
-          `Newer data found in Firestore (synced ${formatDate(
-            remoteDate
-          )}).\nLocal data was last synced ${formatDate(
-            localDate
-          )}.\n\nLoad tasks and purged history from Firestore?`
+          `Newer data found in Firestore (synced ${formatDate(remoteDate)}).\n
+          Local data was last synced ${formatDate(localDate)}.\n\n
+          Load tasks and purged history from Firestore?`
         );
         if (confirmDownload) {
           await downloadAndMergeTasksFromFirestore(uid);
@@ -226,11 +214,9 @@ console.log("check dates1")
       console.log("newr data in firestore, check confirmed")
       if (!hasConfirmed) {
         const confirmUpload = confirm(
-          `Your local data is newer (synced ${formatDate(
-            localDate
-          )}).\nFirestore last sync was ${formatDate(
-            remoteDate
-          )}.\n\nUpload local tasks and purged history to Firestore?`
+          `Your local data is newer (synced ${formatDate(localDate)}).\n
+          Firestore last sync was ${formatDate(remoteDate)}.\n\n
+          Upload local tasks and purged history to Firestore?`
         );
         if (confirmUpload) {
           await uploadTasksToFirestore(uid);
@@ -250,7 +236,6 @@ console.log("check dates1")
     const localWorkData = JSON.parse(localStorage.getItem(activeTabList) || "[]");
     const localPersonalData = JSON.parse(localStorage.getItem("personalList") || "[]");
     const localWorkPurgeData = JSON.parse(localStorage.getItem(activePurgeList) || "[]");
-
     // const localSync = localStorage.getItem("LastSync") || null;
 
     await setDoc(doc(db, "users", uid), {
@@ -278,173 +263,144 @@ console.log("check dates1")
     localStorage.setItem("LastSync", data.lastSync || new Date().toISOString());
   };
 
+// --- React App Component ---
+const SyncControls = () => {
+  const [user, setUser] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [customUid, setCustomUid] = useState(localStorage.getItem("customSyncUID") || "");
+  const [lastSync, setLastSync] = useState(localStorage.getItem("LastSync"));
+  const [syncing, setSyncing] = useState(false);
+  const saveUserData = async (uid, data) => {
+  await setDoc(doc(db, "users", uid), data, { merge: true });
+  };
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      const storedUID = localStorage.getItem("customSyncUID");
 
-//
-//React Component for manual sync controls
-const ManualSyncApp = ({ uid }) => {
-    const [syncing, setSyncing] = useState(false);
-    const [lastSync, setLastSync] = useState(localStorage.getItem("LastSync"));
+      if (!currentUser) {
+        await signInAnonymously(auth);
+      } else {
+        setUser(currentUser);
+        setUserData({ lastSignedIn: new Date() });
+        await saveUserData(currentUser.uid, { lastSignedIn: new Date() });
 
-    const handleManualSync = async () => {
-      setSyncing(true);
-      await autoSyncOnLoad(uid);
-      setLastSync(localStorage.getItem("LastSync"));
-      setSyncing(false);
-    };
-
-    return React.createElement(
-      "div", {
-      style: {
-        padding: "12px",
-        border: "1px solid #ddd",
-        maxWidth: "300px",
-        margin: "20px auto",
-        fontFamily: "sans-serif"
+        if (storedUID) {
+          await autoSyncOnLoad(storedUID);
+          setLastSync(localStorage.getItem("LastSync"));
+        }
       }
-    }, [
-      React.createElement("h3", { key: "title" }, "Sync Controls"),
-      // React.createElement("div", { key: "icon"}
-      //   style: {
-      //     margin-top:"5px",
-      //     text-align: "right"
-      //   }
-      // ),
-      // React.createElement("button", { key: "sync", onClick: handleSyncToFirestore }, "Sync Tasks with Firestore"),
-      //       <input type="submit" id="connect" value=" " class="icon connect" title="Connect">
+    });
 
-      React.createElement("p", { key: "uid" }, `User ID: ${uid}`),
-      React.createElement("p", { key: "lastSync" }, `Last Sync: ${lastSync ? new Date(lastSync).toLocaleString() : "Never"}`),
+    return unsubscribe;
+  }, []);
+
+  const handleManualSync = async () => {
+    if (!user) return;
+    setSyncing(true);
+    await autoSyncOnLoad(user.uid);
+    setLastSync(localStorage.getItem("LastSync"));
+    setSyncing(false);
+  };
+
+  const handleCustomUidSync = async () => {
+    if (!customUid) return alert("Please enter a User ID.");
+    try {
+      localStorage.setItem("customSyncUID", customUid);
+      await downloadAndMergeTasksFromFirestore(customUid);
+      localStorage.setItem("syncConfirmed", "true");
+      setLastSync(localStorage.getItem("LastSync"));
+      alert("Data successfully loaded from Firestore.");
+    } catch (err) {
+      alert("Failed to load data from Firestore.");
+      console.error(err);
+    }
+  };
+
+  return React.createElement("div", {
+    style: {
+      padding: "12px",
+      border: "1px solid #ddd",
+      borderRadius: "10px",
+      maxWidth: "400px",
+      // width: "450px",
+      margin: "20px auto",
+      fontFamily: "sans-serif"
+    }
+  }, [
+
+    
+    React.createElement("h3", { key: "title" }, "Sync Controls"),
+    React.createElement("button", {
+      key: "copyBtn",
+      onClick: () => {
+        navigator.clipboard.writeText(user?.uid || "");
+        alert("User ID copied to clipboard!");
+      },
+      className: "icon copy",
+      style: {
+
+        width: "25px",
+        height: "25px"
+      }
+    }, ""),
+    React.createElement("p", { key: "uid" }, `User ID: ${user?.uid || "Loading..."}`),
+
+    
+
+    React.createElement("div", { key: "customSync" }, [
+      React.createElement("input", {
+        type: "text",
+        placeholder: "Enter UID to sync",
+        value: customUid,
+        onChange: e => setCustomUid(e.target.value),
+        style: { marginRight: "8px", padding: "0px", width: "70%" }
+      }),
       React.createElement("button", {
-        key: "syncBtn",
-        onClick: handleManualSync,
-        disabled: syncing,
+        onClick: handleCustomUidSync,
+        className: "icon rss",
         style: {
-          padding: "6px 12px",
-          backgroundColor: "#007bff",
+          padding: "12px 0px",
+          // backgroundColor: "#28a745",
           color: "#fff",
           border: "none",
           borderRadius: "4px",
-          cursor: "pointer"
+          cursor: "pointer",
+          width: "35px",
+          height: "35px"
         }
-      }, syncing ? "Syncing..." : "Sync Now")
-    ]);
+      }, "")
+    ]),
+    
+    React.createElement("p", { key: "lastSync" }, `Last Sync: ${lastSync ? new Date(lastSync).toLocaleString() : "Never"}`),
+    React.createElement("button", {
+      key: "manualSync",
+      onClick: handleManualSync,
+      disabled: syncing,
+      className: "icon connect",
+      style: {
+        padding: "6px 0px",
+        marginBottom: "20px",
+        // backgroundColor: "#007bff",
+        color: "#fff",
+        border: "none",
+        borderRadius: "4px",
+        cursor: "pointer",
+        width: "35px",
+        height: "35px"
+      }
+    }, syncing ? "Syncing..." : "")
+  ]);
+};
 
-}
-  // Wait for auth before rendering
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      ReactDOM.render(
-        React.createElement(ManualSyncApp, { uid: user.uid }),
-        document.getElementById("manualSyncUI")
-      );
-    }
-     else {
-      signInAnonymously(auth);
-    }
-  });
-  // --- React App Component ---
-  // const App = () => {
-  // const [user, setUser] = useState(null);
-  // const [userData, setUserData] = useState(null);
-  // const [customUid, setCustomUid] = useState("");
-
-  // useEffect(() => {
-  //   const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-  //     if (!currentUser) {
-  //       await signInAnonymously(auth);
-  //     } else {
-  //       setUser(currentUser);
-  //       setUserData({ lastSignedIn: new Date() });
-  //       await saveUserData(currentUser.uid, { lastSignedIn: new Date() });
-  //     }
-  //   });
-  //   return unsubscribe;
-  // }, []);
-
-
-  // const uploadTasksToFirestore = async (uid) => {
-  //   const tasks = JSON.parse(localStorage.getItem(listName) || "[]");
-  //   const tasksRef = collection(db, listName);
-
-  //   for (const task of tasks) {
-  //     try {
-  //       await addDoc(tasksRef, {
-  //         ...task,
-  //         userId: uid,
-  //         syncedAt: new Date().toISOString()
-  //       });
-  //     } catch (error) {
-  //       console.error("Upload error:", error);
-  //     }
-  //   }
-  // };
-
-
-
-  // const handleSyncToFirestore = async () => {
-  //   const uid = customUid || user?.uid;
-  //   if (!uid) return alert("User not authenticated.");
-
-  //   await uploadTasksToFirestore(uid);
-  //   await uploadPurgedTasksToFirestore(uid);
-  //   alert("Tasks synced to Firestore.");
-  // };
-
-  // const handleCustomUidSync = () => {
-  //   if (!customUid) return alert("Please enter a User ID.");
-  //   handleSyncToFirestore();
-  // };
-
- 
-
-
-//   return React.createElement("div", null, [
-//     React.createElement("h1", { key: "heading" }, "Welcome to the Firebase App"),
-
-//     React.createElement("button", { key: "sync", onClick: handleSyncToFirestore }, "Sync Tasks with Firestore"),
-
-//     React.createElement("pre", { key: "userdata" }, JSON.stringify(userData || {}, null, 2)),
-
-//     React.createElement("div", { key: "userIdSection" }, [
-//       React.createElement("p", { key: "uid" }, `User ID: ${user?.uid || 'Loading...'}`),
-//       React.createElement("button", {
-//         key: "copyBtn",
-//         onClick: () => {
-//           navigator.clipboard.writeText(user?.uid || "");
-//           alert("User ID copied to clipboard!");
-//         }
-//       }, "Copy User ID")
-//     ]),
-
-//     React.createElement("div", { key: "manualSync" }, [
-//       React.createElement("input", {
-//         key: "uidInput",
-//         type: "text",
-//         placeholder: "Enter User ID",
-//         value: customUid,
-//         onChange: e => setCustomUid(e.target.value),
-//         style: { marginRight: "8px" }
-//       }),
-//       React.createElement("button", { key: "syncBtn", onClick: handleCustomUidSync }, "Sync from UID")
-//     ]),
-
-//     React.createElement("div", { key: "qrContainer" }, [
+ReactDOM.render(React.createElement(SyncControls), document.getElementById("manualSyncUI"));
+</script>
+<script>
+  //     React.createElement("div", { key: "qrContainer" }, [
 //       React.createElement("p", { key: "qrLabel" }, "Scan to sync this user ID:"),
 //       React.createElement("canvas", { id: "qrCanvas", key: "qrCanvas" })
 //     ]),
 
 //     React.createElement("button", { key: "scanBtn", onClick: startQrScan }, "Start QR Scan")
-//   ]);
-// };
-
-  
-//     ReactDOM.render(React.createElement(App), document.getElementById("root"));
-  </script>
-  
-  
-<!-- <script type="module" src="js/main.js"></script> -->
-
-<script>
     console.log('other script running');
     let activeTab = 'work'; // Default active tab personalTab
     let activeTabList = activeTab + 'List';
@@ -920,25 +876,28 @@ function showHelp() {
 
 function showHistory() {
     const visibleHist = document.getElementById("historyCard").style.display;
-    console.log('show history running - visibleHist=', visibleHist);
     // displayData();
     if (visibleHist === 'none') {
-      console.log('visibleHist= none active', visibleHist);
       document.getElementById("historyCard").style.display = "block";
     } else if (visibleHist === 'block') {
-      console.log('visibleHist= else active', visibleHist);
       document.getElementById("historyCard").style.display = "none";
     }
 } 
-function closeHistory() {
-    document.getElementById("historyCard").style.display = "none";
-}
+
+function showSync() {
+    const visibleSync = document.getElementById("syncCard").style.display;
+    // displayData();
+    if (visibleSync === 'none') {
+      document.getElementById("syncCard").style.display = "block";
+    } else if (visibleSync === 'block') {
+      document.getElementById("syncCard").style.display = "none";
+    }
+} 
 </script>
 
 <div id="toast" class="toast">
--
-</div>
 
+</div>
 
 </body>
 </html>

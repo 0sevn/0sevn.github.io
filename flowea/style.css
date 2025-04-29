@@ -93,7 +93,13 @@
   background-image:url(img/light_mode.png);
   }
   .connect {
-  background-image:url(img/rss.png);
+  background-image:url(img/sync.png);
+  }
+  .rss {
+    background-image:url(img/rss.png);
+    }
+  .copy {
+    background-image:url(img/copy.png);
   }
   .export {
   background-image:url(img/export.png);
