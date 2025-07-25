@@ -217,7 +217,7 @@ function finalizeTabDeletion(tabId) {
   localStorage.setItem("tabList", JSON.stringify(updatedTabList));
 
 // Switch to a fallback tab (e.g., "work")
-  // switchTab("work");
+  switchTab("work");
 
 // Refresh tabs to reflect the deletion
   initTabs(); // Redraw tabs
