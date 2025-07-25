@@ -85,8 +85,11 @@
   background-image:url(img/add_circle.png);
   }
   .settings {
-  background-image:url(img/settings.png);
+  background-image:url(img/eyeoff.png);
   }
+  /* .settings {
+  background-image:url(img/settings.png);
+  } */
   .edit {
   background-image:url(img/edit.png);
   }

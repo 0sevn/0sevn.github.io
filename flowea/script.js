@@ -43,7 +43,7 @@ function renderTaskList() {
                     <span class="task-text">${linkify(item.text)}</span>
                     <p class="time">${displayDate}</p>
                 </span>
-                <div class="edit_tasks" id="edit_tasks" style="display:none;margin:0px;padding:0px;">
+                <div class="edit_tasks" id="edit_tasks" style="display:${editButtonsVisible ? 'inline-block' : 'none'};margin:0px;padding:0px;">
                 <!--input type="submit" class="icon edit" value="" title="Edit task"-->
                 <input type="submit" class="icon delete" value=" " title="Delete task">
                 </div>
@@ -318,13 +318,20 @@ if (savedTheme === 'light') document.body.classList.add('light-mode');
 
 
 // ----------- OTHER -------------
+let editButtonsVisible = localStorage.getItem('editButtonsVisible') === 'true';
 
 function showTaskEdit() {
-    const anyVisible = [...document.querySelectorAll(".edit_tasks")]
-      .some(el => el.style.display !== 'none');
+    editButtonsVisible = !editButtonsVisible;
+    localStorage.setItem('editButtonsVisible', editButtonsVisible); // persist state
+    
+    // const anyVisible = [...document.querySelectorAll(".edit_tasks")]
+    //   .some(el => el.style.display !== 'none');
 
-    document.querySelectorAll(".edit_tasks").forEach(el => {
-        el.style.display = anyVisible ? "none" : "inline-block";
+    // document.querySelectorAll(".edit_tasks").forEach(el => {
+    //     el.style.display = anyVisible ? "none" : "inline-block";
+    // });
+    document.querySelectorAll('.edit_tasks').forEach(taskDiv => {
+        taskDiv.style.display = editButtonsVisible ? 'inline-block' : 'none';
     });
 }
 // function showTaskEdit() {
