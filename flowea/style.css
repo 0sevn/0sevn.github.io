@@ -64,7 +64,8 @@
       border-radius: 15px;
       font-size: 14px;
   }
-  
+
+  /* ICONS */
   .icon {
       background-color: rgb(69, 69, 69, 0);
       background-position: right;
@@ -79,6 +80,12 @@
   }
   .add {
   background-image:url(img/add_pen.png);
+  }
+  .add_tab {
+  background-image:url(img/add_circle.png);
+  }
+  .settings {
+  background-image:url(img/settings.png);
   }
   .edit {
   background-image:url(img/edit.png);
@@ -230,6 +237,15 @@
       padding: 0; /* To remove default left padding */
   }
   
+  .task-edit-input {
+    width: 90%;
+    background-color: #7ab3ac;
+    font-size: 22px;
+    border: 1px solid #ffb4b4;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
   /* tabs */
   .tab-wrap {
     display: flex;
@@ -240,9 +256,6 @@
     /* border: 1px solid black; */
     /* align-items: center; */
   }
-  
-  
-  
   .tabs {
       display: flex;
       /* gap: 10px; */
@@ -251,8 +264,14 @@
   }
   .tab {
       padding: 10px 15px 10px 15px;
+      margin-right: 5px;
       cursor: pointer;
       border-radius: 5px 5px 0px 0px;
+      /* border: 1px solid #ccc; */
+      cursor: pointer;
+      transition: all 0.3s ease-out; /* Smooth transitions for properties */
+      position: relative; /* Needed for transform origin if you scale/rotate */
+      /* overflow: hidden; To clip content if scaling down, etc. */
     /* box-shadow: 0 0.5rem 0.8rem #00000080; */
     /* font-size: 1em; */
       /* border: 1px solid #ccc; */
@@ -265,6 +284,35 @@
       background-color: var(--card-bg);
   }
 
+  .tab.removing {
+  transform: scale(0.8);
+  opacity: 0;
+  max-width: 0;
+  padding: 0;
+  margin: 0;
+  transition: all 0.4s ease;
+}
+
+/* Styles for when a tab is being removed */
+.tab.removing {
+    opacity: 0;
+    transform: translateX(100%); /* Example: slide out to the right */
+    /* You could also use:
+    transform: scale(0);
+    transform: translateY(-50px);
+    */
+}
+.tab-rename-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: inherit; /* Match parent font size */
+    font-family: inherit; /* Match parent font family */
+    color: inherit; /* Match parent text color */
+    width: 100px; /* Adjust as needed */
+    padding: 0;
+    margin: 0;
+}
   .toast{
     visibility: hidden;
   min-width: 250px;
