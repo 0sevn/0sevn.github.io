@@ -16,9 +16,9 @@
 
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/prism.css">
+<!-- <link rel="stylesheet" href="css.css"> -->
 
 <meta name="robots" content="noindex">
-
 </head>
 
 <body data-theme="dark">
@@ -27,15 +27,45 @@
   <header class="page-header">
     <h1 class="page__title">Studio Tamalpais</h1>
     <div class="page__desc">
-      <p>Overlooking the coast</p>
+      <p>_____________</p>
       
       <!-- <p>Design, engineering & value added services</p> https://www.parks.ca.gov/?page_id=28500 -->
     </div>
+
+    <style>
+        .polygonous {
+    position: absolute;
+  width: 50%;
+  height: 350px;
+  background-color: #00578E;;
+  /* generates a five pointed star */
+  clip-path: polygon(53% 0, 64% 7%, 77% 6%, 100% 22%, 100% 36%, 0 36%, 0 18%, 13% 12%, 20% 14%, 37% 3%); 
+  z-index: -1;
+    margin: 0px;
+}
+  .polygonous2 {
+    position: absolute;
+    top: 40px;
+  width: 50%;
+  height: 350px;
+  background-color: #89ACA1;
+  
+  /* generates a five pointed star */
+  clip-path: polygon(53% 0, 64% 7%, 77% 6%, 100% 22%, 100% 36%, 0 36%, 0 18%, 13% 12%, 20% 14%, 37% 3%); 
+  z-index: 2;
+  margin: 0px;
+}
+    </style>
   </header>
-  <div style="background-color:#89ACA1; height: 10%; width: 100%;">
-  <div style="background-color:#00578E; height: 30%; width: 100%;"></div>
+  <div style="background-color:#89ACA1; height: 1%; width: 100%;"></div>
+  <div style="background-color:#00578E; height: 1%; width: 100%;"></div>
 </div>
 <br>
+
+
+<div class="polygonous"></div>
+<div class="polygonous2"></div>
+
 
 
       <!-- <p>Design, engineering & value added services</p> https://www.parks.ca.gov/?page_id=28500 -->
