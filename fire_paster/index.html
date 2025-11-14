@@ -6,6 +6,8 @@
     <title>Pure HTML Cross-Device Text Sharer</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load In-Browser QR Code Generator -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
         /* Define Inter font family for aesthetic consistency */
         body {
@@ -165,7 +167,7 @@
                 // Show success container
                 document.getElementById('shareContainer').classList.remove('hidden');
                 
-                // Generate QR Code
+                // Generate QR Code locally
                 generateQrCode(shareId);
 
                 openModal(
@@ -200,32 +202,39 @@
             }
         });
 
-        // --- QR Code Generation ---
+        // --- QR Code Generation (Using In-Browser Library) ---
         function generateQrCode(id) {
+            // Construct the deep link URL
             const url = new URL(window.location.href);
             url.searchParams.set('readId', id); 
             const dataToEncode = url.toString();
 
-            const size = '120x120';
-            const encodedData = encodeURIComponent(dataToEncode);
-            const apiUrl = `https://chart.googleapis.com/chart?cht=qr&chs=${size}&chl=${encodedData}`;
+            // Clear previous QR code
+            $qrCodeContainer.innerHTML = '';
+            
+            // Create a wrapper div for the QR code to ensure correct sizing and centering
+            const qrWrapper = document.createElement('div');
+            qrWrapper.id = 'qr-wrapper';
+            qrWrapper.className = 'p-3 bg-white rounded-lg border border-gray-200 shadow-inner flex flex-col items-center justify-center';
+            $qrCodeContainer.appendChild(qrWrapper);
 
-            $qrCodeContainer.innerHTML = `
-                <div class="flex flex-col items-center justify-center p-3 bg-white rounded-lg border border-gray-200 shadow-inner">
-                    <img 
-                        src="${apiUrl}" 
-                        alt="QR Code" 
-                        class="w-28 h-28" 
-                        onerror="document.getElementById('qrCodeContainer').innerHTML = \`
-                            <div class='flex flex-col items-center justify-center p-3 bg-red-50 border-2 border-dashed border-red-300 rounded-lg w-32 h-32'>
-                                <svg class='w-6 h-6 text-red-500 mb-1' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z'></path></svg>
-                                <p class='text-xs text-red-700 text-center font-medium'>QR Blocked. Share ID still works!</p>
-                            </div>
-                        \`"
-                    />
-                    <p class="mt-2 text-xs text-gray-500 text-center font-medium">Scan to instantly load</p>
-                </div>
-            `;
+            // Create the QR Code instance and draw it into the wrapper
+            // The qrcode.js library is available globally due to the CDN script tag
+            // eslint-disable-next-line no-undef
+            new QRCode(qrWrapper, {
+                text: dataToEncode,
+                width: 120,
+                height: 120,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+            
+            // Add descriptive text below the code
+            const caption = document.createElement('p');
+            caption.className = 'mt-2 text-xs text-gray-500 text-center font-medium';
+            caption.textContent = 'Scan to instantly load';
+            qrWrapper.appendChild(caption);
         }
 
 
