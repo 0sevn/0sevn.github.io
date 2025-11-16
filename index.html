@@ -28,16 +28,23 @@ model-viewer {
 }
 
 .typewriter{
-  font-size: 20px;
+  font-size: 3vw;
+  line-height: 1.2;
+  overflow-x: auto;
+  white-space: pre-wrap;
+white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
 }
-pre {
+/* pre {
   overflow-x: auto;
   white-space: pre-wrap;
   white-space: -moz-pre-wrap;
   white-space: -pre-wrap;
   white-space: -o-pre-wrap;
   word-wrap: break-word;
-}
+} */
 
 .gallery {
   width: 100%;
@@ -270,7 +277,7 @@ border: 1px solid var(--red);
   <div class="w3-row"style="height:180px">
     <div class="w3-half w3-transparent w3-container" >
       <div class="w3-display-topleft w3-padding-large w3-xlarge" >
-        <pre><mark id="typetext" class="typewriter"> </mark></pre>
+        <mark id="typetext" class="typewriter"> </mark>
       </div>
     </div>
   </div>
