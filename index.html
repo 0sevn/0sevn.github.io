@@ -27,6 +27,9 @@ model-viewer {
   margin: 0 auto;
 }
 
+.typewriter{
+  font-size: 20px;
+}
 pre {
   overflow-x: auto;
   white-space: pre-wrap;
@@ -185,8 +188,8 @@ border: 1px solid var(--red);
 }
 </style>
 
-<body onload="myFunction()">
-  <!-- <body onload="myFunction()"> -->
+<body onload="typeWriter()">
+  <!-- <body onload="typeWriter()"> -->
 
 <!-- Sidebar work/menu -->
 <nav class="w3-sidebar w3-bar-block w3-black w3-animate-left w3-top w3-text-light-grey w3-large" style="z-index:3;width:90%;font-weight:bold;display:none;left:0;" id="mySidebarWork">
@@ -267,7 +270,7 @@ border: 1px solid var(--red);
   <div class="w3-row"style="height:180px">
     <div class="w3-half w3-transparent w3-container" >
       <div class="w3-display-topleft w3-padding-large w3-xlarge" >
-        <pre><mark id="typetext"> </mark></pre>
+        <pre><mark id="typetext" class="typewriter"> </mark></pre>
       </div>
     </div>
   </div>
@@ -282,72 +285,8 @@ border: 1px solid var(--red);
 
 <!-- Second Grid: Work & Resume -->
 <div class="w3-row w3-light-grey">
-<!-- Work grid -->
-  <div class="w3-half w3-light-grey w3-center" style="min-height:300px" id="work">
-    <!-- <div class="w3-padding-8">
-      <h2>My Work</h2>p>Past projects.</p<br>
-    </div> -->
-  <!-- Work content -->
-    <div class="w3-row">
-      <!-- <table class="logo-table">
-        <tr>
-          <td><a href="https://www.volvo.com/"><img src="logos/Volvo_logo.jpg"></a></td>
-          <td><a href="https://www.scoutmotors.com/"><img src="logos/scout1.png"></a></td>
-          <td><a href="https://vwiecc.com/"><img src="logos/iccgroup.svg"></a>
-            <br><a href="https://vwiecc.com/"><img src="logos/icc.svg"></a>
-          </td>
-        </tr>
-        <tr>
-          <td><a href="https://www.zeekrtech.eu/"><img src="logos/zeekr.jpg"></a></td>
-          <td rowspan="3" style="width: 30%;"><a href="https://www.canoo.com/"><img src="logos/canoo.png"></a></td>
-          <td><a href="https://www.vw.com/"><img src="logos/vw.svg"></a></td>
-        </tr>
-        <tr>
-          <td><a href="https://www.lynkco.com/en/"><img src="logos/lynco.png"></a></td>
-          <td><a href="https://www.audi.com/"><img src="logos/audi_logo.jpg"></a></td>
-        </tr>
-        <tr>
-      <td><a href="http://global.geely.com/"><img src="logos/geelylogo.png"></a></td>
-      <td><a href="https://www.porsche.com/"><img src="logos/crest.svg" style="filter: invert(100%);"></a></td>
-        </tr>
-        <tr>
-          <td><a href="https://www.cevt.se/"><img src="logos/cevt.png"></a></td>
-          <td><a href="https://vinfastauto.us/"><img src="logos/vinfast.png"></a></td>
-          <td><a href="https://www.bentleymotors.com/en.html"><img src="logos/bentley1.png"></a></td>
-        </tr>
-      </table> -->
-<div style="display: block; height: 480px;">
-      <div class="w3-third">
-        <a href="https://www.volvo.com/"><img src="logos/volvo.png"  style="height:70px;"></a>
-        <a href="https://www.zeekrtech.eu/"><img src="logos/zeekr.png" style="width:120px;padding-top: 20px;"></a>
-        <a href="https://www.lynkco.com/en/"><img src="logos/lynk.png" style="width:120px;padding-top: 20px;"></a>
-        <a href="http://global.geely.com/"><img src="logos/geely.png" style="width:120px;padding-top: 20px;"></a>
-        <a href="https://www.cevt.se/"><img src="logos/cevt.png" style="width:120px;padding-top: 10px;"></a>
-      </div>
-      <div class="w3-third">
-        <!-- border: 1px solid var(--dark-gary); -->
-        <a href="https://www.scoutmotors.com/"><img src="logos/scout.png" style="width:120px;padding-top: 20px;"></a>
-        <a href="https://www.canoo.com/"><img src="logos/canoo.png" style="width:120px;margin-top: 80px;"></a>
-        <a href="https://vinfastauto.us/"><img src="logos/vinfast.png" style="height: 70px;margin-top: 80px;"></a>
-        
-      </div>
-
-      <div class="w3-third" style="padding-top: 5px;">
-        <a href="https://vwiecc.com/"><img src="logos/iccgroup.png" style="width:200px"></a><img src="logos/icc.png" style="width:50px;">
-
-        <a href="https://www.vw.com/"><img src="logos/vw.png" style="height:70px;padding-top: 15px;"></a>
-        
-        <a href="https://www.audi.com/"><img src="logos/audi.png" style="width:100px"></a>
-        <a href="https://www.porsche.com/"><img src="logos/crest.png" style="height:70px;padding-top: 5px;"></a>
-        <a href="https://www.bentleymotors.com/en.html"><img src="logos/bentley.png" style="width:120px;padding-top: 5px;"></a>
-      </div>
-</div>
-      
-    </div>
-  </div>
-
-<!-- Resume grid -->
-  <div class="w3-half w3-white w3-container" style="margin-top:-2.7%;">
+  <!-- Resume grid -->
+  <div class="w3-half w3-white w3-container" style="margin-top:0.7%;">
 
         <div class="w3-container w3-white w3-xlarge"> 
           <span class="w3-left">Resume</span>
@@ -640,6 +579,71 @@ border: 1px solid var(--red);
       </div>
 
   </div>
+<!-- Work logo grid -->
+  <div class="w3-half w3-light-grey w3-center" style="min-height:300px" id="work">
+    <!-- <div class="w3-padding-8">
+      <h2>My Work</h2>p>Past projects.</p<br>
+    </div> -->
+  <!-- Work content -->
+    <div class="w3-row">
+      <!-- <table class="logo-table">
+        <tr>
+          <td><a href="https://www.volvo.com/"><img src="logos/Volvo_logo.jpg"></a></td>
+          <td><a href="https://www.scoutmotors.com/"><img src="logos/scout1.png"></a></td>
+          <td><a href="https://vwiecc.com/"><img src="logos/iccgroup.svg"></a>
+            <br><a href="https://vwiecc.com/"><img src="logos/icc.svg"></a>
+          </td>
+        </tr>
+        <tr>
+          <td><a href="https://www.zeekrtech.eu/"><img src="logos/zeekr.jpg"></a></td>
+          <td rowspan="3" style="width: 30%;"><a href="https://www.canoo.com/"><img src="logos/canoo.png"></a></td>
+          <td><a href="https://www.vw.com/"><img src="logos/vw.svg"></a></td>
+        </tr>
+        <tr>
+          <td><a href="https://www.lynkco.com/en/"><img src="logos/lynco.png"></a></td>
+          <td><a href="https://www.audi.com/"><img src="logos/audi_logo.jpg"></a></td>
+        </tr>
+        <tr>
+      <td><a href="http://global.geely.com/"><img src="logos/geelylogo.png"></a></td>
+      <td><a href="https://www.porsche.com/"><img src="logos/crest.svg" style="filter: invert(100%);"></a></td>
+        </tr>
+        <tr>
+          <td><a href="https://www.cevt.se/"><img src="logos/cevt.png"></a></td>
+          <td><a href="https://vinfastauto.us/"><img src="logos/vinfast.png"></a></td>
+          <td><a href="https://www.bentleymotors.com/en.html"><img src="logos/bentley1.png"></a></td>
+        </tr>
+      </table> -->
+<div style="display: block; height: 480px;">
+      <div class="w3-third">
+        <a href="https://www.volvo.com/"><img src="logos/volvo.png"  style="height:70px;"></a>
+        <a href="https://www.zeekrtech.eu/"><img src="logos/zeekr.png" style="width:120px;padding-top: 20px;"></a>
+        <a href="https://www.lynkco.com/en/"><img src="logos/lynk.png" style="width:120px;padding-top: 20px;"></a>
+        <a href="http://global.geely.com/"><img src="logos/geely.png" style="width:120px;padding-top: 20px;"></a>
+        <a href="https://www.cevt.se/"><img src="logos/cevt.png" style="width:120px;padding-top: 10px;"></a>
+      </div>
+      <div class="w3-third">
+        <!-- border: 1px solid var(--dark-gary); -->
+        <a href="https://www.scoutmotors.com/"><img src="logos/scout.png" style="width:120px;padding-top: 20px;"></a>
+        <a href="https://www.canoo.com/"><img src="logos/canoo.png" style="width:120px;margin-top: 80px;"></a>
+        <a href="https://vinfastauto.us/"><img src="logos/vinfast.png" style="height: 70px;margin-top: 80px;"></a>
+        
+      </div>
+
+      <div class="w3-third" style="padding-top: 5px;">
+        <a href="https://vwiecc.com/"><img src="logos/iccgroup.png" style="width:200px"></a><img src="logos/icc.png" style="width:50px;">
+
+        <a href="https://www.vw.com/"><img src="logos/vw.png" style="height:70px;padding-top: 15px;"></a>
+        
+        <a href="https://www.audi.com/"><img src="logos/audi.png" style="width:100px"></a>
+        <a href="https://www.porsche.com/"><img src="logos/crest.png" style="height:70px;padding-top: 5px;"></a>
+        <a href="https://www.bentleymotors.com/en.html"><img src="logos/bentley.png" style="width:120px;padding-top: 5px;"></a>
+      </div>
+</div>
+      
+    </div>
+  </div>
+
+
 </div>
 <!-- Footer -->
 <div class="w3-light-grey w3-center w3-padding-8">
@@ -705,10 +709,10 @@ border: 1px solid var(--red);
   }
 // type writer script
   var i = 0;
-  var txta = "California based product developer / Multi-disciplinary engineer."+"\n"+" Human-centred design, human factors and ergonomics specialist."; /* The text */
+  var txta = "Gothenburg based product developer & multi-disciplinary engineer."+"\n"+" Human-centred design, human factors and ergonomics specialist."; /* The text */
   var speed = 50; /* The speed/duration of the effect in milliseconds */
 
-  function myFunction() {
+  function typeWriter() {
   myVar = setTimeout(showPage, 800);
   }
 
