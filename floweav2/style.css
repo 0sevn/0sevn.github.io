@@ -157,7 +157,7 @@
      align-self: center;
      /* margin-top: 75px; */
      margin: 0px auto 0px auto;
-     border: 3px solid rgb(11, 10, 10);
+     /* border: 3px solid rgb(11, 10, 10); */
      display: flex;
     align-items: flex-end;
     flex-direction: column;
@@ -175,7 +175,7 @@
       color: var(--text-color);
       border-radius: 25px 5px;
 
-      border: 3px solid rgb(11, 10, 10);
+      /* border: 3px solid rgb(11, 10, 10); */
       box-shadow: var(--shadow-s);
       
       /* z-index: -99; */
