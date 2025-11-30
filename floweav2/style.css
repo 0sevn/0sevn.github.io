@@ -138,6 +138,7 @@
 
 .top-icons {
   position:fixed;
+  z-index: 1;
 }
  .wrap-container {
     position: relative;
