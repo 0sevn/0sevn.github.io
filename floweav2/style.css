@@ -58,18 +58,7 @@
   .week-header {
       color: var(--text-color);
   }
-  .purge-container {
-    z-index:999;
-    width:75%;
-    font-weight:bold;
-    display:none;
-    right:0;
-    background-color: var(--card-bg); 
-    margin-top: 135px;
-    border: 1px solid #818181; 
-    border-radius: 5px;
-    
-  }
+
 
    /* tabs */
   .tab-wrap {
@@ -184,6 +173,7 @@
       /* margin-bottom: auto; */
       
   }
+  
   
  
     .healthbar {
@@ -374,6 +364,18 @@ border-radius: 0px 0px 5px 5px;
   
   .icon:hover{
       opacity: 0.6; transition: 0.1s
+  }
+    .purge-container {
+    z-index:999;
+    width:90%;
+    font-weight:bold;
+    display:none;
+    right:0;
+    background-color: var(--card-bg); 
+    margin-top: 135px;
+    border: 1px solid #818181; 
+    border-radius: 5px;
+    
   }
   /* .historycard{
     z-index:999;
