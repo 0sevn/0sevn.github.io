@@ -32,9 +32,10 @@
     --toast-color: #fff;
   }
   body.light-mode {
-    --bg-color: #f4f4f4;
+    --bg-color: oklch(97.407% 0.00726 80.57);
+    /* rgb(249, 246, 241) */
     --text-color: #333;
-    --card-bg: #ffffff;
+    --card-bg: oklch(98% 0.00726 80.57);
     --accent-color: #0077ff;
     --box-shadow: var(--shadow-m);
     --invert-icon:15%;
@@ -140,7 +141,7 @@
 }
  .wrap-container {
     position: relative;
-    width: 375px;
+    width: 100%;
     height: 550px;
      justify-self: center;
      align-self: center;
