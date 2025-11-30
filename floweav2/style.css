@@ -151,12 +151,16 @@
  .wrap-container {
     position: relative;
     width: 375px;
-    height: 450px;
+    height: 250px;
      justify-self: center;
      align-self: center;
      /* margin-top: 75px; */
      margin: 75px auto 0px auto;
      /* border: 3px solid rgb(11, 10, 10); */
+     display: flex;
+  align-items: flex-end;
+    flex-direction: column;
+  justify-content: flex-end;
   }
   .mid-container {
     /* position: absolute; */
@@ -176,6 +180,7 @@
       /* z-index: -99; */
       font-size: 18px;      
       /* opacity: 50%; */
+      
   }
   
  
