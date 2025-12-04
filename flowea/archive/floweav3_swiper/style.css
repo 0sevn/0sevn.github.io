@@ -1,0 +1,380 @@
+
+:root {
+    --bg-color: #454545;
+    --text-color: #e6e6e6;
+    --card-bg: #373737;
+    --accent-color: #6ae25aaf;
+    --box-shadow: 0 2rem 2rem #00000080;
+    --invert-icon:100%;
+    --active-tab:#2d2d2d;
+    --toast-bg: #333;
+    --toast-color: #fff;
+  }
+  body.light-mode {
+    --bg-color: #f4f4f4;
+    --text-color: #333;
+    --card-bg: #ffffff;
+    --accent-color: #0077ff;
+    --box-shadow: 0 1rem 1rem rgba(0, 0, 0, 0.2);
+    --invert-icon:15%;
+    --active-tab:#c2c2c2;
+    --toast-bg: #f0f0f0;
+    --toast-color: #333;
+  }
+  
+  body {
+      font-family: "Lato", sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      /* #6b6b6b; */
+      text-align: left;
+      text-decoration: none;
+      position: relative;
+  }
+
+  .swipe {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    overflow-x: auto;
+    /* border-block: 1px #666 solid; */
+    scroll-snap-type: x mandatory;
+    container-type: inline-size;
+    scrollbar-width: none;
+
+    > :nth-child(2) {
+        width: 100cqw;
+        padding: 10px 20px;
+        scroll-snap-align: center;
+    }
+    
+    &.hold {
+        > * {
+            &:first-child {
+                /*animation: scroll_hold 0.0001s forwards;*/
+                scroll-snap-align: start;
+            }
+            &:last-child {
+                scroll-snap-align: end;
+            }
+        }
+    }
+}
+  .week-header {
+      color: var(--text-color);
+  }
+  .mid-container {
+      margin:100px auto 0px auto;
+      /* background-color: #454545; */
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      box-shadow: var(--box-shadow);
+      width: 95% !important;
+      border-radius: 25px 5px;
+      
+      /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); */
+      /* border: 3px solid rgb(11, 10, 10); */
+      box-shadow: 0 2rem 2rem #00000080;
+      padding:20px 20px 0px 20px;
+      z-index: -99;
+      font-size: 18px;
+      max-width: 600px;
+      
+      /* opacity: 50%; */
+  }
+  /* .main-container {
+      position: relative;
+      display: inline-block;
+      z-index: 1;
+      
+  } */
+  a {
+      color: var(--text-color);
+      border-radius: 15px;
+      font-size: 14px;
+  }
+
+  /* ICONS */
+  .icon {
+      background-color: rgb(69, 69, 69, 0);
+      background-position: right;
+      background-size: contain;
+      background-repeat: no-repeat;
+      filter: invert(var(--invert-icon));
+      width: 35px;
+      margin: 1px;
+      padding: 0px;
+      border: none;
+      /* border: 3px solid rgb(255, 255, 255); */
+  }
+  .add {
+  background-image:url(img/add_pen.png);
+  }
+  .add_tab {
+  background-image:url(img/add_circle.png);
+  }
+  .settings {
+  background-image:url(img/eyeoff.png);
+  }
+  /* .settings {
+  background-image:url(img/settings.png);
+  } */
+  .edit {
+  background-image:url(img/edit.png);
+  }
+  .delete {
+  background-image:url(img/delete.png);
+  }
+  .purge {
+  background-image:url(img/purge.png);
+  }
+  .darklight_mode {
+  background-image:url(img/light_mode.png);
+  }
+  .connect {
+  background-image:url(img/sync.png);
+  }
+  .rss {
+    background-image:url(img/rss.png);
+    }
+  .copy {
+    background-image:url(img/copy.png);
+  }
+  .export {
+  background-image:url(img/export.png);
+  background-position-x: 200px;
+  height:35px;
+  width:240px;
+  /* margin-right:25px; */
+  }
+  .import {
+  background-image:url(img/import.png);
+  background-position-x: 200px;
+  height:35px;
+  width:240px; 
+  }
+  .history {
+  background-image:url(img/menu.png);
+  }
+  .help {
+  background-image:url(img/help.png);
+  }
+  
+  .icon:hover{
+      opacity: 0.6; transition: 0.1s
+  }
+  /* .historycard{
+    z-index:999;
+    width:75%;
+    font-weight:bold;
+    display:none;
+    right:0;
+    background-color: var(--card-bg);
+    border: 1px solid #ddd;
+    margin-top: 135px;
+  } */
+  .fileops {
+    /* background-color: rgb(79, 79, 79); */
+    background-color: var(--card-bg);
+    /* color: #fff; */
+    color: var(--text-color);
+    font-weight: normal;
+    font-size: 14px;
+    text-align: right;
+    position: absolute;
+    width:250px;
+    border-radius: 6px;
+    right: 5px;
+    bottom: 165px;
+  }
+  .history-button {
+    /* background-color: rgb(79, 79, 79); */
+    background-color: var(--card-bg);
+    /* color: #fff; */
+    color: var(--text-color);
+    text-align: center;
+    /* font-weight: normal; */
+    /* font-size: 16px; */
+    /* text-align: right; */
+    position: relative;
+   width:100px;
+    padding: 5px;
+    border-radius: 6px;
+    /* top: 25px; */
+      left: 100px;
+    /* margin-right:10%; */
+    box-shadow: 0 1rem 1rem #00000080;
+  }
+  .time {
+      font-size: 10px;
+      color:rgb(154, 153, 150);
+      display: inline-block;
+  }
+  
+  .healthbar {
+      background-color:var(--health-color,rgba(106, 226, 90, 0.686));
+      border-top: 3px solid var(--accent);
+      /* border-bottom: 4px solid rgb(37, 117, 41); */
+      opacity: 70%;
+      border-radius: 50%;
+    width: var(--healthbar-size, 10px);
+    height: 15px;
+    border-radius: 10px;
+    /* position:fixed; */
+    display:block;
+    margin-top:10px;
+    padding: 0px;
+    transition: 0.5s width;
+    z-index: 1;
+    /* background-color: var(--accent); */
+    box-shadow: 0 1rem 0.7rem #00000080;
+  }
+  
+  [type=number] {
+    display: block;
+  }
+  
+  input[type=text] {
+      /* font-size: 16px; */
+      /* padding: 10px; */
+      /* width: 90%; */
+      margin-bottom: 10px;
+  }
+  input[type=submit] {
+          background-color: rgb(79, 79, 79, 0);
+          border: none;
+          color: #fff;
+          padding: 5px 8px;
+          text-decoration: none;
+          margin: 4px 2px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size:14px;
+          font-weight: bold;
+        }
+  
+  /* import export json files */
+  
+  .bold {
+    font-weight: bold;
+  }
+  
+  .connected-sortable {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+  }
+  ul {
+      margin: 0; /* To remove default bottom margin */ 
+      padding: 0; /* To remove default left padding */
+  }
+  
+  .task-edit-input {
+    width: 90%;
+    background-color: #7ab3ac;
+    font-size: 22px;
+    border: 1px solid #ffb4b4;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+  /* tabs */
+  .tab-wrap {
+    display: flex;
+    flex-direction: column;
+    margin-top: -65px;
+    
+    /* background-color: rgb(245, 222, 179, 100%); */
+    /* border: 1px solid black; */
+    /* align-items: center; */
+  }
+  .tabs {
+      display: flex;
+      /* gap: 10px; */
+      /* margin-bottom: 0px; */
+      /* border: 3px solid rgb(11, 10, 10); */
+  }
+  .tab {
+      padding: 10px 15px 10px 15px;
+      margin-right: 5px;
+      cursor: pointer;
+      border-radius: 5px 5px 0px 0px;
+      /* border: 1px solid #ccc; */
+      cursor: pointer;
+      transition: all 0.3s ease-out; /* Smooth transitions for properties */
+      position: relative; /* Needed for transform origin if you scale/rotate */
+      /* overflow: hidden; To clip content if scaling down, etc. */
+    /* box-shadow: 0 0.5rem 0.8rem #00000080; */
+    /* font-size: 1em; */
+      /* border: 1px solid #ccc; */
+      /* background-color: #f4f4f4; */
+  }
+  .tab:hover{
+      opacity: 0.6; transition: 0.1s
+  }
+  .tab.active {
+      background-color: var(--card-bg);
+  }
+
+  .tab.removing {
+  transform: scale(0.8);
+  opacity: 0;
+  max-width: 0;
+  padding: 0;
+  margin: 0;
+  transition: all 0.4s ease;
+}
+
+/* Styles for when a tab is being removed */
+.tab.removing {
+    opacity: 0;
+    transform: translateX(100%); /* Example: slide out to the right */
+    /* You could also use:
+    transform: scale(0);
+    transform: translateY(-50px);
+    */
+}
+.tab-rename-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: inherit; /* Match parent font size */
+    font-family: inherit; /* Match parent font family */
+    color: inherit; /* Match parent text color */
+    width: 100px; /* Adjust as needed */
+    padding: 0;
+    margin: 0;
+}
+  .toast{
+    visibility: hidden;
+  min-width: 250px;
+  height:50px;
+  margin-left: -125px;
+  background-color: var(--toast-bg, #333);
+  color: var(--toast-color, #fff);
+  text-align: center;
+  border-radius: 8px;
+  padding: 16px;
+  position: fixed;
+  z-index: 999;
+  left: 50%;
+  top: 5px;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.5s, bottom 0.5s;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+  }
+  .howto{
+    display: none;
+    width: 280px;
+    height:370px;
+    background-color: rgb(138, 138, 138);
+    border-radius: 5px 5px 5px 5px;
+    text-align: center;
+    margin-left: auto;
+    position: fixed;
+    left: auto;
+    top: 5px;
+    /* /* opacity: 1; */
+    z-index: 999;
+    /* box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4); */
+  }
