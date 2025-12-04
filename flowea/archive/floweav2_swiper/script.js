@@ -43,7 +43,7 @@ weekHeader.append('Wk '+getWeekNumber(new Date()));
             <li data-id="${item.id}" class="sortable-item" draggable="true">
                 
             <div class="swipe" id="swipe">
-            <button style="background: rgb(199, 74, 74); width: 100px">❌</button>
+            <button style="background: rgb(48, 151, 48); width: 100px">✅</button>
             <div>
                 <span>
                     <input type="checkbox" class="task-checkbox" ${item.checked ? 'checked' : ''}>
@@ -51,7 +51,8 @@ weekHeader.append('Wk '+getWeekNumber(new Date()));
                     <p class="time">${displayDate}</p>
                 </span>
                 </div>
-                <button style="background: rgb(48, 151, 48); width: 100px">✅</button>
+                
+            <button style="background: rgb(199, 74, 74); width: 100px">❌</button>
             </div>
                 <div class="edit_tasks" id="edit_tasks" style="display:${editButtonsVisible ? 'inline-block' : 'none'};margin:0px;padding:0px;">
                 <!--input type="submit" class="icon edit" value="" title="Edit task"-->
