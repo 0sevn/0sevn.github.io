@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FloWea</title>
+<link rel="stylesheet" href="w3.css">
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#454545">
+  <!-- QR Code Generator -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script> -->
+<!-- QR Scanner -->
+<!-- <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script> -->
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./serviceWorker.js')
+        .then(() => console.log('✅ Service Worker registered!'))
+        .catch(err => console.error('⚠️ Service Worker registration failed:', err));
+      }
+    </script>
+
+</head>
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<!-- <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script> -->
+<body>
+
+
+<div>
+    <div class="top-icons" style="left:0;text-align:right;">
+        <input type="submit" value=" " class="icon help w3-animate-right" title="Help" onclick="showHelp()">
+        <input type="submit" value=" " class="icon settings1 w3-animate-right" title="Help" onclick="showHelp()">
+        
+    </div>
+    <div class="top-icons" style="right:0;text-align:right;">
+        <div class="">
+            <input type="submit" value=" " class="icon settings w3-animate-left" title="Settings" onclick="showTaskEdit()">
+            <input type="submit" value=" " class="icon darklight_mode w3-animate-left" title="Toggle light/dark mode" onclick="toggleTheme()">
+            <br>
+            
+            <input type="submit" value=" " class="icon history w3-animate-left" title="History" onclick="showHistory()">
+        </div>   
+    </div>
+</div>
+
+<!-- Mid navigation -->
+<div class="wrap-container"><br>
+    <div id="week_header">Week</div>
+    <div class="mid-container">
+        <div class="healthbar" title="FOvea, a small depression within the retina where visual acuity is the highest.">
+            
+        </div>
+
+            <div id="sort_list" >
+                <ul id="todo_list" class="sortable-list">
+                    <!-- list elements -->
+                </ul>
+            </div>
+            <div class="task">
+                <input type="text" id="enter_task" placeholder="Enter Task">
+                <input type="submit" id="add" value=" " class="icon add" title="Add task">
+                <input type="submit" id="purge" value=" " class="icon purge" title="Purge checked tasks to History" disabled>
+            </div>
+            <!-- <div class="list-elements"></div> -->
+    </div>
+    <div class="tab-wrap">   
+        <div class="tabs">
+            <div class="tabs" id="tabsContainer"></div>
+                <input type="submit" id="delete_tab" value=" " class="icon delete" onclick="deleteTab()" title="Delete tab">
+                <input type="submit" id="add_tab" value=" " class="icon add_tab" onclick="addNewTab()" title="Add tab">
+        </div>   
+    </div> 
+</div>
+<div class="howto" id="helpCard" onclick="closeHelp()">
+  <img src="img/help2.png" alt="" style="width: 100%;">
+</div>
+
+<!-- Purged list -->
+<nav class="w3-sidebar w3-animate-right w3-top purge-container" style="display:none;" id="historyCard">
+<!-- sync controls card -->
+<div style="position:fixed; right:0;text-align:right;margin-top: 20px;">
+    <input type="submit" value=" " class="icon rss" title="Sync controls" onclick="showSync()">
+</div>   
+<!-- Purge history list -->
+<div style="margin-top: 20px;  color: var(--text-color);">
+    <ul id="purge_list" style="list-style: none;padding-left: 5%;">
+    </ul>
+</div>
+
+    <!-- Import/export buttons -->
+    <div class="fileops" id="syncControls" style="display: none;">
+        <div id="manualSyncUI"></div>
+        <div id="qr-reader" style="width: 300px;"></div>
+        <div style="border: 1px solid #ddd; border-radius: 10px;">
+            <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
+            <a id="exportHistoryLink" style="display: none;">Export</a>
+            <br>
+            <!-- <label for="FileInputLabel"><b>Import</b></label> -->
+            <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input>
+          </div>
+    </div>
+    <!-- <div id="root"></div> -->
+</nav>
+
+
+<!-- JS vanilla script -->
+ 
+<script src="script.js"></script>
+<script src="tab_script.js"></script>
+<script>
+        const list = document.querySelector('.sortable-list');
+        let draggingItem = null;
+        list.addEventListener('dragstart', (e) => {
+            draggingItem = e.target;
+            e.target.classList.add('dragging');
+        });
+        list.addEventListener('dragend', (e) => {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.sortable-item')
+                .forEach(item => item.classList.remove('over'));
+            draggingItem = null;
+        });
+        list.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const draggingOverItem = getDragAfterElement(list, e.clientY);
+            document.querySelectorAll('.sortable-item').forEach
+                (item => item.classList.remove('over'));
+            if (draggingOverItem) {
+                draggingOverItem.classList.add('over');
+                list.insertBefore(draggingItem, draggingOverItem);
+            } else {
+                list.appendChild(draggingItem); 
+            }
+        });
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll
+                ('.sortable-item:not(.dragging)')];
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+    </script>
+<div id="toast" class="toast">
+
+</div>
+
+</body>
+</html>
