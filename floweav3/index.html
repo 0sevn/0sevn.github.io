@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FloWea</title>
+<link rel="stylesheet" href="w3.css">
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#454545">
+  <!-- QR Code Generator -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script> -->
+<!-- QR Scanner -->
+<!-- <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script> -->
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
+
+<!-- Firebase -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC5IM5dasyavKCHczWIUlqoFThxLUtTZps",
+          authDomain: "flowea-d43ef.firebaseapp.com",
+          projectId: "flowea-d43ef",
+          storageBucket: "flowea-d43ef.firebasestorage.app",
+          messagingSenderId: "701455113224",
+          appId: "1:701455113224:web:1f89c2ae60b37a075605bd",
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Attach the function to the window object so script.js can see it
+window.initializeFirebaseSync = async function() {
+    updateStatusHUD('Connecting...', 'orange');
+    try {
+        const cred = await signInAnonymously(auth);
+        
+        // 1. Check all possible sources for a shared ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const syncIdParam = urlParams.get('syncId');
+        const savedSyncId = localStorage.getItem('syncId');
+
+        // 2. Priority Logic: URL Parameter > LocalStorage Link > New Anonymous ID
+        if (syncIdParam) {
+            window.userId = syncIdParam;
+            localStorage.setItem('syncId', syncIdParam); // Save for future refreshes
+        } else if (savedSyncId && savedSyncId !== "null") {
+            window.userId = savedSyncId;
+        } else {
+            // No shared ID found, use this device's unique ID
+            window.userId = cred.user.uid;
+            localStorage.setItem('syncId', cred.user.uid); 
+        }
+        
+        // Update UI and start the real-time listener
+        document.getElementById('userUidDisplay').textContent = window.userId;
+        updateStatusHUD('Cloud Active', '#4CAF50');
+        
+        window.startCloudWatcher();
+
+    } catch (error) {
+        console.error("Auth Error:", error);
+        updateStatusHUD('Error', 'red');
+    }
+};
+
+let syncTimeout = null;
+
+window.pushFullSync = function() {
+    // 1. Initial Safety Checks
+    if (!window.userId || localStorage.getItem('cloudSyncEnabled') !== 'true') {
+        return;
+    }
+
+    // 2. Show "Pending" state in the HUD
+    window.updateStatusHUD('Saving in 2s...', '#f39c12'); // Yellow/Orange
+
+    // 3. Clear any existing timer (Debounce)
+    if (syncTimeout) clearTimeout(syncTimeout);
+
+    // 4. Start a new timer
+    syncTimeout = setTimeout(async () => {
+        console.log("Debounce finished. Pushing to cloud...");
+        window.updateStatusHUD('Syncing...', 'orange');
+
+        try {
+            const tabList = JSON.parse(localStorage.getItem("tabList") || '["work", "personal"]');
+
+            // Filter the tabList to only include tabs that are NOT local-only
+            const syncedTabList = tabList.filter(id => localStorage.getItem(`tabLocked_${id}`) !== 'true');
+
+            const state = {
+                tabList: syncedTabList,
+                tabCounter: localStorage.getItem("tabCounter"),
+                activeTab: localStorage.getItem("activeTab"),
+                data: {}
+            };
+
+            syncedTabList.forEach(id => {
+                    state.data[`tabName_${id}`] = localStorage.getItem(`tabName_${id}`);
+                    state.data[`${id}List`] = JSON.parse(localStorage.getItem(`${id}List`) || '[]');
+                    state.data[`${id}PurgeList`] = JSON.parse(localStorage.getItem(`${id}PurgeList`) || '[]');
+            });
+                // Check if this specific tab is locked to local storage
+            //     const isLocalOnly = localStorage.getItem(`tabLocked_${id}`) === 'true';
+                
+            //     if (!isLocalOnly) {
+            //         state.data[`tabName_${id}`] = localStorage.getItem(`tabName_${id}`);
+            //         state.data[`${id}List`] = JSON.parse(localStorage.getItem(`${id}List`) || '[]');
+            //         state.data[`${id}PurgeList`] = JSON.parse(localStorage.getItem(`${id}PurgeList`) || '[]');
+            //     } else {
+            //         console.log(`Tab ${id} is locked. Skipping cloud upload.`);
+            //     }
+            // });
+
+            await setDoc(doc(db, "users", window.userId), {
+                allData: state,
+                lastUpdated: serverTimestamp()
+            }, { merge: true });
+
+            localStorage.setItem('lastLocalPushTime', Date.now() + 1000); // Small forward-buffer to prevent feedback loops
+            document.getElementById('cloudPullBtn').classList.add('hidden');
+            window.updateStatusHUD('Cloud Active', '#4CAF50');
+            
+        } catch (e) {
+            console.error("Sync Error:", e);
+            window.updateStatusHUD('Sync Error', 'red');
+        }
+    }, 2000); // <--- Change this number to 5000 for a 5-second delay
+};
+
+window.pullFullSync = async function(remoteUid) {
+    window.updateStatusHUD('Pulling...', 'orange');
+    
+    try {
+        const docSnap = await getDoc(doc(db, "users", remoteUid));
+
+        if (docSnap.exists()) {
+            const remoteData = docSnap.data().allData;
+
+            // 1. Clear current local data (except basic settings)
+            const keysToKeep = ['theme', 'cloudSyncEnabled', 'editButtonsVisible'];
+            Object.keys(localStorage).forEach(key => {
+                if (!keysToKeep.includes(key)) localStorage.removeItem(key);
+            });
+
+            // 2. Inject core tab state
+            localStorage.setItem("tabList", JSON.stringify(remoteData.tabList));
+            localStorage.setItem("activeTab", remoteData.activeTab);
+            localStorage.setItem("tabCounter", remoteData.tabCounter);
+            localStorage.setItem('lastLocalPushTime', Date.now()); 
+
+// 3. Inject all tab names and lists from the remote 'data' object
+if (remoteData.data) {
+    Object.entries(remoteData.data).forEach(([key, value]) => {
+        // NEW: Check if this specific tab is locked LOCALLY before overwriting
+        // We extract the ID from keys like "tabName_work" or "workList"
+        const tabIdMatch = key.match(/tabName_(.*)|(.*)List|(.*)PurgeList/);
+        const extractedId = tabIdMatch ? (tabIdMatch[1] || tabIdMatch[2] || tabIdMatch[3]) : null;
+        
+        const isLockedLocally = localStorage.getItem(`tabLocked_${extractedId}`) === 'true';
+
+        if (!isLockedLocally) {
+            const valStr = typeof value === 'object' ? JSON.stringify(value) : value;
+            localStorage.setItem(key, valStr);
+        } else {
+            console.log(`Skipping pull for locked tab: ${extractedId}`);
+        }
+    });
+}
+
+            window.updateStatusHUD('Synced', '#4CAF50');
+            
+            // 4. Final step: Alert then Reload
+            alert("Sync successful! Reloading your lists...");
+            window.location.href = window.location.pathname; 
+
+        } else {
+            // This runs if the ID is valid but no document exists for it
+            alert("Cloud data not found for this ID.");
+            window.updateStatusHUD('Error', 'red');
+        }
+    } catch (e) {
+        // This runs if the internet is down or permissions are denied
+        console.error("Pull failed:", e);
+        window.updateStatusHUD('Fail', 'red');
+        alert("Pull failed. Check console for details.");
+    }
+};
+
+let isInitialLoad = true;
+
+window.startCloudWatcher = function() {
+    if (!window.userId) return;
+    
+    // Use a local variable to track the last time THIS device successfully pushed
+    // This prevents the device from "pulling back" its own changes immediately after saving
+    onSnapshot(doc(db, "users", window.userId), (docSnap) => {
+        if (docSnap.exists()) {
+            const remoteData = docSnap.data().allData;
+            if (!remoteData) return;
+
+            const cloudTime = docSnap.data().lastUpdated?.toMillis() || 0;
+            const lastLocalPush = parseInt(localStorage.getItem('lastLocalPushTime') || 0);
+
+            // LOGIC: If Cloud is newer than our last push (with a 500ms buffer for network jitter)
+            if (cloudTime > (lastLocalPush + 1000)) {
+                console.log("Cloud change detected! Auto-syncing...");
+                
+                // 1. Sync the Tab List (The "Skeleton")
+                if (remoteData.tabList) {
+                    localStorage.setItem("tabList", JSON.stringify(remoteData.tabList));
+                }
+                
+                // 2. Inject Data (The "Content")
+                if (remoteData.data) {
+                    Object.entries(remoteData.data).forEach(([key, value]) => {
+                        // Check if tab is locked LOCALLY on this device
+                        const tabIdMatch = key.match(/tabName_(.*)|(.*)List|(.*)PurgeList/);
+                        const extractedId = tabIdMatch ? (tabIdMatch[1] || tabIdMatch[2] || tabIdMatch[3]) : null;
+                        const isLockedLocally = localStorage.getItem(`tabLocked_${extractedId}`) === 'true';
+
+                        if (!isLockedLocally) {
+                            const valStr = typeof value === 'object' ? JSON.stringify(value) : value;
+                            localStorage.setItem(key, valStr);
+                        }
+                    });
+                }
+                
+                // 3. Update active tab (optional, can be jarring if user is typing)
+                if (remoteData.activeTab) {
+                    localStorage.setItem("activeTab", remoteData.activeTab);
+                }
+
+                // 4. Update the "Known" time so we don't trigger again until a NEW cloud change happens
+                localStorage.setItem('lastLocalPushTime', cloudTime.toString());
+
+                // 5. Tell script.js to refresh the visuals
+                if (window.refreshUIFromSync) {
+                    window.refreshUIFromSync();
+                }
+                
+                window.updateStatusHUD('Cloud Updated', '#4CAF50');
+            }
+        }
+    });
+};
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./serviceWorker.js')
+        .then(() => console.log('✅ Service Worker registered!'))
+        .catch(err => console.error('⚠️ Service Worker registration failed:', err));
+      }
+    </script>
+
+    <style>
+</style>
+
+</head>
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<!-- <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script> -->
+<body>
+
+
+<div style="z-index: 99;">
+    <div class="top-icons" style="left:0;text-align:left;">
+        <input type="submit" value=" " class="icon help w3-animate-right" title="Help" onclick="showHelp()">
+        <!-- ?<input type="submit" value=" " class="icon settings1 w3-animate-right" title="Help" onclick="showHelp()"> -->
+        
+    </div>
+<div id="favBar" class="topnav hidden">
+    <!-- Life  -->
+    <div class="dropdown">
+
+        <button class="dropbtn"><a href="https://workflowy.com/" target="_blank">Life</a></button>
+        <div class="dropdown-content">
+            <a href="https://streamsquid.com/#/playlists/spotify/cat/chill" target="_blank">Stream squid</a>
+            <a href="https://www.youtube.com/watch?v=svLzmFuSBhk" target="_blank">3D fractals</a>
+            <a href="https://www.zooniverse.org/projects/zookeeper/galaxy-zoo/classify" target="_blank">Zooniverse galaxy classifier</a>
+            <a href="https://www.youtube.com/user/shiffman" target="_blank">The coding train</a>
+<hr>Kring
+https://m.co/se/sv-SE/stationer/
+            <a href="https://www.twitch.tv/videos/307268441" target="_blank">Gassy mexican Twitch</a>
+
+            <a href="https://acko.net/blog/occupy-www-street-en/" target="_blank">acko design</a>
+        </div>
+    </div>
+    <!-- Work -->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="http://catiadoc.free.fr/online/CATIAfr_C2/stlugCATIAfrs.htm" target="_blank">Work</a></button>
+        <div class="dropdown-content">
+            <a href="https://dined.io.tudelft.nl/en/about">Dined ergo database</a>
+            <a href="http://catiadoc.free.fr/online/CATIAfr_C2/stlugCATIAfrs.htm">STL rapid prototyping</a>
+            <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A42010X0731%2803%29">Eurlex</a>
+<hr>Ergonomics
+            <a href="http://www2.me.rochester.edu/courses/ME204/nx_help/index.html#uid:index">NX manual</a>
+            <a href="https://resources.rand3d.com/videos-webcasts/making-sense-of-catia-v5-v6-and-the-transition-to-the-3dexperience">V5 to v6 transition</a>
+            <a href="https://www.fictiv.com/articles/gdt-101-an-introduction-to-geometric-dimensioning-and-tolerancing">GDnT</a>
+        </div>
+    </div>
+<!-- News SE-->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="http://www.gp.se/">News SWE</a></button>
+        <div class="dropdown-content">
+            
+            <a href="http://www.svt.se/">SVT</a>
+            <a href="http://www.sr.se/">SR</a>
+            <a href="http://www.ur.se/">UR</a>
+            <hr>På gång
+            <a href="http://www.gp.se/">GP</a>            
+            <a href="http://www.goteborg.se/">Göteborg/Hanoi/LA/SF</a>
+            
+        </div>
+    </div>
+    <!-- News -->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="https://www.sfgate.com/">News US</a></button>
+        <div class="dropdown-content">
+            
+            <a href="https://www.noevalleyvoice.com/">Noe Valley Voice</a>
+            <a href="https://sfstandard.com/">SF Standard</a>
+            <a href="https://missionlocal.org/">Mission local</a>
+            <a href="https://48hills.org/">48 hills</a>
+            https://riniart.com/index.html
+
+            https://thefrisc.com/
+            https://www.axios.com/local/san-francisco/things-to-do
+            https://sf.eater.com/
+            https://sfist.com/
+            Hoodline, Broke Ass Stuart, DotheBay, SF.funcheap, SF Station, SF Examiner, 7x7, NextDoor , LA Times
+            politico
+            elpais
+            pbs, npr, kqed
+            <hr>På gång
+            https://www.eventbrite.com/d/ca--san-francisco/all-events/
+            
+            <a href="https://www.kqed.org/podcasts">The Atlantic</a>
+            <a href="https://www.theatlantic.com/world/">The Atlantic</a>
+            <a href="http://www.newyorker.com/">The New Yorker</a>
+            <a href="https://boingboing.net/">Boingboing</a>
+        </div>
+    </div>
+        <!-- Bostad -->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="https://www.sverigehuset.se/projekt/jarntorgsgatanxbrogatan">Bostad</a></button>
+        <div class="dropdown-content">
+            <a href="https://www.goteborgenergi.se/">Goteborg energi</a>
+            <a href="https://www.sbc.se/">SBC</a>
+            <hr>På gång
+            <a href="http://www.boplats.se/">Boplats</a>
+            <a href="http://lexin.nada.kth.se/sve-eng.html" target="_blank">LexinKon</a>
+            <a href="http://www.gotlib.goteborg.se/" target="_blank">GOTLIB</a>
+            <a href="http://www.lib.chalmers.se/" target="_blank">Chalmers bibliotek</a>
+        </div>
+    </div>
+    <!-- Hobby -->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="https://www.sverigehuset.se/projekt/jarntorgsgatanxbrogatan">Hobby</a></button>
+        <div class="dropdown-content">
+            
+            <a href="http://www.kobbs.se/main.htm">te</a>
+            <a href="http://www.omte.se/">Om te</a>
+            <a href="http://www.nyfikenvital.org/?q=node/144">Nyfiken</a>
+            <a href="http://home.swipnet.se/~w-58525/te/">Tedrickarnas hörna</a>
+            <hr>
+        </div>
+    </div>
+</div>
+<!-- </div> -->
+    <div class="top-icons" style="right:0;text-align:right;">
+        <div class="">
+            <input type="submit" value=" " class="icon settings w3-animate-left" title="Settings" onclick="showTaskEdit()">
+            <!-- <input type="submit" value=" " class="icon darklight_mode w3-animate-left" title="Toggle light/dark mode" onclick="toggleTheme()"> -->
+            <!-- <br> -->
+            
+            <input type="submit" value=" " class="icon history w3-animate-left" title="History" onclick="showHistory()">
+        </div>   
+    </div>
+</div><br>
+
+<!-- Mid navigation -->
+<div class="wrap-container">
+    <div id="week_header" class="week-header">Week</div>
+        <div class="flex items-center space-x-2 status-hud">
+        <div id="syncStatusDot" class="status-dot"></div>
+        <span id="syncStatusText" class="status-text">Local Only</span>
+        <button id="cloudPullBtn" class="hidden" onclick="window.pullFullSync(window.userId)" title="Updates available in cloud">
+            ☁️ ↓
+        </button>
+</div>
+    <div class="mid-container">
+        <div id="health_bar" class="healthbar" title="FOvea, a small depression within the retina where visual acuity is the highest.">
+            
+        </div>
+
+            <div id="sort_list" class="sort_list">
+                <ul id="todo_list" class="sortable-list">
+                    <!-- list elements -->
+                </ul>
+            </div>
+            <div class="task">
+                <input type="text" id="enter_task" placeholder="Enter Task">
+                <input type="submit" id="add" value=" " class="icon add" title="Add task">
+                <input type="submit" id="purge" value=" " class="icon purge" title="Purge checked tasks to History" disabled>
+            </div>
+            <!-- <div class="list-elements"></div> -->
+    </div>
+    <div class="tab-wrap">   
+        <div class="tabs">
+            <div class="tabs" id="tabsContainer"></div>
+                <input type="submit" id="delete_tab" value=" " class="icon delete" onclick="deleteTab()" title="Delete tab">
+                <input type="submit" id="add_tab" value=" " class="icon add_tab" onclick="addNewTab()" title="Add tab">
+        </div>   
+    </div> 
+</div>
+<div class="howto" id="helpCard" onclick="closeHelp()">
+  <img src="img/help2.png" alt="" style="width: 100%;">
+</div>
+
+<!-- Purged list -->
+<nav id="historyCard" class="history-card">
+    <!-- sync controls card -->
+    <div style="position:fixed; right:0;text-align:right;margin-top: 20px;">
+        <input type="submit" value=" " class="icon rss" title="Sync controls" onclick="showSync()">
+    </div>   
+    <!-- Purge history list -->
+    <div style="margin-top: 20px;  color: var(--text-color);">
+        <ul id="purge_list" style="list-style: none;padding-left: 5%;">
+        </ul>
+    </div>
+
+    <!-- Import/export buttons -->
+    <div class="fileops" id="syncControls" style="display: none;">
+        <div id="manualSyncUI"></div>
+        <div id="qr-reader" style="width: 300px;"></div>
+        <div style="border: 1px solid #ddd; border-radius: 10px;">
+            <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
+            <a id="exportHistoryLink" style="display: none;">Export</a>
+            <br>
+            <!-- <label for="FileInputLabel"><b>Import</b></label> -->
+            <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input>
+          </div>
+    </div>
+    <!-- <div id="root"></div> -->
+</nav>
+
+
+<!-- JS vanilla script -->
+ 
+<script src="script.js"></script>
+<script src="tab_script.js"></script>
+<script>
+    // sortable list
+        const list = document.querySelector('.sortable-list');
+        let draggingItem = null;
+        list.addEventListener('dragstart', (e) => {
+            draggingItem = e.target;
+            e.target.classList.add('dragging');
+        });
+        list.addEventListener('dragend', (e) => {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.sortable-item')
+                .forEach(item => item.classList.remove('over'));
+            draggingItem = null;
+        });
+        list.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const draggingOverItem = getDragAfterElement(list, e.clientY);
+            document.querySelectorAll('.sortable-item').forEach
+                (item => item.classList.remove('over'));
+            if (draggingOverItem) {
+                draggingOverItem.classList.add('over');
+                list.insertBefore(draggingItem, draggingOverItem);
+            } else {
+                list.appendChild(draggingItem); 
+            }
+        });
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll
+                ('.sortable-item:not(.dragging)')];
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+    </script>
+        <script>
+            // console.log("asdf");
+
+    </script>
+<div id="toast" class="toast">
+
+</div>
+<div id="syncDashboard" class="sync-dashboard hidden">
+    <div class="dashboard-content">
+        <div class="dashboard-header">
+            <h3>Sync Dashboard</h3>
+            <span class="close-hint">Press 'D' to close</span>
+        </div>
+        <small id="lastSyncTimeDisplay"></small>
+        <div class="tab-sync-settings">
+            <label>Tab Syncing Permissions</label>
+            <div id="tabSyncList" class="tab-sync-list">
+                </div>
+        </div>
+        
+        <div class="sync-toggle-container">
+            <span>Cloud Sync</span>
+            <label class="switch">
+                <input type="checkbox" id="cloudSyncToggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div id="syncDetails" class="hidden">
+    <div class="uid-section">
+        <label>Your Sync ID</label>
+        <div class="uid-display">
+            <code id="userUidDisplay">...</code>
+            <button onclick="copyUid()">Copy</button>
+        </div>
+    </div>
+
+    <div class="manual-sync-section">
+        <hr style="border: 0; border-top: 1px solid #444; margin: 15px 0;">
+        <label>Link Secondary Device</label>
+        <div class="input-group">
+            <input type="text" id="manualSyncInput" placeholder="Paste Remote ID here...">
+            <button onclick="handleManualSync()">Link</button>
+        </div>
+    </div>
+
+    <div class="qr-section">
+        <p>Or scan to Sync</p>
+        <div id="syncQrCode"></div>
+    </div>
+</div>
+    </div>
+</div>
+<div id="leftDashboard" class="left-dashboard hidden">
+    <div class="dashboard-content">
+        <div class="dashboard-header">
+            <h3>Sync Dashboard</h3>
+            <span class="close-hint">Press 'D' to close</span>
+        </div>
+        <small id="lastSyncTimeDisplay"></small>
+        <div class="tab-sync-settings">
+            <label>Tab Syncing Permissions</label>
+            <div id="tabSyncList" class="tab-sync-list">
+                </div>
+        </div>
+        
+
+
+
+    </div>
+</div>
+
+
+</body>
+</html>
