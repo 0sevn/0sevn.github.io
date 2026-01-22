@@ -19,58 +19,267 @@
 <!-- <link rel="stylesheet" href="css.css"> -->
 
 <meta name="robots" content="noindex">
+
+
+    <style>
+  .mt-tam1 {
+    position: absolute;
+    width: 30%;
+    height: 450px;
+    background-color: #00578E;;
+
+    clip-path: polygon(53% 0, 64% 7%, 77% 6%, 
+    100% 15%, 100% 36%, 0 36%, 0 18%, 13% 12%, 20% 14%, 37% 3%); 
+    z-index: -3;
+    margin: 0px;
+}
+  .mt-tam2 {
+    position: absolute;
+    top: 5px;
+  width: 30%;
+  height: 450px;
+  background-color: #89ACA1;
+  
+  clip-path: polygon(53% 0, 64% 7%, 77% 6%, 
+  100% 15%, 100% 36%, 0 36%, 0 18%, 13% 12%, 20% 14%, 37% 3%); 
+  z-index: -2;
+  margin: 0px;
+}
+  .treeline {
+  position: absolute;
+  top: 60px;
+  width: 30%;
+  height: 350px;
+  background-color: #1e1e1e;
+  /* border-radius: 3px; */
+  /* border: 4px solid red; */
+  clip-path: polygon(49% 17%, 56% 27%, 64% 22%, 77% 2%, 88% 21%, 
+  100% 13%,
+  100% 36%, 
+  0 36%, 
+  0 14%, 6% 2%, 15% 21%, 25% 9%,42% 28%); 
+  clip-path: inset(round 10px);
+  z-index: -1;
+  margin: 0px;
+}
+
+.tree {
+  position: absolute;
+  /* top: 71%; */
+  bottom: 0%;
+  left: 11.325%;
+  width: 50px;
+  height: 80px;
+  /* background: #071ece; */
+  background: linear-gradient(to bottom right, rgb(42, 34, 33), rgb(0, 161, 161) 90%);
+       
+  clip-path: polygon(
+    50% 0%,
+
+    55% 4%, 52% 6%, 60% 10%, 54% 12%,
+    62% 16%, 56% 18%, 66% 23%, 58% 25%,
+
+    70% 30%, 60% 32%, 74% 38%, 62% 40%,
+    78% 47%, 64% 49%, 82% 56%, 66% 58%,
+
+    86% 66%, 68% 68%, 90% 76%, 70% 78%,
+    94% 88%, 72% 90%,
+
+    100% 100%, 0% 100%,
+
+    28% 90%, 6% 88%,
+    30% 78%, 10% 76%,
+    32% 68%, 14% 66%,
+    34% 58%, 18% 56%,
+    36% 49%, 22% 47%,
+    38% 40%, 26% 38%,
+    40% 32%, 30% 30%,
+    42% 25%, 34% 23%,
+    44% 18%, 38% 16%,
+    46% 12%, 40% 10%,
+    48% 6%, 45% 4%
+  );
+
+  z-index: -10;
+}
+.tree2 {
+  position: absolute;
+  top: 71%;
+  left: 25%;
+  width: 50px;
+  height: 80px;
+  /* background: #071ece; */
+  background: linear-gradient(to bottom right, rgb(255,53,26), rgb(0,235,235) 90%);
+       
+  clip-path:
+    "path('M36.9273 55.6337C35.2784 54.9693 33.3921 55.354 32.1351 56.611L31.9808 56.7653C30.3346 58.4116 27.6654 58.4116 26.0191 56.7653C24.803 55.5492 22.9701 55.1938 21.3876 55.8672C19.2453 56.7789 16.7696 55.7813 15.8579 53.639L15.7725 53.4383C15.0764 51.8026 13.4706 50.7408 11.6929 50.7408H11.4748C9.14659 50.7408 7.25919 48.8534 7.25919 46.5252C7.25919 44.8053 6.21441 43.2579 4.61919 42.6151C2.45972 41.745 1.41453 39.289 2.28469 37.1295L2.3662 36.9272C3.0306 35.2784 2.64593 33.3921 1.38892 32.1351L1.23471 31.9809C-0.411583 30.3346 -0.411564 27.6654 1.23473 26.0191C2.45085 24.803 2.80627 22.97 2.1328 21.3875C1.22113 19.2453 2.21872 16.7695 4.36099 15.8579L4.56168 15.7725C6.1974 15.0764 7.25919 13.4705 7.25919 11.6929V11.4747C7.25919 9.14657 9.14655 7.25922 11.4747 7.25922C13.1946 7.25922 14.742 6.21442 15.3848 4.61921C16.2549 2.45972 18.711 1.41448 20.8705 2.28466L21.0728 2.36618C22.7217 3.03059 24.6079 2.64592 25.8649 1.38891L26.0191 1.23471C27.6654 -0.411569 30.3346 -0.41157 31.9808 1.23471C33.197 2.45083 35.0299 2.80623 36.6124 2.13277C38.7547 1.22109 41.2305 2.21868 42.1422 4.36097L42.2276 4.5617C42.9237 6.19742 44.5295 7.25921 46.3072 7.25921H46.5253C48.8535 7.25921 50.7408 9.14656 50.7408 11.4747C50.7408 13.1946 51.7856 14.742 53.3808 15.3847C55.5402 16.2549 56.5854 18.7109 55.7153 20.8704L55.6337 21.0727C54.9693 22.7216 55.354 24.6079 56.611 25.8649L56.7653 26.0192C58.4116 27.6654 58.4116 30.3346 56.7653 31.9808C55.5492 33.1969 55.1938 35.0299 55.8672 36.6124C56.7789 38.7547 55.7813 41.2304 53.6391 42.1421L53.4384 42.2275C51.8026 42.9236 50.7408 44.5294 50.7408 46.3071V46.5252C50.7408 48.8534 48.8534 50.7408 46.5252 50.7408C44.8053 50.7408 43.2579 51.7856 42.6151 53.3808C41.745 55.5402 39.289 56.5854 37.1296 55.7153L36.9273 55.6337Z')";
+
+  z-index: 0;
+}
+.trees {
+    position: absolute;
+    left:10%;
+  width: 80%;
+  height: 450px;
+  /* border: 1px solid red; */
+  z-index: 2;
+  overflow: hidden;
+  /* background: #071ece; */
+
+}
+
+
+canvas {
+    position: fixed;   /* Stay in place during scroll */
+    top: 0;
+    left: 0;
+    width: 100vw;      /* Occupy full viewport width */
+    height: 100vh;     /* Occupy full viewport height */
+    z-index: -1;       /* Move behind all other content */
+    pointer-events: none; /* Crucial: clicks pass through to buttons/links below */
+    display: block;
+
+/* The Gradient Mask: Full visibility at top, fading out starting at 60% */
+    -webkit-mask-image: linear-gradient(to bottom, 
+        rgba(0,0,0,1) 0%, 
+        rgba(0,0,0,1) 10%, 
+        rgba(0,0,0,0) 100%
+    );
+    mask-image: linear-gradient(to bottom, 
+        rgba(0,0,0,1) 0%, 
+        rgba(0,0,0,1) 10%, 
+        rgba(0,0,0,0) 100%
+    );
+}
+
+    </style>
 </head>
 
 <body data-theme="dark">
 
  <main class="container page">
   <header class="page-header">
-    <h1 class="page__title">Studio Tamalpais</h1>
+    <h1 class="page__title" style="z-index: 99;">Studio Tamalpais</h1>
     <div class="page__desc">
-      <p>_____________</p>
+      <!-- <p>(Bay Mt, Alta vista)</p> -->
+      <!-- <p>Sound ideas, sound design, sound engineering</p> -->
+      <p>Sound design, sound engineering</p>
       
       <!-- <p>Design, engineering & value added services</p> https://www.parks.ca.gov/?page_id=28500 -->
     </div>
+    <!-- <img src="mount_tamalpais_schwab.png" alt=""> -->
 
-    <style>
-        .polygonous {
-    position: absolute;
-  width: 50%;
-  height: 350px;
-  background-color: #00578E;;
-  /* generates a five pointed star */
-  clip-path: polygon(53% 0, 64% 7%, 77% 6%, 100% 22%, 100% 36%, 0 36%, 0 18%, 13% 12%, 20% 14%, 37% 3%); 
-  z-index: -1;
-    margin: 0px;
-}
-  .polygonous2 {
-    position: absolute;
-    top: 40px;
-  width: 50%;
-  height: 350px;
-  background-color: #89ACA1;
-  
-  /* generates a five pointed star */
-  clip-path: polygon(53% 0, 64% 7%, 77% 6%, 100% 22%, 100% 36%, 0 36%, 0 18%, 13% 12%, 20% 14%, 37% 3%); 
-  z-index: 2;
-  margin: 0px;
-}
-    </style>
   </header>
-  <div style="background-color:#89ACA1; height: 1%; width: 100%;"></div>
+    <!-- <div class="asdf" style="position:fixed ; z-index: -10; height: 110px; width:100%;">
+  <canvas id="snow" height="110px" width="100%" >
+    asdf
+  </canvas>
+</div> -->
+<div style="top: 10% z-index: 100;">
+    <div style="background-color:#89ACA1; height: 1%; width: 100%;"></div>
   <div style="background-color:#00578E; height: 1%; width: 100%;"></div>
 </div>
+
 <br>
 
 
-<div class="polygonous"></div>
-<div class="polygonous2"></div>
+<div class="mt-tam1"></div>
+<div class="mt-tam2"></div>
+<div class="treeline"></div>
+
+
+<div class="trees">
+  <div class="tree" style="scale: 65%; transform: translate(750px,30px);"></div>
+  <div class="tree" style="scale: 95%; transform: translate(540px,30px);"></div>
+  <div class="tree" style="scale: 250%; transform: translate(0px,-10px);"></div>
+  <div class="tree" style="scale: 350%; transform: translate(-25px,-20px);"></div>
+  <div class="tree" style="scale: 250%; transform: translate(40px,10px);"></div>
+  <div class="tree" style="scale: 270%; left:86%; top: 75%;"></div>
+  <div class="tree" style="scale: 450%; left:95%; top: 53%;"></div>
+  
+<!-- <div class="tree2" style="scale: 200%;"></div> -->
+</div>
 
 
 
       <!-- <p>Design, engineering & value added services</p> https://www.parks.ca.gov/?page_id=28500 -->
-    </div>
 </body>
+<script>
+
+const canvas = document.createElement('canvas');
+canvas.id = 'snow-canvas';
+document.body.prepend(canvas); // Put it first in the DOM
+const ctx = canvas.getContext('2d');
+
+let width, height, snowflakes = [];
+let currentWind = 0, targetWind = 0.01;
+let currentSpeed = 0.01, targetSpeed = 0.02;
+
+class Snowflake {
+    constructor() { this.reset(true); }
+
+    reset(firstTime = false) {
+        this.x = Math.random() * width;
+        this.y = firstTime ? Math.random() * height : -20;
+        this.size = Math.random() * 1.5 + 0.9; // radius: [.5, 2]
+        this.baseSpeed = Math.random() * 0.2 + 0.2; // Slow gravity
+        this.angle = Math.random() * Math.PI * 2;
+        this.spin = Math.random() * 0.001 + 0.005; // Slow wobble
+    }
+
+    update() {
+        // Smooth Easing for global environment
+        currentWind += (targetWind - currentWind) * 0.005;
+        currentSpeed += (targetSpeed - currentSpeed) * 0.005;
+
+        this.y += this.baseSpeed + currentSpeed;
+        this.x += currentWind + Math.sin(this.angle) * 0.1;
+        this.angle += this.spin;
+
+        if (this.y > height + 20) this.reset();
+    }
+
+    draw() {
+        ctx.moveTo(this.x, this.y);
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    }
+}
+
+function init() {
+    const dpr = window.devicePixelRatio || 1;
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
+    
+    // Density logic: 200 for desktop, 75 for mobile
+    const count = width > 1000 ? 200 : 75;
+    snowflakes = Array.from({ length: count }, () => new Snowflake());
+}
+
+function render() {
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Subtle white
+    ctx.beginPath();
+    snowflakes.forEach(s => { s.update(); s.draw(); });
+    ctx.fill();
+    requestAnimationFrame(render);
+}
+
+// Random Wind Gusts every 10-30 seconds
+function triggerGusts() {
+    const isStormy = Math.random() > 0.75;
+    targetWind = isStormy ? (Math.random() * 0.11 + 0.51) : 0.1;
+    targetSpeed = isStormy ? 0.2 : 0.2;
+    setTimeout(triggerGusts, Math.random() * 2000 + 10000);
+}
+
+window.addEventListener('resize', init);
+init();
+render();
+triggerGusts();
+</script>
   
   
 </html>
