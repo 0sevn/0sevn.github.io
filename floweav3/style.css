@@ -123,7 +123,7 @@ a {
       padding: 0px;
       color: var(--text-color);
   }
-  .swipe {
+  .swipe-container {
     display: grid;
     grid-template-columns: auto 1fr auto;
     overflow-x: auto;
@@ -134,7 +134,7 @@ a {
 
     > :nth-child(2) {
         width: 100cqw;
-        padding: 10px 20px;
+        padding: 2px 20px;
         scroll-snap-align: center;
     }
     
@@ -153,33 +153,56 @@ a {
 
    /* tabs */
   .tab-wrap {
-    /* position: absolute; */
-    /* justify-self: center;   */
+    position: relative;
+    /* justify-self: right; */
+    /* align-items:center; */
+    width: 100%;
+/* overflow-x:hidden; */
     /* display: flex;
     flex-direction: column; */
     /* margin-top: 5px; */
     /* margin:0px auto 0px auto; */
-      /* width: 95% !important; */
       /* padding:0px 20px 0px 20px; */
       /* max-width: 600px; */
       
     /* background-color: rgb(245, 222, 179, 100%); */
     /* border: 1px solid black; */
-    /* align-items: center; */
+    
     height:50px;
   }
   .tabs {
-      display: flex;
-      /* gap: 10px; */
-      margin-left: 5px;
-      /* border: 3px solid rgb(11, 10, 10); */
+    display: flex;
+    /* gap: 10px; */
+    /* margin-left: 5px; */
+    /* border: 3px solid rgb(11, 10, 10); */
+    /* border-block: 1px #666 solid; */
+    /* overflow-x:scroll; */
+    /* width: 100%; */
+    flex-wrap: nowrap; /* Prevent tabs from jumping to a second line */
+    overflow-x: auto;  /* Enable horizontal scrolling */
+    overflow-y: hidden;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+    width: 100%;
+    padding: 0px 8px 12px 12px; /* Tiny padding so the shadow isn't clipped */
+    /* scroll-snap-type: x mandatory; */
+    /* container-type: inline-size; */
+    scrollbar-width: none;
   }
+  /* Hide scrollbar for Chrome, Safari and Opera */
+.tabs::-webkit-scrollbar {
+    display: none;
+}
   .tab {
-      padding: 10px 15px 10px 15px;
+    flex: 0 0 auto; /* Crucial: stops tabs from shrinking to fit the screen */
+      padding: 10px 15px;
       margin-right: 5px;
+      height: 45px;
+      white-space: nowrap; /* Keeps tab text on one line */
+      width: auto;
       cursor: pointer;
       border-radius: 0px 0px 5px 5px;
-      box-shadow: 0 0.5rem 1rem #00000080;
+      box-shadow: 0 0.1rem 0.5rem #00000080;
       /* box-shadow: var(--shadow-s); */
       /* border: 1px solid #ccc; */
       transition: all 0.3s ease-out; /* Smooth transitions for properties */
@@ -375,12 +398,12 @@ li {
     /* font-size: 1.1em; */
     /* color: #333; */
     /* font-weight: bold; */
-    margin-left: 10px; /* To remove default bottom margin */ 
+    margin-left: 0px; /* To remove default bottom margin */ 
     padding: 0px; /* To remove default left padding */
     cursor: grab;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: background 0.2s, transform 0.2s;
-    
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
 }
 .sortable-item:hover {
     background: #6d6d6d;
@@ -614,7 +637,7 @@ border-radius: 0px 0px 5px 5px;
   right:0;
   width:90%;
   height: 430px;
-  margin-top: 95px;
+  margin-top: 70px;
   display: none;
   z-index:9999;
   background-color: var(--card-bg); 
@@ -622,6 +645,8 @@ border-radius: 0px 0px 5px 5px;
   pointer-events: none; /* Allows clicking through the empty space */
   border: 1px solid #818181; 
   border-radius: 5px;
+  overflow-y: scroll;
+  
 }
 .history-card.hidden { display: inline; }
 

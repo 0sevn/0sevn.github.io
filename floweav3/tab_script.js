@@ -28,6 +28,8 @@ function switchTab(tabId) {
     const selectedTab = document.querySelector(`[data-tab-id="${tabId}"]`);
      if (selectedTab) { // Ensure the tab element exists before trying to add class
         selectedTab.classList.add("active");
+        // Inside your tab click/activation function:
+selectedTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
 
     // Update the placeholder for the task input

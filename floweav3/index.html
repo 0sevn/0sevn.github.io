@@ -270,12 +270,17 @@ window.startCloudWatcher = function() {
 <body>
 
 
-<div style="z-index: 99;">
-    <div class="top-icons" style="left:0;text-align:left;">
-        <input type="submit" value=" " class="icon help w3-animate-right" title="Help" onclick="showHelp()">
+<!-- <div style="z-index: 99;"> -->
+    <!-- <div class="top-icons" style="left:0;text-align:left;"> -->
+        <!-- <input type="submit" value=" " class="icon help w3-animate-right" title="Help" onclick="showHelp()"> -->
         <!-- ?<input type="submit" value=" " class="icon settings1 w3-animate-right" title="Help" onclick="showHelp()"> -->
+         <!-- <input type="submit" value=" " class="icon settings w3-animate-right" title="Settings" onclick="showTaskEdit()"> -->
+            <!-- <input type="submit" value=" " class="icon darklight_mode w3-animate-left" title="Toggle light/dark mode" onclick="toggleTheme()"> -->
+            <!-- <br> -->
+            
+            <!-- <input type="submit" value=" " class="icon history w3-animate-right" title="History" onclick="showHistory()"> -->
         
-    </div>
+    <!-- </div> -->
 <div id="favBar" class="topnav hidden">
     <!-- Life  -->
     <div class="dropdown">
@@ -375,27 +380,27 @@ https://m.co/se/sv-SE/stationer/
     </div>
 </div>
 <!-- </div> -->
-    <div class="top-icons" style="right:0;text-align:right;">
+    <!-- <div class="top-icons" style="right:0;text-align:right;">
         <div class="">
             <input type="submit" value=" " class="icon settings w3-animate-left" title="Settings" onclick="showTaskEdit()">
-            <!-- <input type="submit" value=" " class="icon darklight_mode w3-animate-left" title="Toggle light/dark mode" onclick="toggleTheme()"> -->
-            <!-- <br> -->
+            <input type="submit" value=" " class="icon darklight_mode w3-animate-left" title="Toggle light/dark mode" onclick="toggleTheme()">
+            <br>
             
             <input type="submit" value=" " class="icon history w3-animate-left" title="History" onclick="showHistory()">
         </div>   
-    </div>
-</div><br>
+    </div> -->
+<!-- </div><br> -->
 
 <!-- Mid navigation -->
 <div class="wrap-container">
-    <div id="week_header" class="week-header">Week</div>
+    <div class="week-header" style="width: 450px;" >
+        
         <div class="flex items-center space-x-2 status-hud">
-        <div id="syncStatusDot" class="status-dot"></div>
-        <span id="syncStatusText" class="status-text">Local Only</span>
-        <button id="cloudPullBtn" class="hidden" onclick="window.pullFullSync(window.userId)" title="Updates available in cloud">
-            ☁️ ↓
-        </button>
-</div>
+            <div id="week_header">Week</div>
+            <div id="syncStatusDot" class="status-dot"></div>
+            <span id="syncStatusText" class="status-text">Local Only</span>
+        </div>
+    </div>
     <div class="mid-container">
         <div id="health_bar" class="healthbar" title="FOvea, a small depression within the retina where visual acuity is the highest.">
             
@@ -421,6 +426,30 @@ https://m.co/se/sv-SE/stationer/
         </div>   
     </div> 
 </div>
+<div style="z-index: 99;">
+    <div class="top-icons" style="left:0;text-align:left;">
+        <!-- <input type="submit" value=" " class="icon help w3-animate-right" title="Help" onclick="showHelp()"> -->
+        <!-- ?<input type="submit" value=" " class="icon settings1 w3-animate-right" title="Help" onclick="showHelp()"> -->
+         <input type="submit" value=" " class="icon settings w3-animate-right" title="Settings" onclick="showTaskEdit()">
+            <!-- <input type="submit" value=" " class="icon darklight_mode w3-animate-left" title="Toggle light/dark mode" onclick="toggleTheme()"> -->
+            <!-- <br> -->
+            
+            <input type="submit" value=" " class="icon history w3-animate-right" title="History" onclick="showHistory()">
+        
+    </div>
+
+<!-- </div> -->
+    <!-- <div class="top-icons" style="right:0;text-align:right;">
+        <div class="">
+            <input type="submit" value=" " class="icon settings w3-animate-left" title="Settings" onclick="showTaskEdit()">
+            <input type="submit" value=" " class="icon darklight_mode w3-animate-left" title="Toggle light/dark mode" onclick="toggleTheme()">
+            <br>
+            
+            <input type="submit" value=" " class="icon history w3-animate-left" title="History" onclick="showHistory()">
+        </div>   
+    </div> -->
+</div><br>
+
 <div class="howto" id="helpCard" onclick="closeHelp()">
   <img src="img/help2.png" alt="" style="width: 100%;">
 </div>
@@ -428,11 +457,11 @@ https://m.co/se/sv-SE/stationer/
 <!-- Purged list -->
 <nav id="historyCard" class="history-card">
     <!-- sync controls card -->
-    <div style="position:fixed; right:0;text-align:right;margin-top: 20px;">
+    <div style="position:fixed; right:0;text-align:right;">
         <input type="submit" value=" " class="icon rss" title="Sync controls" onclick="showSync()">
     </div>   
     <!-- Purge history list -->
-    <div style="margin-top: 20px;  color: var(--text-color);">
+    <div style="color: var(--text-color);">
         <ul id="purge_list" style="list-style: none;padding-left: 5%;">
         </ul>
     </div>

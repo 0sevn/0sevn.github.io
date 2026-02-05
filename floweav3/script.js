@@ -44,8 +44,8 @@ weekHeader.append('Wk '+getWeekNumber(new Date()));
         const newListItem = $(`
             <li data-id="${item.id}" class="sortable-item" draggable="true">
                 
-            <div class="swipe" id="swipe">
-            <button style="background: rgb(48, 151, 48); width: 100px">✅</button>
+            <div class="swipe-container" id="swipe">
+            <button style="background: rgba(48, 151, 48, 0.69); width: 100px; border: none">✅</button>
             <div>
                 <span>
                     <input type="checkbox" class="task-checkbox" ${item.checked ? 'checked' : ''}>
@@ -54,47 +54,72 @@ weekHeader.append('Wk '+getWeekNumber(new Date()));
                 </span>
                 </div>
                 
-            <button style="background: rgb(199, 74, 74); width: 100px">❌</button>
+            <button style="background: rgb(199, 74, 74); width: 100px; border: none">❌</button>
             </div>
                 <div class="edit_tasks" id="edit_tasks" style="display:${editButtonsVisible ? 'inline-block' : 'none'};margin:0px;padding:0px;">
-                <!--input type="submit" class="icon edit" value="" title="Edit task"-->
-                <input type="submit" class="icon delete" value=" " title="Delete task" style="padding-right:0%;">
+                    <!--input type="submit" class="icon edit" value="" title="Edit task"-->
+                    <input type="submit" class="icon delete" value=" " title="Delete task" style="padding-right:0%;">
                 </div>
             </li>
         `);
         listElement.append(newListItem);
         
-            const swiper = document.getElementById("swipe");
-            swiper.addEventListener("scroll", on_scroll);
+        // const swiper = document.getElementById("swipe");
+        // FIX 2: Attach listener to the specific container of THIS item
+        const swiper = newListItem.find(".swipe-container")[0];
+        swiper.addEventListener("scroll", function(e) {
+            const li = e.target.closest('.sortable-item');
+            if (!li) return; // Exit if we didn't scroll a task
 
-            function on_scroll(e) {
-                const scroll_div = e.currentTarget;
-                const scroll_center = scroll_div.scrollWidth / 2;
-                const viewport_center = scroll_div.clientWidth / 2;
-                const current = scroll_div.scrollLeft + viewport_center;
-                const dx = current - scroll_center;
-                console.log(dx);
+            const taskId = li.getAttribute('data-id');
+            const scroll_div = e.currentTarget;
+            const scroll_center = scroll_div.scrollWidth / 2;
+            const viewport_center = scroll_div.clientWidth / 2;
+            const current = scroll_div.scrollLeft + viewport_center;
+            const dx = current - scroll_center;
+            console.log(dx);
 
-                // Threshold logic
-                if (dx > 99) {
-                    scroll_div.style.backgroundColor = "red";
-                    console.log("red");
-                    delay
-                    if (dx > 99) {
-                    deleteTask();
-                    }
+            // Threshold logic
+            if (dx > 99) {                
+                scroll_div.style.backgroundColor = "red";
+                // console.log("red");
+                    setTimeout(() => {
+                        li.style.transform = "translateX(-90%)";
+                        li.style.opacity = "0";
+                        setTimeout(() => {
+                            // Your existing delete logic here
+                            deleteTaskById(taskId);
+                            // deleteTask();
+                            // saveData();
+                        }, 100); // 1 second delay
+                    }, 600); // 1 second delay
+                    
 
-                } else if (dx < -99) {
-                    scroll_div.style.backgroundColor = "green";
-                    console.log("green");
-                    purgeList();
-                    togglePurgeButton();
+            } else if (dx < -99) {
+                scroll_div.style.backgroundColor = "green";
+                // console.log("green");
+                // purgeList();
+                // togglePurgeButton();
+                setTimeout(() => {
+                    const cb = li.querySelector('input[type="checkbox"]');
+                    if (cb) cb.checked = true; // Mark as done so purge picks it up
+                    li.style.transform = "translateX(90%)";
+                    li.style.opacity = "10";
+                    // Call your existing purge function
+                    setTimeout(() => {
+                        // Your existing delete logic here
+                        // purgeList();
+                        // togglePurgeButton(); 
+                        purgeSpecificTask(taskId);
+                        // saveData();
+                    }, 100); // 1 second delay
+                }, 300); // Shorter delay for purge to feel "snappy"
 
-                } else {
-                    scroll_div.style.backgroundColor = ""; // reset when in middle
-                    // console.log("middle");
-                }
+            } else {
+                scroll_div.style.backgroundColor = ""; // reset when in middle
+                // console.log("middle");
             }
+        });
     });
 
     togglePurgeButton();
@@ -760,3 +785,58 @@ window.refreshUIFromSync = function() {
         setTimeout(() => dot.style.transform = 'scale(1)', 400);
     }
 };
+
+// Minimal change: One listener on the parent container
+document.getElementById('todo_list').addEventListener('click', function(e) {
+    // Find the closest list item (the task row)
+    const li = e.target.closest('.sortable-item');
+    
+    if (li) {
+        const checkbox = li.querySelector('input[type="checkbox"]');
+        
+        // If the user didn't click the checkbox directly, toggle it
+        if (e.target !== checkbox) {
+            checkbox.checked = !checkbox.checked;
+            
+            // Manually trigger the 'change' event so your 
+            // existing logic (like saveData) still runs
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        
+        // Toggle the visual class
+        li.classList.toggle('checked', checkbox.checked);
+    }
+});
+
+// Targeted deletion
+function deleteTaskById(id) {
+    let todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+    todoList = todoList.filter(task => task.id !== id);
+    localStorage.setItem(activeTabList, JSON.stringify(todoList));
+    updateHealthBar();
+    renderTaskList();
+    if (window.pushFullSync) window.pushFullSync();
+}
+
+// Targeted purging
+function purgeSpecificTask(id) {
+    let todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+    let purgeList = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
+
+    const taskIndex = todoList.findIndex(t => t.id === id);
+    if (taskIndex > -1) {
+        const task = todoList.splice(taskIndex, 1)[0];
+        task.purgedAt = new Date().toISOString();
+        task.purgedWeek = getWeekNumber(new Date(task.purgedAt));
+        purgeList.unshift(task);
+
+        localStorage.setItem(activeTabList, JSON.stringify(todoList));
+        localStorage.setItem(activeTabPurgeList, JSON.stringify(purgeList));
+        
+        updateHealthBar();
+        renderTaskList();
+        renderPurgeList();
+        showToast(purgeMessages[Math.floor(Math.random() * purgeMessages.length)]);
+        if (window.pushFullSync) window.pushFullSync();
+    }
+}
