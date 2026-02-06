@@ -121,26 +121,29 @@ a {
   .week-header {
     position: relative;
     display: flex;
-    align-items: center; 
-    text-align: left; 
-    /* margin: 0px auto 0px auto; */
-    padding: 0px;
+    justify-content: space-between; /* Pushes week to left, HUD to right */
+    align-items: center;            /* Vertically centers both items */
+    padding: 0 10px;               /* Optional spacing from edges */
+    margin-bottom: 10px;
+    
     color: var(--text-color);
     width: 100%;
     border: 1px solid black;
+
+    
   }
 
 .status-hud { 
-display: inline-flex; 
+display: flex; 
 /* width: 100%; */
-right:0px; 
 align-items: center; 
 text-align: right; 
 gap: 8px; 
 vertical-align: middle; 
-border: 1px solid #818181;
+/* border: 1px solid #818181; */
 }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; background: gray; transition: 0.3s; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: gray; display: inline-block;
+    transition: transform 0.4s ease; }
 .status-text { 
     font-size: 10px; text-transform: uppercase; font-weight: bold; color: var(--text-color); opacity: 0.7; 
     align-items: right; text-align: right; right:0px;
