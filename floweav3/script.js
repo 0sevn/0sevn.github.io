@@ -210,56 +210,83 @@ function updateTaskInStorage(index, newText, checked = false) {
 
 function deleteTask() {
     const listItem = $(this).closest('li');
-    const index = $('#todo_list li').index(listItem);
-    // const idStr = listItem.attr('id').replace('item-', '');
-    // const id = parseInt(idStr, 10);
+    const taskId = listItem.data('id');
+    
+    let todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+    const taskIndex = todoList.findIndex(t => t.id === taskId);
+    
+    if (taskIndex === -1) return;
 
-    const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
-    todoList.splice(index, 1);
-    // todoList = todoList.filter(task => task.id !== id);
+    // Save the task for undoing before removing it
+    const deletedTask = todoList[taskIndex];
+    todoList.splice(taskIndex, 1);
+
     localStorage.setItem(activeTabList, JSON.stringify(todoList));
-    updateHealthBar();
     renderTaskList();
+    updateHealthBar();
+
+    const undoDelete = () => {
+        let currentTodo = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+        currentTodo.push(deletedTask); // Put it back
+        localStorage.setItem(activeTabList, JSON.stringify(currentTodo));
+        renderTaskList();
+        updateHealthBar();
+        if (window.pushFullSync) window.pushFullSync();
+    };
+
+    showToast("Task deleted", undoDelete);
     if (window.pushFullSync) window.pushFullSync();
 }
 
 function purgeList() {
     let todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
-    let purgeList = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
+    let purgeHistory = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
 
-    // Collect task IDs to purge
     const idsToPurge = [];
-
     $('#todo_list input[type="checkbox"]:checked').each(function () {
-        const li = $(this).closest('li');
-        const id = li.data('id'); // now uses ISO string
-        idsToPurge.push(id);
+        idsToPurge.push($(this).closest('li').data('id'));
     });
 
-    // Filter out tasks to keep
+    const tasksToPurge = todoList.filter(task => idsToPurge.includes(task.id));
     const remainingTasks = todoList.filter(task => !idsToPurge.includes(task.id));
-    // Extract tasks to purge
-    const purgedTasks = todoList.filter(task => idsToPurge.includes(task.id));
 
-    // Sort in reverse to prevent shifting issues when splicing
-    // indicesToPurge.sort((a, b) => b - a);
-
-    purgedTasks.forEach(task => {
-        task.purgedAt = new Date().toISOString();
-        task.purgedWeek = getWeekNumber(new Date(task.purgedAt));
-        purgeList.unshift(task);
-    });
-
+    // Execute Purge
     localStorage.setItem(activeTabList, JSON.stringify(remainingTasks));
-    localStorage.setItem(activeTabPurgeList, JSON.stringify(purgeList));
+    
+    const purgedWithMetadata = tasksToPurge.map(task => ({
+        ...task,
+        purgedAt: new Date().toISOString(),
+        purgedWeek: getWeekNumber(new Date())
+    }));
+    
+    localStorage.setItem(activeTabPurgeList, JSON.stringify([...purgedWithMetadata, ...purgeHistory]));
 
-    updateHealthBar();
     renderTaskList();
     renderPurgeList();
+    updateHealthBar();
 
-    showToast(purgeMessages[Math.floor(Math.random() * purgeMessages.length)]);
+    // Define the Undo action
+    const undoPurge = () => {
+        // Refresh data to ensure we have latest state
+        let currentTodo = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+        let currentPurge = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
+
+        // Move tasks back to active list and uncheck them
+        const restoredTasks = tasksToPurge.map(t => ({ ...t, checked: false }));
+        localStorage.setItem(activeTabList, JSON.stringify([...currentTodo, ...restoredTasks]));
+
+        // Remove them from purge list
+        const filteredPurge = currentPurge.filter(p => !idsToPurge.includes(p.id));
+        localStorage.setItem(activeTabPurgeList, JSON.stringify(filteredPurge));
+
+        displayData();
+        if (window.pushFullSync) window.pushFullSync();
+    };
+
+    showToast(purgeMessages[Math.floor(Math.random() * purgeMessages.length)], undoPurge);
     if (window.pushFullSync) window.pushFullSync();
 }
+
 
 // ----------- UTILITIES --------------
 
@@ -314,9 +341,34 @@ function updateHealthBar() {
 }
 
 
-function showToast(message) {
+// Updated in script.js
+function showToast(message, undoCallback = null) {
     const toast = document.getElementById("toast");
-    toast.textContent = message;
+    
+    // Clear previous content
+    toast.innerHTML = '';
+    
+    // Add message text
+    const textSpan = document.createElement('span');
+    textSpan.textContent = message + " ";
+    toast.appendChild(textSpan);
+
+    // Add Undo link if a callback is provided
+    if (undoCallback) {
+        const undoLink = document.createElement('a');
+        undoLink.href = "#";
+        undoLink.textContent = "Undo";
+        undoLink.style.color = "#3498db";
+        undoLink.style.marginLeft = "10px";
+        undoLink.style.textDecoration = "underline";
+        undoLink.onclick = (e) => {
+            e.preventDefault();
+            undoCallback();
+            toast.style.opacity = "0"; // Hide toast immediately after undo
+        };
+        toast.appendChild(undoLink);
+    }
+
     toast.style.visibility = "visible";
     toast.style.opacity = "1";
     toast.style.bottom = "50px";
@@ -325,7 +377,7 @@ function showToast(message) {
         toast.style.opacity = "0";
         toast.style.bottom = "30px";
         setTimeout(() => (toast.style.visibility = "hidden"), 500);
-    }, 3000);
+    }, 5000); // Increased to 5s to give user time to click undo
 }
 
 const purgeMessages = [

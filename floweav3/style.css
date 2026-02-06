@@ -117,12 +117,35 @@ a {
 .dropdown:hover .dropup-content {display: block;}
 .dropdown:hover .dropbtn {background-color: #3e6a8e;}
   /* TOP NAV END */
+
   .week-header {
     position: relative;
-      margin: 0px auto 0px auto;
-      padding: 0px;
-      color: var(--text-color);
+    display: flex;
+    align-items: center; 
+    text-align: left; 
+    /* margin: 0px auto 0px auto; */
+    padding: 0px;
+    color: var(--text-color);
+    width: 100%;
+    border: 1px solid black;
   }
+
+.status-hud { 
+display: inline-flex; 
+/* width: 100%; */
+right:0px; 
+align-items: center; 
+text-align: right; 
+gap: 8px; 
+vertical-align: middle; 
+border: 1px solid #818181;
+}
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: gray; transition: 0.3s; }
+.status-text { 
+    font-size: 10px; text-transform: uppercase; font-weight: bold; color: var(--text-color); opacity: 0.7; 
+    align-items: right; text-align: right; right:0px;
+}
+
   .swipe-container {
     display: grid;
     grid-template-columns: auto 1fr auto;
@@ -454,7 +477,7 @@ li {
   .delete {
   background-image:url(img/delete.png);
   position: relative;
-  right:0px;
+  /* right:0px; */
   top:-2px;
   /* margin-left:50px; */
   /* display: flex; */
@@ -612,9 +635,6 @@ border-radius: 0px 0px 5px 5px;
   }
 
   /* dashboard */
-.status-hud { display: inline-flex; align-items: center; gap: 8px; margin-left: 15px; vertical-align: middle; }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; background: gray; transition: 0.3s; }
-.status-text { font-size: 10px; text-transform: uppercase; font-weight: bold; color: var(--text-color); opacity: 0.7; }
 
 /* The Dashboard Overlay */
 .left-dashboard {
@@ -696,25 +716,6 @@ border-radius: 0px 0px 5px 5px;
     margin-top: 10px; font-size: 11px; align-items: center; justify-content: space-between;
 }
 #syncQrCode img { margin: 15px auto; border: 8px solid white; border-radius: 8px; }
-
-/* Status HUD next to Week Number */
-.status-hud { 
-    display: inline-flex; 
-    align-items: center; 
-    gap: 6px; 
-    margin-left: 15px;
-}
-.status-dot { 
-    width: 8px; 
-    height: 8px; 
-    border-radius: 50%; 
-    background: #888; 
-}
-.status-text { 
-    font-size: 11px; 
-    font-weight: bold; 
-    color: var(--text-color); 
-}
 
 /* Toggle Switch Styling */
 .switch {
