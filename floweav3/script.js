@@ -46,20 +46,21 @@ weekHeader.append('Wk '+getWeekNumber(new Date()));
                 
             <div class="swipe-container" id="swipe">
             <button style="background: rgba(48, 151, 48, 0.69); width: 100px; border: none">✅</button>
-            <div>
-                <span>
-                    <input type="checkbox" class="task-checkbox" ${item.checked ? 'checked' : ''}>
-                    <span class="task-text">${linkify(item.text)}</span>
-                    <p class="time">${displayDate}</p>
-                </span>
+                <div class="task-content">
+                    <span>
+                        <input type="checkbox" class="task-checkbox" ${item.checked ? 'checked' : ''}>
+                        <span class="task-text">${linkify(item.text)}</span>
+                        <p class="time">${displayDate}</p>
+                    </span>
+                    <div class="edit_tasks" id="edit_tasks" style="display:${editButtonsVisible ? 'inline-block' : 'none'};margin:0px;padding:0px;">
+                        <input type="submit" class="icon edit" value="" title="Edit task">
+                        <input type="submit" class="icon delete" value=" " title="Delete task" style="padding-right:0%;">
+                    </div>
                 </div>
                 
             <button style="background: rgb(199, 74, 74); width: 100px; border: none">❌</button>
             </div>
-                <div class="edit_tasks" id="edit_tasks" style="display:${editButtonsVisible ? 'inline-block' : 'none'};margin:0px;padding:0px;">
-                    <!--input type="submit" class="icon edit" value="" title="Edit task"-->
-                    <input type="submit" class="icon delete" value=" " title="Delete task" style="padding-right:0%;">
-                </div>
+                
             </li>
         `);
         listElement.append(newListItem);

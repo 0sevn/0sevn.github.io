@@ -124,7 +124,7 @@ a {
     justify-content: space-between; /* Pushes week to left, HUD to right */
     align-items: center;            /* Vertically centers both items */
     padding: 0 10px;               /* Optional spacing from edges */
-    margin-bottom: 10px;
+    margin-bottom: 0px;
     
     color: var(--text-color);
     width: 100%;
@@ -157,6 +157,7 @@ vertical-align: middle;
     scroll-snap-type: x mandatory;
     container-type: inline-size;
     scrollbar-width: none;
+    border: 11px solid rgb(124, 11, 11);
 
     > :nth-child(2) {
         width: 100cqw;
@@ -175,6 +176,11 @@ vertical-align: middle;
             }
         }
     }
+}
+.task-content {
+    display: flex; 
+    justify-content: space-between; 
+    border: 1px solid black;
 }
 
    /* tabs */
@@ -420,10 +426,14 @@ li {
     /* padding: 1px 25px; */
     /* margin: 8px 0; */
     /* background: rgba(255, 255, 255, 0.8); */
+    border: 3px solid rgb(11, 10, 10);
     border-radius: 5px;
     /* font-size: 1.1em; */
     /* color: #333; */
     /* font-weight: bold; */
+    vertical-align: middle; 
+    align-items: center;
+    justify-content: center;
     margin-left: 0px; /* To remove default bottom margin */ 
     padding: 0px; /* To remove default left padding */
     cursor: grab;
@@ -440,7 +450,7 @@ li {
     transform: rotate(-2deg);
 }
 .over {
-    /* border: 2px dashed #67a25c; */
+    border: 2px dashed #67a25c;
     /* background: #77826c; */
 }
   a {
@@ -481,7 +491,7 @@ li {
   background-image:url(img/delete.png);
   position: relative;
   /* right:0px; */
-  top:-2px;
+  /* top:-2px; */
   /* margin-left:50px; */
   /* display: flex; */
   /* top: -5px; */
