@@ -52,8 +52,8 @@ weekHeader.append('Wk '+getWeekNumber(new Date()));
                         <span class="task-text">${linkify(item.text)}</span>
                         <p class="time">${displayDate}</p>
                     </span>
-                    <div class="edit_tasks" id="edit_tasks" style="display:${editButtonsVisible ? 'inline-block' : 'none'};margin:0px;padding:0px;">
-                        <input type="submit" class="icon edit" value="" title="Edit task">
+                    <div class="edit_tasks" id="edit_tasks" style="display:${editButtonsVisible ? 'inline-block' : 'none'};">
+                        <!--input type="submit" class="icon edit" value="" title="Edit task"-->
                         <input type="submit" class="icon delete" value=" " title="Delete task" style="padding-right:0%;">
                     </div>
                 </div>
