@@ -161,9 +161,9 @@ touch-action: pan-y; /* Prevent horizontal jitter while scrolling vertically */
 /* border: 11px solid rgb(124, 11, 11); */ 
 
     > :nth-child(2) {
-        width: 100cqw;
-        padding: 0px 20px;
-        vertical-align: middle;
+        width: 101cqw;
+        
+        vertical-align: top;
         /* justify-content: center; */
         align-items: center;
         scroll-snap-align: center;
@@ -184,6 +184,7 @@ touch-action: pan-y; /* Prevent horizontal jitter while scrolling vertically */
 .task-content {
     display: flex; 
     justify-content: space-between; 
+    padding: 5px 30px 0px 30px;
     /* border: 1px solid black; */
 }
 
