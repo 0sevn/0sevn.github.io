@@ -151,13 +151,9 @@ vertical-align: middle;
 
 .swipe-container {
     display: grid;
-    /* grid-template-columns: auto 1fr auto; */
-    grid-template-columns: 100px 100cqw 100px;
+    grid-template-columns: auto 1fr auto;
     overflow-x: auto;
-    overflow-y: hidden;
     scroll-snap-type: x mandatory;
-    /* auto purgar direkt */
-    /* scroll-behavior: smooth;  */
     container-type: inline-size;
     scrollbar-width: none;
     width: 100%;
@@ -186,10 +182,7 @@ vertical-align: middle;
     }
 }
 .task-content {
-    width: 100cqw;
     display: flex; 
-    scroll-snap-align: center;
-    flex-shrink: 0;
     justify-content: space-between; 
     /* border: 1px solid black; */
 }

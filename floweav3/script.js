@@ -70,7 +70,7 @@ weekHeader.append('Wk '+getWeekNumber(new Date()));
         const swiper = newListItem.find(".swipe-container")[0];
 // Force the swiper to start in the middle (hiding the buttons)
 requestAnimationFrame(() => {
-    swiper.scrollLeft = 100; 
+    swiper.scrollLeft = 99; 
 });
 
         swiper.addEventListener("scroll", function(e) {
@@ -874,6 +874,19 @@ function deleteTaskById(id) {
     localStorage.setItem(activeTabList, JSON.stringify(todoList));
     updateHealthBar();
     renderTaskList();
+
+    // const undoDelete = () => {
+    //     let currentTodo = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+    //     currentTodo.push(deletedTask); // Put it back
+    //     localStorage.setItem(activeTabList, JSON.stringify(currentTodo));
+    //     renderTaskList();
+    //     updateHealthBar();
+    //     if (window.pushFullSync) window.pushFullSync();
+    // };
+
+
+    // showToast("Task deleted", undoDelete);
+    showToast("Task deleted");
     if (window.pushFullSync) window.pushFullSync();
 }
 
