@@ -68,6 +68,11 @@ weekHeader.append('Wk '+getWeekNumber(new Date()));
         // const swiper = document.getElementById("swipe");
         // FIX 2: Attach listener to the specific container of THIS item
         const swiper = newListItem.find(".swipe-container")[0];
+// Force the swiper to start in the middle (hiding the buttons)
+requestAnimationFrame(() => {
+    swiper.scrollLeft = 100; 
+});
+
         swiper.addEventListener("scroll", function(e) {
             const li = e.target.closest('.sortable-item');
             if (!li) return; // Exit if we didn't scroll a task
@@ -893,3 +898,26 @@ function purgeSpecificTask(id) {
         if (window.pushFullSync) window.pushFullSync();
     }
 }
+
+// Add to script.js
+window.saveNewOrder = function() {
+    // 1. Get the current list from storage
+    const currentList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+    
+    // 2. Map through the actual DOM elements to see the new order
+    const newOrderIds = $('#todo_list li').map(function() {
+        return $(this).data('id'); // This matches the data-id="${item.id}" we set in render
+    }).get();
+
+    // 3. Rebuild the list based on the new order of IDs
+    const reorderedList = newOrderIds.map(id => {
+        return currentList.find(task => task.id === id);
+    }).filter(task => task !== undefined); // Safety check
+
+    // 4. Save back to localStorage and Sync to Cloud
+    localStorage.setItem(activeTabList, JSON.stringify(reorderedList));
+    
+    // 5. Optional: Provide visual feedback or sync
+    if (window.pushFullSync) window.pushFullSync();
+    console.log("New task order saved!");
+};

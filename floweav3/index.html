@@ -498,6 +498,8 @@ https://m.co/se/sv-SE/stationer/
             document.querySelectorAll('.sortable-item')
                 .forEach(item => item.classList.remove('over'));
             draggingItem = null;
+            
+            if (window.saveNewOrder) window.saveNewOrder();
         });
         list.addEventListener('dragover', (e) => {
             e.preventDefault();
