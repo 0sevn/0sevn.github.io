@@ -425,14 +425,14 @@ window.addEventListener('keydown', (e) => {
 });
 // 1. Dashboard Toggle (Key 'D')
 window.addEventListener('keydown', (e) => {
-    if (e.key.toLowerCase() === 's' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+    if (e.key.toLowerCase() === 'a' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
         const dash = document.getElementById("leftDashboard");
         dash.classList.toggle("hidden");
         if (!dash.classList.contains("hidden")) updateDashboardUI();
     }
 });
 window.addEventListener('keydown', (e) => {
-    if (e.key.toLowerCase() === 'a' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+    if (e.key.toLowerCase() === 's' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
         const dash = document.getElementById("historyCard");
         dash.classList.toggle("hidden");
         if (!dash.classList.contains("hidden")) updateDashboardUI();
@@ -545,7 +545,7 @@ window.handleManualSync = function() {
 
 // Example toggle logic for the 'F' key
 window.addEventListener('keydown', (e) => {
-if (e.key.toLowerCase() === 'f' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+if (e.key.toLowerCase() === 'w' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
     const dash = document.getElementById('favBar');
     dash.classList.toggle('hidden');
     if (dash.classList.contains('hidden')) {
@@ -666,7 +666,6 @@ function showTaskEdit() {
 // REPLACE WITH HTML POP UP & OVERS
 function showHelp() {
     document.getElementById("helpCard").style.display = "block";
-    document.getElementById("favBar").style.display = "block";
     // console.log('activetablist', activeTabList);
     // displayData();
 }
