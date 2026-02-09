@@ -116,6 +116,7 @@ requestAnimationFrame(() => {
                         // Your existing delete logic here
                         // purgeList();
                         // togglePurgeButton(); 
+                        scroll_div.scrollTo({ left: 100, behavior: 'instant' });
                         purgeSpecificTask(taskId);
                         // saveData();
                     }, 100); // 1 second delay
