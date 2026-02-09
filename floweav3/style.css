@@ -157,7 +157,8 @@ scroll-snap-type: x mandatory;
 container-type: inline-size;
 scrollbar-width: none;
 width: 100%;
-touch-action: pan-y; /* Prevent horizontal jitter while scrolling vertically */
+/* touch-action: pan-y;  */
+/* Prevent horizontal jitter while scrolling vertically */
 /* border: 11px solid rgb(124, 11, 11); */ 
 
     > :nth-child(2) {
