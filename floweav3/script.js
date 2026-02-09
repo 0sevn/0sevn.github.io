@@ -69,9 +69,9 @@ weekHeader.append('Wk '+getWeekNumber(new Date()));
         // FIX 2: Attach listener to the specific container of THIS item
         const swiper = newListItem.find(".swipe-container")[0];
 // Force the swiper to start in the middle (hiding the buttons)
-// requestAnimationFrame(() => {
-//     swiper.scrollLeft = 99; 
-// });
+requestAnimationFrame(() => {
+    swiper.scrollLeft = 99; 
+});
 
         swiper.addEventListener("scroll", function(e) {
             const li = e.target.closest('.sortable-item');
