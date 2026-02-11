@@ -26,8 +26,8 @@ document.querySelectorAll(".tab").forEach(tab => {
   }
 });
 function renderTaskList() {
-const weekHeader = $("#week_header").empty();
-weekHeader.append('Wk '+getWeekNumber(new Date()));
+    const weekHeader = $("#week_header").empty();
+    weekHeader.append('Wk '+getWeekNumber(new Date()));
 
     const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
     const listElement = $("#todo_list").empty();
@@ -43,7 +43,9 @@ weekHeader.append('Wk '+getWeekNumber(new Date()));
         
         // Seed defaults if empty
         if (todoList.length === 0) {
-            // const defaults = ["Water", "Gym", "Read", "Meditation"];
+            // const defaults = ["Water", "Gym", "Read", "Meditation"];"Stretch flexors 45/97"
+            // Choose program, begin, rehab, stretch, gain
+            // const defaults = ["Back Low row/Lats Pull 89/97","Zercher 45/97", "Smith Squat 100/100", "Dead Lift 90/120", "Bench Press 50/80", "Shoulder Press 60/97", "Triceps/Biceps 45/97", "Toe raise, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Leg raise/Crunches 45/97" ];
             const defaults = ["Pulldown 40/97kg", "Row 45/97", "Chest Press 45/97", "Shoulder Press 45/97", "Leg Extension 45/97", "Leg Curl 45/97", "Hip Add, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Zercher 45/97", "Leg raise/Crunches 45/97" ];
             const seeded = defaults.map(name => ({
                 id: new Date().toISOString() + Math.random(),
@@ -63,9 +65,18 @@ weekHeader.append('Wk '+getWeekNumber(new Date()));
             `);
             // Handle Increment Click
             tile.on('click', () => {
+                const wasZero = (item.clicks || 0) === 0;
                 item.clicks = (item.clicks || 0) + 1;
                 localStorage.setItem(activeTabList, JSON.stringify(todoList));
-                renderTaskList(); // UI Refresh
+                
+                // UI Updates
+                tile.find('.checkin-count').text(item.clicks);
+                
+                // If it went from 0 to 1, we update the health bar immediately
+                if (wasZero) {
+                    updateHealthBar();
+                }
+                
                 if (window.pushFullSync) window.pushFullSync();
             });
 
@@ -79,106 +90,107 @@ weekHeader.append('Wk '+getWeekNumber(new Date()));
         if (todoList.length === 0) {
             listElement.append('<p class="empty-msg">No tasks for this week yet.</p>');
         } else {
-    // todoList.sort((a, b) => b.id.localeCompare(a.id)); // sort newest first
-    todoList.forEach((item) => {
-        // Format id timestamp to just day and month (e.g., "31 May")
-        const displayDate = new Date(item.id).toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'short'
-        });
+                // todoList.sort((a, b) => b.id.localeCompare(a.id)); // sort newest first
+                todoList.forEach((item) => {
+                    // Format id timestamp to just day and month (e.g., "31 May")
+                    const displayDate = new Date(item.id).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'short'
+                    });
 
-        const newListItem = $(`
-            <li data-id="${item.id}" class="sortable-item" draggable="true">
-                
-            <div class="swipe-container" id="swipe">
-            <button style="background: rgba(48, 151, 48, 0.69); width: 100px; border: none">✅</button>
-                <div class="task-content">
-                    <span>
-                        <input type="checkbox" class="task-checkbox" ${item.checked ? 'checked' : ''}>
-                        <span class="task-text">${linkify(item.text)}</span>
-                        <p class="time">${displayDate}</p>
-                    </span>
-                    <div class="edit_tasks" id="edit_tasks" style="display:${editButtonsVisible ? 'inline-block' : 'none'};">
-                        <!--input type="submit" class="icon edit" value="" title="Edit task"-->
-                        <input type="submit" class="icon delete" value=" " title="Delete task" style="padding-right:0%;">
-                    </div>
-                </div>
-                
-            <button style="background: rgb(199, 74, 74); width: 100px; border: none">❌</button>
-            </div>
-                
-            </li>
-        `);
-        listElement.append(newListItem);
-        
-            // const swiper = document.getElementById("swipe");
-            // FIX 2: Attach listener to the specific container of THIS item
-            const swiper = newListItem.find(".swipe-container")[0];
-            // Force the swiper to start in the middle (hiding the buttons)
-            // 99px to hide gap gap on mobile
-            requestAnimationFrame(() => {
-                swiper.scrollLeft = 99; 
-        });
-
-        swiper.addEventListener("scroll", function(e) {
-            const li = e.target.closest('.sortable-item');
-            if (!li) return; // Exit if we didn't scroll a task
-
-            const taskId = li.getAttribute('data-id');
-            const scroll_div = e.currentTarget;
-            const scroll_center = scroll_div.scrollWidth / 2;
-            const viewport_center = scroll_div.clientWidth / 2;
-            const current = scroll_div.scrollLeft + viewport_center;
-            const dx = current - scroll_center;
-            console.log(dx);
-
-            // Threshold logic
-            if (dx > 99) {                
-                scroll_div.style.backgroundColor = "red";
-                // console.log("red");
-                    setTimeout(() => {
-                        li.style.transform = "translateX(-90%)";
-                        li.style.opacity = "0";
-                        setTimeout(() => {
-                            // Your existing delete logic here
-                            deleteTaskById(taskId);
-                            // deleteTask();
-                            // saveData();
-                        }, 100); // 1 second delay
-                    }, 600); // 1 second delay
+                    const newListItem = $(`
+                        <li data-id="${item.id}" class="sortable-item" draggable="true">
+                            
+                        <div class="swipe-container" id="swipe">
+                        <button style="background: rgba(48, 151, 48, 0.69); width: 100px; border: none">✅</button>
+                            <div class="task-content">
+                                <span>
+                                    <input type="checkbox" class="task-checkbox" ${item.checked ? 'checked' : ''}>
+                                    <span class="task-text">${linkify(item.text)}</span>
+                                    <p class="time">${displayDate}</p>
+                                </span>
+                                <div class="edit_tasks" id="edit_tasks" style="display:${editButtonsVisible ? 'inline-block' : 'none'};">
+                                    <!--input type="submit" class="icon edit" value="" title="Edit task"-->
+                                    <input type="submit" class="icon delete" value=" " title="Delete task" style="padding-right:0%;">
+                                </div>
+                            </div>
+                            
+                        <button style="background: rgb(199, 74, 74); width: 100px; border: none">❌</button>
+                        </div>
+                            
+                        </li>
+                    `);
+                    listElement.append(newListItem);
                     
+                        // const swiper = document.getElementById("swipe");
+                        // FIX 2: Attach listener to the specific container of THIS item
+                        const swiper = newListItem.find(".swipe-container")[0];
+                        // Force the swiper to start in the middle (hiding the buttons)
+                        // 99px to hide gap gap on mobile
+                        requestAnimationFrame(() => {
+                            swiper.scrollLeft = 99; 
+                    });
 
-            } else if (dx < -99) {
-                scroll_div.style.backgroundColor = "green";
-                // console.log("green");
-                // purgeList();
-                // togglePurgeButton();
-                setTimeout(() => {
-                    const cb = li.querySelector('input[type="checkbox"]');
-                    if (cb) cb.checked = true; // Mark as done so purge picks it up
-                    li.style.transform = "translateX(90%)";
-                    li.style.opacity = "10";
-                    // Call your existing purge function
-                    setTimeout(() => {
-                        // Your existing delete logic here
-                        // purgeList();
-                        // togglePurgeButton(); 
-                        scroll_div.scrollTo({ left: 99, behavior: 'instant' });
-                        purgeSpecificTask(taskId);
-                        // saveData();
-                    }, 100); // 1 second delay
-                }, 300); // Shorter delay for purge to feel "snappy"
+                    swiper.addEventListener("scroll", function(e) {
+                        const li = e.target.closest('.sortable-item');
+                        if (!li) return; // Exit if we didn't scroll a task
 
-            } else {
-                scroll_div.style.backgroundColor = ""; // reset when in middle
-                // console.log("middle");
-            }
-        });
-    });
+                        const taskId = li.getAttribute('data-id');
+                        const scroll_div = e.currentTarget;
+                        const scroll_center = scroll_div.scrollWidth / 2;
+                        const viewport_center = scroll_div.clientWidth / 2;
+                        const current = scroll_div.scrollLeft + viewport_center;
+                        const dx = current - scroll_center;
+                        console.log(dx);
 
+                        // Threshold logic
+                        if (dx > 99) {                
+                            scroll_div.style.backgroundColor = "red";
+                            // console.log("red");
+                                setTimeout(() => {
+                                    li.style.transform = "translateX(-90%)";
+                                    li.style.opacity = "0";
+                                    setTimeout(() => {
+                                        // Your existing delete logic here
+                                        deleteTaskById(taskId);
+                                        // deleteTask();
+                                        // saveData();
+                                    }, 100); // 1 second delay
+                                }, 600); // 1 second delay
+                                
+
+                        } else if (dx < -99) {
+                            scroll_div.style.backgroundColor = "green";
+                            // console.log("green");
+                            // purgeList();
+                            // togglePurgeButton();
+                            setTimeout(() => {
+                                const cb = li.querySelector('input[type="checkbox"]');
+                                if (cb) cb.checked = true; // Mark as done so purge picks it up
+                                li.style.transform = "translateX(90%)";
+                                li.style.opacity = "10";
+                                // Call your existing purge function
+                                setTimeout(() => {
+                                    // Your existing delete logic here
+                                    // purgeList();
+                                    // togglePurgeButton(); 
+                                    scroll_div.scrollTo({ left: 99, behavior: 'instant' });
+                                    purgeSpecificTask(taskId);
+                                    // saveData();
+                                }, 100); // 1 second delay
+                            }, 300); // Shorter delay for purge to feel "snappy"
+
+                        } else {
+                            scroll_div.style.backgroundColor = ""; // reset when in middle
+                            // console.log("middle");
+                        }
+                    });
+                });
+
+    
+        }
+    }
     togglePurgeButton();
-}
-}
 }
 
 function renderPurgeList() {
@@ -210,8 +222,20 @@ function renderPurgeList() {
 
 // ----------- TASK FUNCTIONS -------------
 function togglePurgeButton() {
-    const anyChecked = $('#todo_list input[type="checkbox"]:checked').length > 0;
-    $('#purge').prop('disabled', !anyChecked);
+    const currentTabName = localStorage.getItem(`tabName_${activeTab}`) || activeTab;
+
+    if (currentTabName === 'x') {
+        console.log("togglePurgeButton in x Tab")
+        // For 'x' tab: Enable if any tile has clicks > 0
+        const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+        const hasClicks = todoList.some(task => (task.clicks || 0) > 0);
+        $('#purge').prop('disabled', !hasClicks);
+    } else {
+        // Standard mode: Enable if any checkbox is checked
+        const anyChecked = $('#todo_list input[type="checkbox"]:checked').length > 0;
+        $('#purge').prop('disabled', !anyChecked);
+        console.log("togglePurgeButton in standard Tab")
+    }
 }
 
 function enterTask() {
@@ -294,10 +318,63 @@ function deleteTask() {
     if (window.pushFullSync) window.pushFullSync();
 }
 
+// purge button click
 function purgeList() {
     let todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
     let purgeHistory = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
 
+    const currentTabName = localStorage.getItem(`tabName_${activeTab}`) || activeTab;
+    const now = new Date().toISOString();
+    let purgedAnything = false;
+
+if (currentTabName === 'x') {
+    // FIX: Ensure purgeList is actually an array
+        let rawPurgeData = localStorage.getItem(activeTabPurgeList);
+        let purgeList = [];
+        
+        try {
+            const parsed = JSON.parse(rawPurgeData);
+            if (Array.isArray(parsed)) {
+                purgeList = parsed;
+            }
+        } catch (e) {
+            console.error("Purge list corrupted, resetting to empty array");
+        }
+        // --- Special Purge Logic for 'x' Tab ---
+        todoList.forEach(task => {
+            if (task.clicks > 0) {
+                // Create a historical record
+                const historyEntry = {
+                    id: new Date().getTime() + Math.random(),
+                    text: `${task.text} (${task.clicks} sets)`,
+                    purgedAt: now,
+                    purgedWeek: getWeekNumber(new Date(now)),
+                    originalTask: task.text,
+                    count: task.clicks
+                };
+                
+                purgeList.unshift(historyEntry);
+                task.clicks = 0; // Reset the counter
+                purgedAnything = true;
+            }
+        });
+
+        if (purgedAnything) {
+            localStorage.setItem(activeTabList, JSON.stringify(todoList));
+            localStorage.setItem(activeTabPurgeList, JSON.stringify(purgeList));
+            
+            showToast("Progress archived & counters reset!");
+            renderTaskList();
+            renderPurgeList();
+            if (window.pushFullSync) window.pushFullSync();
+        } else {
+            showToast("Nothing to purge (all counts are 0)");
+        }
+    } else {
+
+
+    // --- YOUR ORIGINAL PURGE LOGIC HERE ---
+    // (The logic that filters for item.completed === true)
     const idsToPurge = [];
     $('#todo_list input[type="checkbox"]:checked').each(function () {
         idsToPurge.push($(this).closest('li').data('id'));
@@ -320,6 +397,10 @@ function purgeList() {
     renderTaskList();
     renderPurgeList();
     updateHealthBar();
+
+    }
+
+
 
     // Define the Undo action
     const undoPurge = () => {
@@ -355,12 +436,26 @@ function getWeekNumber(date) {
 
 function updateHealthBar() {
     const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+    const currentTabName = localStorage.getItem(`tabName_${activeTab}`) || activeTab;
+
     const count = todoList.length;
     const healthBar = document.getElementById('health_bar');
 
+    let totalItems, activeItems;
+    totalItems = todoList.length;
+    if (currentTabName === 'x') {
+        // --- Health Logic for Check-in Tab ---
+        // A task "depletes" health if it has 1 or more clicks (it's active/started)
+        
+        unfinishedTasks = todoList.filter(item => !(item.clicks || 0) > 0).length;
+    }
+    else {
+        // --- Standard Health Logic ---
+        unfinishedTasks = todoList.filter(item => !item.checked).length;
+    }
     // if (!healthBar) return;
 
-        const unfinishedTasks = todoList.filter(t => !t.checked).length;
+        // const unfinishedTasks = todoList.filter(t => !t.checked).length;
     // const completionPercentage = (totalTasks)/totalTasks;
     if (count === 0) {
         // If no tasks exist, show an "initialized" bar
@@ -378,13 +473,20 @@ function updateHealthBar() {
     healthBar.style.width = finalWidth + '%';
 
     // COLOR LOGIC: Turn red if > 5 tasks
-    if (unfinishedTasks > 4) {
+    if (unfinishedTasks > 5) {
         healthBar.style.backgroundColor = '#e74c3c'; // Danger Red
         healthBar.style.boxShadow = '0 0 8px #e74c3c'; // Optional "Glow"
-    } else {
+    } else if (unfinishedTasks > 3 && unfinishedTasks < 6 ) {
+        healthBar.style.backgroundColor = '#f1c40f';
+        healthBar.style.boxShadow = 'none';
+    }
+    else if (unfinishedTasks > 0 && unfinishedTasks < 4 ) {
         healthBar.style.backgroundColor = '#3498db'; // Healthy Blue (or your theme color)
         healthBar.style.boxShadow = 'none';
     }
+    else {
+            healthBar.style.backgroundColor = '#2ecc71';
+        }
 
     // document.querySelector('.healthbar').style.setProperty('--healthbar-size', newSize + '%');
     // document.querySelector('.healthbar').style.setProperty('--health-color', unfinishedTasks > 4 ? '#e25a5aaf' : '#6ae25aaf');
@@ -617,7 +719,7 @@ if (e.key.toLowerCase() === 'w' && e.target.tagName !== 'INPUT' && e.target.tagN
         updateTaskInStorage(index, $(this).siblings('.task-text').text(), this.checked);
         updateHealthBar();
         togglePurgeButton();
-        $(this).closest('li').toggleClass('bold', !this.checked);
+        // $(this).closest('li').toggleClass('bold', !this.checked);
     });
 
     $('#todo_list').on('click', '.delete', deleteTask);
@@ -998,29 +1100,42 @@ function renderStats() {
     const chart = document.getElementById('barChart');
     if (!chart) return;
 
-    // Fetch data
     const activeTasks = JSON.parse(localStorage.getItem(activeTabList) || '[]');
     const purgedTasks = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
     const now = new Date();
     const currentWeek = getWeekNumber(now);
+    const currentTabName = localStorage.getItem(`tabName_${activeTab}`) || activeTab;
 
-    // Calculate values
-    const created = [...activeTasks, ...purgedTasks].filter(t => 
-        getWeekNumber(new Date(t.id)) === currentWeek).length;
-    const done = purgedTasks.filter(t => 
-        getWeekNumber(new Date(t.purgedAt)) === currentWeek).length;
-    const left = activeTasks.length;
+    let created, done, left;
 
-    // Find the scale factor
+    if (currentTabName === 'x') {
+        // --- Stats for Check-in Tab ---
+        // 'Created' is the sum of current clicks + all historical clicks this week
+        const historicalClicks = purgedTasks
+            .filter(t => getWeekNumber(new Date(t.purgedAt)) === currentWeek)
+            .reduce((sum, t) => sum + (t.count || 0), 0);
+        
+        const currentClicks = activeTasks.reduce((sum, t) => sum + (t.clicks || 0), 0);
+
+        created = historicalClicks + currentClicks; 
+        done = historicalClicks;
+        left = currentClicks; // In this mode, 'Left' represents pending clicks
+    } else {
+        // --- Stats for Standard Tabs ---
+        created = [...activeTasks, ...purgedTasks].filter(t => 
+            getWeekNumber(new Date(t.id)) === currentWeek).length;
+        done = purgedTasks.filter(t => 
+            getWeekNumber(new Date(t.purgedAt)) === currentWeek).length;
+        left = activeTasks.length;
+    }
+
     const maxVal = Math.max(created, done, left, 1);
-
     const statsData = [
-        { label: 'Created', val: created, cls: 'created' },
-        { label: 'Done', val: done, cls: 'completed' },
-        { label: 'Left', val: left, cls: 'remaining' }
+        { label: 'Total', val: created, cls: 'created' },
+        { label: 'Purged', val: done, cls: 'completed' },
+        { label: 'Current', val: left, cls: 'remaining' }
     ];
 
-    // Build HTML - We start with height 0% to trigger the CSS transition
     chart.innerHTML = statsData.map(stat => `
         <div class="bar-wrapper">
             <div class="bar ${stat.cls}" id="bar-${stat.label}" style="height: 0%"></div>
@@ -1028,14 +1143,26 @@ function renderStats() {
         </div>
     `).join('');
 
-    // Trigger animation in the next frame
     requestAnimationFrame(() => {
         statsData.forEach(stat => {
-            const barElement = document.getElementById(`bar-${stat.label}`);
-            if (barElement) {
-                const height = (stat.val / maxVal) * 100;
-                barElement.style.height = Math.max(height, 2) + '%';
-            }
+            const bar = document.getElementById(`bar-${stat.label}`);
+            if (bar) bar.style.height = Math.max((stat.val / maxVal) * 100, 2) + '%';
         });
     });
+}
+
+let currentStatsInterval = 'wk';
+
+window.setStatsInterval = function(interval) {
+    currentStatsInterval = interval;
+    renderStats();
+};
+
+function isInInterval(dateStr) {
+    const d = new Date(dateStr);
+    const now = new Date();
+    if (currentStatsInterval === 'wk') return getWeekNumber(d) === getWeekNumber(now);
+    if (currentStatsInterval === 'mo') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    if (currentStatsInterval === 'yr') return d.getFullYear() === now.getFullYear();
+    return false;
 }
