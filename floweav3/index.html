@@ -454,17 +454,21 @@ https://m.co/se/sv-SE/stationer/
 </div>
 
 <!-- Purged list -->
-<nav id="historyCard" class="purge_list_container">
+<nav id="historyCard" class="purge_list_container w3-animate-bottom">
     <!-- sync controls card -->
     <div style="position:fixed; right:0;text-align:right;">
         <input type="submit" value=" " class="icon rss" title="Sync controls" onclick="showSync()">
     </div>   
     <!-- Purge history list -->
-    <div style="color: var(--text-color);">
+    <!-- <div style="color: var(--text-color);">
         <ul id="purge_list" style="list-style: none;padding-left: 5%;">
         </ul>
-    </div>
-
+    </div> -->
+<div class="tab-sync-settings">
+            <label>Tab Syncing Permissions</label>
+            <div id="tabSyncList" class="tab-sync-list">
+                </div>
+        </div>
     <!-- Import/export buttons -->
     <div class="fileops" id="syncControls" style="display: none;">
         <div id="manualSyncUI"></div>
@@ -534,7 +538,7 @@ https://m.co/se/sv-SE/stationer/
 <div id="toast" class="toast">
 
 </div>
-<div id="syncDashboard" class="sync-dashboard hidden">
+<div id="syncDashboard" class="sync-dashboard hidden w3-animate-right">
     <div class="dashboard-content">
         <div class="dashboard-header">
             <h3>Sync Dashboard</h3>
@@ -580,25 +584,51 @@ https://m.co/se/sv-SE/stationer/
         </div>
     </div>
 </div>
-<div id="leftDashboard" class="left-dashboard hidden">
+<div id="leftDashboard" class="left-dashboard hidden w3-animate-left" style="width: 90%;" >
     <div class="dashboard-content">
         <div class="dashboard-header">
-            <h3>Left dash</h3>
-            <span class="close-hint">Press 'D' to close</span>
+            <h3>History list</h3>
+            <span class="close-hint">Press 'A' to close</span>
         </div>
         <small id="lastSyncTimeDisplay"></small>
         <div class="tab-sync-settings">
-            <label>Tab Syncing Permissions</label>
-            <div id="tabSyncList" class="tab-sync-list">
-                </div>
-        </div>
-        
+            <label>Purged tasks</label>
+            <div id="tabSyncList" class="tab-sync-list" style="height: 400px;">
 
+            
+                            <!-- Purged list -->
+                    <!-- <nav id="historyCard" class="purge_list_container"> -->
+                        <!-- sync controls card -->
+                        <!-- Purge history list -->
+                        <div style="color: var(--text-color);">
+                            <ul id="purge_list" style="list-style: none;padding-left: 5%;">
+                            </ul>
+                        </div>
+
+                        <!-- <div id="root"></div> -->
+                    <!-- </nav> -->
+                        </div>
+        </div>
 
 
     </div>
 </div>
 
+<div id="statsDashboard" class="left-dashboard hidden">
+    <div class="dashboard-content">
+        <div class="dashboard-header">
+            <h3>Tab Statistics</h3>
+            <span class="close-hint">Press 'S' to close</span>
+        </div>
+        <div class="stats-container">
+            <div class="stats-group">
+                <h4 id="statsIntervalLabel">Weekly Overview</h4>
+                <div id="barChart" class="bar-chart"></div> 
+            </div>
+            <div class="stats-summary" id="statsSummary"></div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

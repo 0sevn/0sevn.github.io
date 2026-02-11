@@ -32,8 +32,54 @@ weekHeader.append('Wk '+getWeekNumber(new Date()));
     const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
     const listElement = $("#todo_list").empty();
 
+    // 2. Determine if the current activeTab is named 'x'
+    // tab_script.js defines activeTab as the ID (e.g. "work" or "173931...")
+    const currentTabName = localStorage.getItem(`tabName_${activeTab}`) || activeTab;
+    
+    if (currentTabName === 'x') {
+        // --- CHECK-IN MODE ---
+        console.log("check/in mode")
+        listElement.addClass('checkin-grid');
+        
+        // Seed defaults if empty
+        if (todoList.length === 0) {
+            // const defaults = ["Water", "Gym", "Read", "Meditation"];
+            const defaults = ["Pulldown 40/97kg", "Row 45/97", "Chest Press 45/97", "Shoulder Press 45/97", "Leg Extension 45/97", "Leg Curl 45/97", "Hip Add, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Zercher 45/97", "Leg raise/Crunches 45/97" ];
+            const seeded = defaults.map(name => ({
+                id: new Date().toISOString() + Math.random(),
+                text: name,
+                clicks: 0
+            }));
+            localStorage.setItem(activeTabList, JSON.stringify(seeded));
+            return renderTaskList(); // Re-run once with data
+        }
+
+        todoList.forEach((item) => {
+            const tile = $(`
+                <li class="checkin-tile" data-id="${item.id}">
+                    <div class="checkin-text">${item.text}</div>
+                    <div class="checkin-count">${item.clicks || 0}</div>
+                </li>
+            `);
+            // Handle Increment Click
+            tile.on('click', () => {
+                item.clicks = (item.clicks || 0) + 1;
+                localStorage.setItem(activeTabList, JSON.stringify(todoList));
+                renderTaskList(); // UI Refresh
+                if (window.pushFullSync) window.pushFullSync();
+            });
+
+            listElement.append(tile);
+        });
+
+    } else {
+        // --- STANDARD MODE ---
+        listElement.removeClass('checkin-grid');
+        
+        if (todoList.length === 0) {
+            listElement.append('<p class="empty-msg">No tasks for this week yet.</p>');
+        } else {
     // todoList.sort((a, b) => b.id.localeCompare(a.id)); // sort newest first
-// console.log("asdf");
     todoList.forEach((item) => {
         // Format id timestamp to just day and month (e.g., "31 May")
         const displayDate = new Date(item.id).toLocaleDateString('en-GB', {
@@ -65,13 +111,14 @@ weekHeader.append('Wk '+getWeekNumber(new Date()));
         `);
         listElement.append(newListItem);
         
-        // const swiper = document.getElementById("swipe");
-        // FIX 2: Attach listener to the specific container of THIS item
-        const swiper = newListItem.find(".swipe-container")[0];
-// Force the swiper to start in the middle (hiding the buttons)
-requestAnimationFrame(() => {
-    swiper.scrollLeft = 99; 
-});
+            // const swiper = document.getElementById("swipe");
+            // FIX 2: Attach listener to the specific container of THIS item
+            const swiper = newListItem.find(".swipe-container")[0];
+            // Force the swiper to start in the middle (hiding the buttons)
+            // 99px to hide gap gap on mobile
+            requestAnimationFrame(() => {
+                swiper.scrollLeft = 99; 
+        });
 
         swiper.addEventListener("scroll", function(e) {
             const li = e.target.closest('.sortable-item');
@@ -130,6 +177,8 @@ requestAnimationFrame(() => {
     });
 
     togglePurgeButton();
+}
+}
 }
 
 function renderPurgeList() {
@@ -432,13 +481,22 @@ window.addEventListener('keydown', (e) => {
     }
 });
 window.addEventListener('keydown', (e) => {
-    if (e.key.toLowerCase() === 's' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+    if (e.key.toLowerCase() === 'f' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
         const dash = document.getElementById("historyCard");
         dash.classList.toggle("hidden");
         if (!dash.classList.contains("hidden")) updateDashboardUI();
     }
 });
 
+window.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    if (e.key.toLowerCase() === 's') {
+        const statsDash = document.getElementById("statsDashboard");
+        statsDash.classList.toggle("hidden");
+        if (!statsDash.classList.contains("hidden")) renderStats();
+    }
+});
 // 2. Sync Toggle Listener
 // 1. Locate the checkbox in the Dashboard
 const syncToggle = document.getElementById('cloudSyncToggle');
@@ -934,3 +992,50 @@ window.saveNewOrder = function() {
     if (window.pushFullSync) window.pushFullSync();
     console.log("New task order saved!");
 };
+
+
+function renderStats() {
+    const chart = document.getElementById('barChart');
+    if (!chart) return;
+
+    // Fetch data
+    const activeTasks = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+    const purgedTasks = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
+    const now = new Date();
+    const currentWeek = getWeekNumber(now);
+
+    // Calculate values
+    const created = [...activeTasks, ...purgedTasks].filter(t => 
+        getWeekNumber(new Date(t.id)) === currentWeek).length;
+    const done = purgedTasks.filter(t => 
+        getWeekNumber(new Date(t.purgedAt)) === currentWeek).length;
+    const left = activeTasks.length;
+
+    // Find the scale factor
+    const maxVal = Math.max(created, done, left, 1);
+
+    const statsData = [
+        { label: 'Created', val: created, cls: 'created' },
+        { label: 'Done', val: done, cls: 'completed' },
+        { label: 'Left', val: left, cls: 'remaining' }
+    ];
+
+    // Build HTML - We start with height 0% to trigger the CSS transition
+    chart.innerHTML = statsData.map(stat => `
+        <div class="bar-wrapper">
+            <div class="bar ${stat.cls}" id="bar-${stat.label}" style="height: 0%"></div>
+            <span class="bar-label"><strong>${stat.val}</strong><br>${stat.label}</span>
+        </div>
+    `).join('');
+
+    // Trigger animation in the next frame
+    requestAnimationFrame(() => {
+        statsData.forEach(stat => {
+            const barElement = document.getElementById(`bar-${stat.label}`);
+            if (barElement) {
+                const height = (stat.val / maxVal) * 100;
+                barElement.style.height = Math.max(height, 2) + '%';
+            }
+        });
+    });
+}
