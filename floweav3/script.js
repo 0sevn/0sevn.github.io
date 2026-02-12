@@ -59,10 +59,22 @@ function renderTaskList() {
         todoList.forEach((item) => {
             // We cap the data-clicks at 3 for the CSS logic
             const colorLevel = Math.min(item.clicks || 0, 3);
+
+            // Regex to find "number/number" patterns
+            const goalMatch = item.text.match(/(\d+\/\d+)/);
+            const goalText = goalMatch ? goalMatch[0] : "";
+            // Clean the name by removing the goal pattern from the main label
+            const displayName = item.text.replace(/(\d+\/\d+)/, "").trim();
+            
             const tile = $(`
                 <li class="checkin-tile" data-id="${item.id}" data-clicks="${colorLevel}">
-                    <div class="checkin-text">${item.text}</div>
-                    <div class="checkin-count">${item.clicks || 0}</div>
+                    <div class="checkin-main">
+                        <div class="checkin-text">${displayName}</div>
+                        <div class="checkin-subline">
+                            <span class="checkin-goal">${goalText}kg</span>
+                            <span class="checkin-count">${item.clicks || 0}</span>
+                        </div>
+                    </div>
                 </li>
             `);
             // Handle Increment Click
