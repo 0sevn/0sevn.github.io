@@ -46,7 +46,7 @@ function renderTaskList() {
             // const defaults = ["Water", "Gym", "Read", "Meditation"];"Stretch flexors 45/97"
             // Choose program, begin, rehab, stretch, gain
             // const defaults = ["Back Low row/Lats Pull 89/97","Zercher 45/97", "Smith Squat 100/100", "Dead Lift 90/120", "Bench Press 50/80", "Shoulder Press 60/97", "Triceps/Biceps 45/97", "Toe raise, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Leg raise/Crunches 45/97" ];
-            const defaults = ["Lat Pull 40/97kg", "Row 45/97", "Chest Press 45/97", "Shoulder Press 45/97", "Leg Extension 45/97", "Leg Curl 45/97", "Hip Add, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Zercher 45/97", "Leg raise/Crunches 45/97" ];
+            const defaults = ["Lat Pull 40/97", "Row 45/97", "Chest Press 45/97", "Shoulder Press 45/97", "Leg Extension 45/97", "Leg Curl 45/97", "Hip Add, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Zercher 45/97", "Leg raise/Crunches 45/97" ];
             const seeded = defaults.map(name => ({
                 id: new Date().toISOString() + Math.random(),
                 text: name,
