@@ -57,8 +57,10 @@ function renderTaskList() {
         }
 
         todoList.forEach((item) => {
+            // We cap the data-clicks at 3 for the CSS logic
+            const colorLevel = Math.min(item.clicks || 0, 3);
             const tile = $(`
-                <li class="checkin-tile" data-id="${item.id}">
+                <li class="checkin-tile" data-id="${item.id}" data-clicks="${colorLevel}">
                     <div class="checkin-text">${item.text}</div>
                     <div class="checkin-count">${item.clicks || 0}</div>
                 </li>
@@ -76,7 +78,7 @@ function renderTaskList() {
                 if (wasZero) {
                     updateHealthBar();
                 }
-                
+                renderTaskList();
                 if (window.pushFullSync) window.pushFullSync();
             });
 
@@ -435,42 +437,53 @@ function getWeekNumber(date) {
 
 
 function updateHealthBar() {
+    const healthBar = document.getElementById('health_bar');
+    if (!healthBar) return;
+
     const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
     const currentTabName = localStorage.getItem(`tabName_${activeTab}`) || activeTab;
 
     const count = todoList.length;
-    const healthBar = document.getElementById('health_bar');
+    
+    let totalItems = todoList.length;
+    let activeItems;
+    let calculatedWidth;
 
-    let totalItems, activeItems;
-    totalItems = todoList.length;
     if (currentTabName === 'x') {
         // --- Health Logic for Check-in Tab ---
         // A task "depletes" health if it has 1 or more clicks (it's active/started)
-        
+        // find tasks, filter those with clicks or 0, get length of if there are more than 0
         unfinishedTasks = todoList.filter(item => !(item.clicks || 0) > 0).length;
+        const remainingRatio = (totalItems-unfinishedTasks) / totalItems;
+        console.log("x tasks",unfinishedTasks)
+        calculatedWidth = 100-Math.pow(remainingRatio, 2) * 100;
     }
     else {
         // --- Standard Health Logic ---
-        unfinishedTasks = todoList.filter(item => !item.checked).length;
-    }
-    // if (!healthBar) return;
-
-        // const unfinishedTasks = todoList.filter(t => !t.checked).length;
-    // const completionPercentage = (totalTasks)/totalTasks;
-    if (count === 0) {
-        // If no tasks exist, show an "initialized" bar
-        // document.querySelector('.healthbar').style.setProperty('--healthbar-size', '1' + '%');
-        healthBar.style.width = '3%';
-        return;
+        // get opposite of checked tasks, 
+        unfinishedTasks = todoList.filter(item => (!item.checked)).length;
+        console.log("standard tasks",unfinishedTasks)
+        // DIMINISHING RETURNS FORMULA
+        // This makes the bar grow fast at first, but slow down as it gets bigger
+        // 5 tasks ≈ 60% width, 10 tasks ≈ 80% width, 20 tasks ≈ 90% width
+        calculatedWidth = (100) * (1 - Math.exp(-unfinishedTasks / 5.5));
     }
 
-    // DIMINISHING RETURNS FORMULA
-    // This makes the bar grow fast at first, but slow down as it gets bigger
-    // 5 tasks ≈ 60% width, 10 tasks ≈ 80% width, 20 tasks ≈ 90% width
-    let calculatedWidth = 100 * (1 - Math.exp(-unfinishedTasks / 5.5));
+    // Explicitly clamp the percentage between 0 and 100
+    let healthPercent;
+    if (totalItems === 0) {
+        // empty
+        healthPercent = 3;
+    } else {
+        // percentage
+        healthPercent = Math.max(3, calculatedWidth);
+    }
 
-    const finalWidth = Math.max(3, calculatedWidth);
-    healthBar.style.width = finalWidth + '%';
+    // Apply as a percentage string
+    healthBar.style.width = `${healthPercent}%`;
+
+    // const finalWidth = Math.max(3, calculatedWidth);    
+    // healthBar.style.width = finalWidth + '%';
 
     // COLOR LOGIC: Turn red if > 5 tasks
     if (unfinishedTasks > 5) {
@@ -494,7 +507,7 @@ function updateHealthBar() {
     localStorage.setItem("LastSync", new Date().toISOString());
 
     // console.log("count" + count);
-    console.log("unfinishedTasks" + unfinishedTasks);
+    // console.log("unfinishedTasks" + unfinishedTasks);
     // // console.log("completionPercentage " + completionPercentage);
 }
 
