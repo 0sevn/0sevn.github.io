@@ -57,42 +57,91 @@ function renderTaskList() {
         }
 
         todoList.forEach((item) => {
+            let clickTimer = null; // Local timer for this specific tile
             // We cap the data-clicks at 3 for the CSS logic
             const colorLevel = Math.min(item.clicks || 0, 3);
 
             // Regex to find "number/number" patterns
-            const goalMatch = item.text.match(/(\d+\/\d+)/);
-            const goalText = goalMatch ? goalMatch[0] : "";
-            // Clean the name by removing the goal pattern from the main label
-            const displayName = item.text.replace(/(\d+\/\d+)/, "").trim();
-            
-            const tile = $(`
-                <li class="checkin-tile" data-id="${item.id}" data-clicks="${colorLevel}">
-                    <div class="checkin-main">
-                        <div class="checkin-text">${displayName}</div>
-                        <div class="checkin-subline">
-                            <span class="checkin-goal">${goalText}kg</span>
-                            <span class="checkin-count">${item.clicks || 0}</span>
+            const goalMatch = item.text.match(/(\d+)\/(\d+)/);
+    
+                // Default to 0/1 if no pattern found
+                let aa = goalMatch ? goalMatch[1] : "0";
+                let bb = goalMatch ? goalMatch[2] : "1";
+                let displayName = item.text.replace(/\d+\/\d+/, "").trim();
+
+                const tile = $(`
+                    <li class="checkin-tile" data-id="${item.id}" data-clicks="${colorLevel}">
+                        <div class="checkin-main">
+                            <div class="checkin-text">${displayName}</div>
+                            <div class="checkin-subline">
+                                <div class="goal-container">
+                                    <span class="goal-display">${aa}/${bb}</span>
+                                </div>
+                                <span class="checkin-count">${item.clicks || 0}</span>
+                            </div>
                         </div>
-                    </div>
-                </li>
-            `);
-            // Handle Increment Click
+                    </li>
+                `);
+
+            // --- Single Click to Increment --- Handle Increment Click
             tile.on('click', () => {
-                const wasZero = (item.clicks || 0) === 0;
-                item.clicks = (item.clicks || 0) + 1;
-                localStorage.setItem(activeTabList, JSON.stringify(todoList));
+                if (clickTimer) {
+                    clearTimeout(clickTimer);
+                    clickTimer = null;
+                    // This was the second click! We handle dblclick logic here for better reliability
+                    handleDblClick();
+                } else {
+                    clickTimer = setTimeout(() => {
+                        // This was a true single click
+                        item.clicks = (item.clicks || 0) + 1;
+                        localStorage.setItem(activeTabList, JSON.stringify(todoList));
+                        updateHealthBar();
+                        renderTaskList();
+                        if (window.pushFullSync) window.pushFullSync();
+                        clickTimer = null;
+                    }, 250); // 250ms is the sweet spot for human reaction
+                }
+                
+                // const wasZero = (item.clicks || 0) === 0;
+                // item.clicks = (item.clicks || 0) + 1;
+                // localStorage.setItem(activeTabList, JSON.stringify(todoList));
                 
                 // UI Updates
-                tile.find('.checkin-count').text(item.clicks);
+                // tile.find('.checkin-count').text(item.clicks);
                 
                 // If it went from 0 to 1, we update the health bar immediately
-                if (wasZero) {
-                    updateHealthBar();
-                }
-                renderTaskList();
-                if (window.pushFullSync) window.pushFullSync();
+                // if (wasZero) {
+                //     updateHealthBar();
+                // }
+                // renderTaskList();
+                
             });
+
+                /// DOUBLE CLICK FUNCTION: Show the Dual Sliders
+                function handleDblClick() {
+                    const container = tile.find('.goal-container');
+                    
+                    container.html(`
+                        <div class="dual-slider-wrap">
+                            <input type="range" class="s-aa" min="0" max="${bb}" value="${aa}">
+                            <input type="range" class="s-bb" min="1" max="100" value="${bb}">
+                        </div>
+                    `);
+
+                    // Prevent tile click from triggering while sliding
+                    container.find('input').on('click dblclick', e => e.stopPropagation());
+
+                    // Update values on change
+                    container.find('input').on('change blur', function() {
+                        const newAA = container.find('.s-aa').val();
+                        const newBB = container.find('.s-bb').val();
+                        item.text = `${displayName} ${newAA}/${newBB}`;
+                        localStorage.setItem(activeTabList, JSON.stringify(todoList));
+                        // Note: We might want to sync item.clicks with newAA here
+                        item.clicks = parseInt(newAA); 
+                        renderTaskList();
+                    });
+                }
 
             listElement.append(tile);
         });
@@ -378,6 +427,7 @@ if (currentTabName === 'x') {
             localStorage.setItem(activeTabPurgeList, JSON.stringify(purgeList));
             
             showToast("Progress archived & counters reset!");
+            updateHealthBar();
             renderTaskList();
             renderPurgeList();
             if (window.pushFullSync) window.pushFullSync();
