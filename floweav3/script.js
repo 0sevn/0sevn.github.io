@@ -57,101 +57,96 @@ function renderTaskList() {
         }
 
         todoList.forEach((item) => {
-            let clickTimer = null; // Local timer for this specific tile
-            // We cap the data-clicks at 3 for the CSS logic
-            const colorLevel = Math.min(item.clicks || 0, 3);
-
-            // Regex to find "number/number" patterns
+            const bb = 100; // Fixed Goal
             const goalMatch = item.text.match(/(\d+)\/(\d+)/);
-    
-                // Default to 0/1 if no pattern found
-                let aa = goalMatch ? goalMatch[1] : "0";
-                let bb = goalMatch ? goalMatch[2] : "1";
-                let displayName = item.text.replace(/\d+\/\d+/, "").trim();
+            let aa = goalMatch ? goalMatch[1] : "0";
+            const displayName = item.text.replace(/\d+\/\d+/, "").trim();
 
                 const tile = $(`
-                    <li class="checkin-tile" data-id="${item.id}" data-clicks="${colorLevel}">
-                        <div class="checkin-main">
-                            <div class="checkin-text">${displayName}</div>
-                            <div class="checkin-subline">
-                                <div class="goal-container">
-                                    <span class="goal-display">${aa}/${bb}</span>
-                                </div>
-                                <span class="checkin-count">${item.clicks || 0}</span>
+                    <li class="checkin-tile" data-id="${item.id}" data-clicks="${Math.min(item.clicks || 0, 3)}">
+                        <div class="checkin-text">${displayName}</div>
+                        <div class="checkin-subline">
+                            <div class="goal-container">
+                                <span class="goal-display">${aa}/${bb}</span>
                             </div>
+                            <span class="checkin-count">${item.clicks || 0}</span>
                         </div>
                     </li>
                 `);
 
-            // --- Single Click to Increment --- Handle Increment Click
-            tile.on('click', () => {
-                if (clickTimer) {
-                    clearTimeout(clickTimer);
-                    clickTimer = null;
-                    // This was the second click! We handle dblclick logic here for better reliability
-                    handleDblClick();
-                } else {
-                    clickTimer = setTimeout(() => {
-                        // This was a true single click
-                        item.clicks = (item.clicks || 0) + 1;
-                        localStorage.setItem(activeTabList, JSON.stringify(todoList));
-                        updateHealthBar();
-                        renderTaskList();
-                        if (window.pushFullSync) window.pushFullSync();
-                        clickTimer = null;
-                    }, 250); // 250ms is the sweet spot for human reaction
-                }
-                
-                // const wasZero = (item.clicks || 0) === 0;
-                // item.clicks = (item.clicks || 0) + 1;
-                // localStorage.setItem(activeTabList, JSON.stringify(todoList));
-                
-                // UI Updates
-                // tile.find('.checkin-count').text(item.clicks);
-                
-                // If it went from 0 to 1, we update the health bar immediately
-                // if (wasZero) {
-                //     updateHealthBar();
-                // }
-                // renderTaskList();
-                
-            });
+                let clickTimer = null;
+                let isEditing = false; // Flag to block single clicks while slider is active
 
-                /// DOUBLE CLICK FUNCTION: Show the Dual Sliders
-                function handleDblClick() {
-                    const container = tile.find('.goal-container');
-                    
-                    container.html(`
-                        <div class="dual-slider-wrap">
+                // We use a single 'click' handler to manage the state
+                tile.on('click', function(e) {
+                    if (isEditing) return; // Ignore single clicks while slider is visible
+
+                    if (clickTimer) {
+                        // --- SUCCESSFUL DOUBLE CLICK ---
+                        clearTimeout(clickTimer);
+                        clickTimer = null;
+                        enterEditMode();
+                    } else {
+                        // --- POTENTIAL SINGLE CLICK ---
+                        clickTimer = setTimeout(() => {
+                            // If we reach here, no second click happened
+                            item.clicks = (item.clicks || 0) + 1;
+                            
+                            // Update UI locally
+                            tile.find('.checkin-count').text(item.clicks);
+                            tile.attr('data-clicks', Math.min(item.clicks, 3));
+
+                            localStorage.setItem(activeTabList, JSON.stringify(todoList));
+                            updateHealthBar();
+                            clickTimer = null;
+                        }, 250); // 250ms is the standard gap
+                    }
+                });
+
+                function enterEditMode() {
+                    isEditing = true;
+                    const textElement = tile.find('.checkin-text');
+                    const goalDisplay = tile.find('.goal-display');
+
+                    textElement.html(`
+                        <div class="goal-slider">
                             <input type="range" class="s-aa" min="0" max="${bb}" value="${aa}">
-                            <input type="range" class="s-bb" min="1" max="100" value="${bb}">
                         </div>
                     `);
 
-                    // Prevent tile click from triggering while sliding
-                    container.find('input').on('click dblclick', e => e.stopPropagation());
+                    const slider = textElement.find('input');
+                    slider.focus();
 
-                    // Update values on change
-                    container.find('input').on('change blur', function() {
-                        const newAA = container.find('.s-aa').val();
-                        const newBB = container.find('.s-bb').val();
-                        item.text = `${displayName} ${newAA}/${newBB}`;
+                    // Prevent clicking inside the slider from doing anything to the tile
+                    slider.on('click dblclick mousedown', e => e.stopPropagation());
+
+                    slider.on('input', function() {
+                        const newVal = $(this).val();
+                        aa = newVal;
+                        goalDisplay.text(`${newVal}/${bb}`);
+                        item.text = `${displayName} ${newVal}/${bb}`;
                         localStorage.setItem(activeTabList, JSON.stringify(todoList));
-                        // Note: We might want to sync item.clicks with newAA here
-                        item.clicks = parseInt(newAA); 
-                        renderTaskList();
+                    });
+
+                    slider.on('blur', () => {
+                        // Restore UI
+                        textElement.text(displayName);
+                        
+                        // Crucial: Use a tiny timeout before re-enabling clicks 
+                        // so the "exit click" doesn't trigger an increment
+                        setTimeout(() => { isEditing = false; }, 100);
                     });
                 }
 
-            listElement.append(tile);
-        });
+                listElement.append(tile);
+            });
 
     } else {
         // --- STANDARD MODE ---
         listElement.removeClass('checkin-grid');
         
         if (todoList.length === 0) {
-            listElement.append('<p class="empty-msg">No tasks for this week yet.</p>');
+            // listElement.append('<p class="empty-msg" style="margin:20px;">No tasks for this week yet.</p>');
         } else {
                 // todoList.sort((a, b) => b.id.localeCompare(a.id)); // sort newest first
                 todoList.forEach((item) => {
