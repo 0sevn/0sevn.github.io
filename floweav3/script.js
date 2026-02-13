@@ -25,6 +25,7 @@ document.querySelectorAll(".tab").forEach(tab => {
     if (label) label.textContent = storedName;
   }
 });
+
 function renderTaskList() {
     const weekHeader = $("#week_header").empty();
     weekHeader.append('Wk '+getWeekNumber(new Date()));
@@ -98,6 +99,7 @@ function renderTaskList() {
 
                             localStorage.setItem(activeTabList, JSON.stringify(todoList));
                             updateHealthBar();
+                            checkBoardCompletion(); // Run the check live
                             clickTimer = null;
                         }, 250); // 250ms is the standard gap
                     }
@@ -140,7 +142,26 @@ function renderTaskList() {
 
                 listElement.append(tile);
             });
+            function checkBoardCompletion() {
+                const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+                const container = $("#todo_list");
 
+                // Only trigger if there are actually tasks in the list
+                if (todoList.length === 0) {
+                    container.removeClass("board-complete");
+                    return;
+                }
+
+                // Check if every single item has at least 3 clicks
+                const allFinished = todoList.every(item => (item.clicks || 0) >= 3);
+
+                if (allFinished) {
+                    container.addClass("board-complete");
+                } else {
+                    container.removeClass("board-complete");
+                }
+            }
+checkBoardCompletion(); // Run the check live
     } else {
         // --- STANDARD MODE ---
         listElement.removeClass('checkin-grid');
@@ -276,6 +297,7 @@ function renderPurgeList() {
         `);
         $(`.week-${purgedWeek}`).after(newPurgeItem);
     });
+    
 }
 
 // ----------- TASK FUNCTIONS -------------
@@ -522,7 +544,6 @@ function updateHealthBar() {
         console.log("standard tasks",unfinishedTasks)
         // DIMINISHING RETURNS FORMULA
         // This makes the bar grow fast at first, but slow down as it gets bigger
-        // 5 tasks ≈ 60% width, 10 tasks ≈ 80% width, 20 tasks ≈ 90% width
         calculatedWidth = (100) * (1 - Math.exp(-unfinishedTasks / 5.5));
     }
 

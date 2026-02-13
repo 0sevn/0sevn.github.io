@@ -365,6 +365,24 @@ width: 100%;
     /* opacity: 0.7; */
 }
 
+@keyframes board-complete-glow {
+    0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); border-color: rgba(255, 215, 0, 0.3); }
+    50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); border-color: rgba(255, 215, 0, 0.8); }
+    100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); border-color: rgba(255, 215, 0, 0.3); }
+}
+
+.board-complete {
+    animation: board-complete-glow 2s infinite ease-in-out;
+    border: 2px solid gold !important;
+    border-radius: 12px;
+    transition: all 0.5s ease;
+}
+
+/* Optional: Make the tiles sparkle slightly when complete */
+.board-complete .checkin-tile {
+    filter: brightness(1.1);
+}
+
 .tile-clicked {
     transform: scale(0.9);
     background-color: var(--accent-color) !important;
@@ -855,23 +873,25 @@ border-radius: 0px 0px 5px 5px;
   }
 
   .toast {
-  visibility: hidden;
-  min-width: 250px;
-  height:50px;
-  margin-left: -125px;
-  background-color: var(--toast-bg, #333);
-  color: var(--toast-color, #fff);
-  text-align: center;
-  border-radius: 8px;
-  padding: 16px;
-  position: fixed;
-  z-index: 999;
-  left: 50%;
-  top: 5px;
-  font-size: 14px;
-  opacity: 0;
-  transition: opacity 0.5s, bottom 0.5s;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+    position: fixed;
+    visibility: hidden;
+    min-width: 250px;
+    height:50px;
+    margin: 0 auto 0 auto;
+    background-color: var(--toast-bg, #333);
+    color: var(--toast-color, #fff);
+    text-align: center;
+    border-radius: 8px;
+    padding: 16px;
+
+    z-index: 999;
+    left: 50%;
+    transform: translateX(-50%); /* Moves it back left by 50% of its width */
+    top: 5px;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.1s, top 0.5s;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
   }
   .howto {
     display: none;
