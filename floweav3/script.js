@@ -100,6 +100,7 @@ function renderTaskList() {
                             localStorage.setItem(activeTabList, JSON.stringify(todoList));
                             updateHealthBar();
                             checkBoardCompletion(); // Run the check live
+                            togglePurgeButton()
                             clickTimer = null;
                         }, 250); // 250ms is the standard gap
                     }
@@ -152,11 +153,41 @@ function renderTaskList() {
                     return;
                 }
 
+                // 1. Check if any work has started at all
+                const anyClicks = todoList.some(item => (item.clicks || 0) > 0);
                 // Check if every single item has at least 3 clicks
                 const allFinished = todoList.every(item => (item.clicks || 0) >= 3);
 
+                // 2. Timer Logic: Start the timer on the very first click
+                let startTime = localStorage.getItem(`startTime_${activeTab}`);
+                if (anyClicks && !startTime) {
+                    startTime = new Date().getTime();
+                    localStorage.setItem(`startTime_${activeTab}`, startTime);
+                }
+
                 if (allFinished) {
+                    // If it was already finished, don't trigger the toast again
+                    if (container.hasClass("board-complete")) return;
+
                     container.addClass("board-complete");
+
+                    // 3. Calculate Elapsed Time
+                    const endTime = new Date().getTime();
+                    const durationMs = endTime - parseInt(startTime);
+                    
+                    const totalMinutes = Math.floor(durationMs / (1000 * 60));
+                    const hours = Math.floor(totalMinutes / 60);
+                    const minutes = totalMinutes % 60;
+
+                    // 4. Show the Toast
+                    let timeMsg = hours > 0 
+                        ? `${hours} hour${hours > 1 ? 's' : ''} and ${minutes} minutes`
+                        : `${minutes} minutes`;
+                        
+                    showToast(`Congratulations! Completed in ${timeMsg}!`);
+                    
+                    // Optional: Clear start time so it can reset tomorrow/next reset
+                    // localStorage.removeItem(`startTime_${activeTab}`);
                 } else {
                     container.removeClass("board-complete");
                 }
@@ -309,6 +340,7 @@ function togglePurgeButton() {
         // For 'x' tab: Enable if any tile has clicks > 0
         const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
         const hasClicks = todoList.some(task => (task.clicks || 0) > 0);
+        console.log("togglePurgeButton in x Tab", hasClicks)
         $('#purge').prop('disabled', !hasClicks);
     } else {
         // Standard mode: Enable if any checkbox is checked
@@ -620,11 +652,11 @@ function showToast(message, undoCallback = null) {
 
     toast.style.visibility = "visible";
     toast.style.opacity = "1";
-    toast.style.bottom = "50px";
+    toast.style.top = "20px";
 
     setTimeout(() => {
         toast.style.opacity = "0";
-        toast.style.bottom = "30px";
+        toast.style.bottom = "5px";
         setTimeout(() => (toast.style.visibility = "hidden"), 500);
     }, 5000); // Increased to 5s to give user time to click undo
 }
