@@ -192,7 +192,7 @@ function renderTaskList() {
                     container.removeClass("board-complete");
                 }
             }
-checkBoardCompletion(); // Run the check live
+            checkBoardCompletion(); // Run the check live
     } else {
         // --- STANDARD MODE ---
         listElement.removeClass('checkin-grid');
@@ -432,6 +432,11 @@ function deleteTask() {
 
 // purge button click
 function purgeList() {
+    // Clear the timer for the 'x' tab specifically
+    localStorage.removeItem(`startTime_${activeTab}`);
+    checkBoardCompletion();
+    console.log("Timer reset for session");
+
     let todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
     let purgeHistory = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
 
