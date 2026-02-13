@@ -143,55 +143,7 @@ function renderTaskList() {
 
                 listElement.append(tile);
             });
-            function checkBoardCompletion() {
-                const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
-                const container = $("#todo_list");
-
-                // Only trigger if there are actually tasks in the list
-                if (todoList.length === 0) {
-                    container.removeClass("board-complete");
-                    return;
-                }
-
-                // 1. Check if any work has started at all
-                const anyClicks = todoList.some(item => (item.clicks || 0) > 0);
-                // Check if every single item has at least 3 clicks
-                const allFinished = todoList.every(item => (item.clicks || 0) >= 3);
-
-                // 2. Timer Logic: Start the timer on the very first click
-                let startTime = localStorage.getItem(`startTime_${activeTab}`);
-                if (anyClicks && !startTime) {
-                    startTime = new Date().getTime();
-                    localStorage.setItem(`startTime_${activeTab}`, startTime);
-                }
-
-                if (allFinished) {
-                    // If it was already finished, don't trigger the toast again
-                    if (container.hasClass("board-complete")) return;
-
-                    container.addClass("board-complete");
-
-                    // 3. Calculate Elapsed Time
-                    const endTime = new Date().getTime();
-                    const durationMs = endTime - parseInt(startTime);
-                    
-                    const totalMinutes = Math.floor(durationMs / (1000 * 60));
-                    const hours = Math.floor(totalMinutes / 60);
-                    const minutes = totalMinutes % 60;
-
-                    // 4. Show the Toast
-                    let timeMsg = hours > 0 
-                        ? `${hours} hour${hours > 1 ? 's' : ''} and ${minutes} minutes`
-                        : `${minutes} minutes`;
-                        
-                    showToast(`Congratulations! Completed in ${timeMsg}!`);
-                    
-                    // Optional: Clear start time so it can reset tomorrow/next reset
-                    // localStorage.removeItem(`startTime_${activeTab}`);
-                } else {
-                    container.removeClass("board-complete");
-                }
-            }
+            
             checkBoardCompletion(); // Run the check live
     } else {
         // --- STANDARD MODE ---
@@ -1293,4 +1245,54 @@ function isInInterval(dateStr) {
     if (currentStatsInterval === 'mo') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
     if (currentStatsInterval === 'yr') return d.getFullYear() === now.getFullYear();
     return false;
+}
+
+function checkBoardCompletion() {
+    const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+    const container = $("#todo_list");
+
+    // Only trigger if there are actually tasks in the list
+    if (todoList.length === 0) {
+        container.removeClass("board-complete");
+        return;
+    }
+
+    // 1. Check if any work has started at all
+    const anyClicks = todoList.some(item => (item.clicks || 0) > 0);
+    // Check if every single item has at least 3 clicks
+    const allFinished = todoList.every(item => (item.clicks || 0) >= 3);
+
+    // 2. Timer Logic: Start the timer on the very first click
+    let startTime = localStorage.getItem(`startTime_${activeTab}`);
+    if (anyClicks && !startTime) {
+        startTime = new Date().getTime();
+        localStorage.setItem(`startTime_${activeTab}`, startTime);
+    }
+
+    if (allFinished) {
+        // If it was already finished, don't trigger the toast again
+        if (container.hasClass("board-complete")) return;
+
+        container.addClass("board-complete");
+
+        // 3. Calculate Elapsed Time
+        const endTime = new Date().getTime();
+        const durationMs = endTime - parseInt(startTime);
+        
+        const totalMinutes = Math.floor(durationMs / (1000 * 60));
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+
+        // 4. Show the Toast
+        let timeMsg = hours > 0 
+            ? `${hours} hour${hours > 1 ? 's' : ''} and ${minutes} minutes`
+            : `${minutes} minutes`;
+            
+        showToast(`Congratulations! Completed in ${timeMsg}!`);
+        
+        // Optional: Clear start time so it can reset tomorrow/next reset
+        // localStorage.removeItem(`startTime_${activeTab}`);
+    } else {
+        container.removeClass("board-complete");
+    }
 }
