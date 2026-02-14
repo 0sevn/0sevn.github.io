@@ -459,16 +459,26 @@ https://m.co/se/sv-SE/stationer/
     <div style="position:fixed; right:0;text-align:right;">
         <input type="submit" value=" " class="icon rss" title="Sync controls" onclick="showSync()">
     </div>   
+    <label>Purged tasks</label>
+            <div id="tabSyncList1" class="tab-sync-list" style="margin: 80px; height: 500px;">
+
+                    <!-- Purged list -->
+                    <!-- <nav id="historyCard" class="purge_list_container"> -->
+                    <!-- sync controls card -->
+                    <!-- Purge history list -->
+                    <div style="color: var(--text-color);">
+                        <ul id="purge_list" style="list-style: none;padding-left: 5%;">
+                        </ul>
+                    </div>
+
+        <!-- <div id="root"></div> -->
+        <!-- </nav> -->
+            </div>
     <!-- Purge history list -->
     <!-- <div style="color: var(--text-color);">
         <ul id="purge_list" style="list-style: none;padding-left: 5%;">
         </ul>
     </div> -->
-<div class="tab-sync-settings">
-            <label>Tab Syncing Permissions</label>
-            <div id="tabSyncList" class="tab-sync-list">
-                </div>
-        </div>
     <!-- Import/export buttons -->
     <div class="fileops" id="syncControls" style="display: none;">
         <div id="manualSyncUI"></div>
@@ -591,21 +601,7 @@ https://m.co/se/sv-SE/stationer/
         </div>
         <small id="lastSyncTimeDisplay"></small>
         <div class="tab-sync-settings">
-            <label>Purged tasks</label>
-            <div id="tabSyncList" class="tab-sync-list" style="height: 400px;">
-
-                    <!-- Purged list -->
-                    <!-- <nav id="historyCard" class="purge_list_container"> -->
-                    <!-- sync controls card -->
-                    <!-- Purge history list -->
-                    <div style="color: var(--text-color);">
-                        <ul id="purge_list" style="list-style: none;padding-left: 5%;">
-                        </ul>
-                    </div>
-
-        <!-- <div id="root"></div> -->
-        <!-- </nav> -->
-            </div>
+            
         </div>
 
 

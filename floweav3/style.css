@@ -840,8 +840,8 @@ border-radius: 0px 0px 5px 5px;
     position: absolute;
     width:250px;
     border-radius: 6px;
-    right: 5px;
-    bottom: 165px;
+    right: 35px;
+    top: 25px;
   }
 
   .time {
