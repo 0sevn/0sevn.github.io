@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Spiral Poplog</title>
+<style>
+  body {
+    margin: 0;
+    height: 600vh;
+    background: #000;
+    overflow-x: hidden;
+    font-family: system-ui, sans-serif;
+  }
+
+  .scene {
+    position: fixed;
+    inset: 0;
+    perspective: 1200px;
+    overflow: hidden;
+  }
+
+  .spiral {
+    position: absolute;
+    top: 50%;
+    left: 35%;
+    transform-style: preserve-3d;
+  }
+
+.item {
+  all: unset;
+  position: absolute;
+  width: 400px; /* Slightly smaller for better spiral density */
+  height: 220px;
+  padding: 5px;
+  margin: 20px; /* Center alignment */
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: white;
+  transition: background 0.3s, border 0.3s, transform 0.1s;
+  cursor: pointer;
+  will-change: transform, opacity;
+}
+
+.item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  z-index: 1000; /* Bring hovered item to front */
+}
+
+.item img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  pointer-events: none; /* Let clicks pass to the button */
+}
+.item:focus {
+  outline: none;
+}
+
+  .title {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .description {
+    font-size: 13px;
+    opacity: 0.7;
+    margin-bottom: 12px;
+  }
+
+  .meta {
+    font-size: 12px;
+    opacity: 0.5;
+    display: flex;
+    justify-content: space-between;
+  }
+  img {
+  width: 100%;
+  height:180px;
+  /* height: 140px; */
+  object-fit: cover;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+.popover {
+  width: 420px;
+  max-width: 90%;
+  padding: 30px;
+  border-radius: 12px;
+  border: none;
+  background: #111;
+  color: white;
+}
+
+.popover::backdrop {
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+}
+
+.close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+</style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="spiral" id="spiral"></div>
+</div>
+
+<div id="postPopover" popover class="popover">
+  <button popovertarget="postPopover" popovertargetaction="hide" class="close">
+    ×
+  </button>
+  <div id="popoverContent"></div>
+</div>
+
+<script>
+/* ---------------------------
+   DATA (Your Structure)
+---------------------------- */
+
+const posts = [
+  {
+    id: 14,
+    title: "Sentimental value",
+    description: "Slow burn, thin story with promises of great art without showing great art, laying out the emotional blocks until the very end. Last scene is a breathtaking culmination of everything unsaid, proving it never needed to be said. Entire theater was left reeling, hoping to stay connected with the feeling of resolve for just a moment longer.  ",
+    status: "active", // or "inactive"
+    category: "Roy",
+    date: "2026-02-22"
+  },
+  {
+    id: 13,
+    title: "Iloveruss",
+    description: "the life",
+    status: "active", // or "inactive"
+    category: "Capitol",
+    date: "20-02-2026"
+  },
+  {
+    id: 12,
+    title: "Rental Family",
+    description: "Endearing, about Loneliness, finiding your place and purpose, abandonment and repair, and doing it all over and over again",
+    status: "active", // or "inactive"
+    category: "Roy",
+    date: "14-02-2026"
+  },
+  {
+    id: 11,
+    title: "The secret agent",
+    description: "Prazer - storytelling at its best. Fantastic lead, visually compelling,  ",
+    status: "active", // or "inactive"
+    category: "Roy",
+    date: "10-02-2026"
+  },
+  {
+    id: 10,
+    title: "No other choice",
+    description: "Survival instinct, protecting the self",
+    status: "active", // or "inactive"
+    category: "Capitol",
+    date: "08-02-2026"
+  },
+  {
+    id: 9,
+    title: "Pillion",
+    description: "Rinding (Backseat rug), Captivating! Moments of complete immersion in the characters (ie not actors) dedication to the part. Exploring the unsustainable outsourcing of a submissive self.",
+    status: "active",
+    category: "Roy",
+    date: "07-02-2026"
+  },
+  {
+    id: 8,
+    title: "Bugonia",
+    description: "Remake of Save the Green Planet! (2003), futility and ideological insignificance. ",
+    status: "active",
+    category: "Capitol",
+    date: "04-02-2026"
+  },
+  {
+    id: 7,
+    title: "Marty supreme",
+    description: "big budged actors, small budget acting. There are no small roles, and yet.. deals and relationships seem as unnatural as the CGI pingpong balls. (paltrow in two lovers..) made it challenging to suspend disbelief. overall underwhelming",
+    status: "inactive",
+    category: "Roy",
+    date: "03-02-2026"
+  },
+  {
+    id: 6,
+    title: "The love that remains",
+    description: "Icelandic / Monster ",
+    status: "active",
+    category: "Draken",
+    date: "27-01-2026"
+  },
+  {
+    id: 5,
+    title: "The testament of Ann Lee",
+    description: "seeking, community and spiritual resolve in the quaker/shaker movement",
+    status: "active",
+    category: "Draken",
+    date: "25-01-2026"
+  },
+  {
+    id: 4,
+    title: "A private life",
+    description: "A psychiatrist in Paris faces her convictions (Vie privée, fr)",
+    status: "inactive",
+    category: "Draken",
+    date: "25-01-2026"
+  },
+  {
+    id: 3,
+    title: "The brutalist",
+    description: "Black out..",
+    status: "inactive",
+    category: "Draken",
+    date: "25-01-2026"
+  },
+  {
+    id: 2,
+    title: "Dune",
+    description: "Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+    status: "inactive",
+    category: "Draken",
+    date: "25-01-2026"
+  },
+  {
+    id: 1,
+    title: "The creator",
+    description: "Pretty dystopia",
+    status: "inactive",
+    category: "M harms / bio?",
+    date: "25-01-2026"
+  },
+  {
+    id: 15,
+    title: "Mulholland drive",
+    description: "..",
+    status: "active", // or "inactive"
+    category: "Roy",
+    date: "2026-02-23"
+  }
+];
+
+/* Optional: sort by date (newest first) */
+// posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+/* ---------------------------
+   SPIRAL CONFIG
+---------------------------- */
+
+// <script>
+/* ---------------------------
+   DATA
+---------------------------- */
+
+// const posts = [
+//   { id: 0, title: "Entry 01", description: "Short description here.", status: "active", category: "research", date: "2026-02-01" },
+//   { id: 1, title: "Entry 02", description: "Another short note.", status: "draft", category: "visual", date: "2026-02-10" },
+//   { id: 2, title: "Entry 03", description: "Experimental log item.", status: "active", category: "system", date: "2026-02-15" },
+//   { id: 3, title: "Entry 04", description: "Another entry.", status: "active", category: "visual", date: "2026-02-18" }
+// ];
+
+// posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+/* ---------------------------
+   CONFIG
+---------------------------- */
+
+const spiral = document.getElementById("spiral");
+const popoverContent = document.getElementById("popoverContent");
+
+const total = posts.length;
+const spacing = 500;      // Distance between items in Z-space
+const radius = 600;       // How wide the spiral is
+const angleStep = 0.6;    // Tightness of the spiral
+const totalDepth = total * spacing;
+
+// Set page height based on content
+// document.body.style.height = (total * 500) + "px"; 
+// total * spacing + window height (so the last item can pass through the center)
+document.body.style.height = (total * spacing + window.innerHeight) + "px";
+
+
+let items = [];
+let targetScroll = 0;
+let currentScroll = 0;
+
+// Initialize Items
+posts.forEach((post, i) => {
+  const el = document.createElement("button");
+  el.className = "item";
+  el.popoverTargetElement = document.getElementById("postPopover");
+  
+  el.innerHTML = `
+    <img src="movies/${post.title}.jpg" onerror="this.src='https://via.placeholder.com/300x180?text=No+Image'"/>
+    <div class="title"><strong>${post.title}</strong></div>
+  `;
+
+  el.addEventListener("click", () => {
+    popoverContent.innerHTML = `
+      <h2 style="margin-top:0">${post.title}</h2>
+      <img src="movies/${post.title}.jpg" style="width:100%; border-radius:8px;" onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'"/>
+      <p style="line-height:1.6; font-size:1.1rem;">${post.description}</p>
+      <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+      <div style="opacity:0.6;">
+        ${post.category} <br> 
+        ${post.date}
+      </div>
+    `;
+  });
+
+  spiral.appendChild(el);
+  items.push(el);
+});
+
+function update() {
+  // A. Calculate Position Based on Absolute Scroll
+  // Smoothing the scroll input
+  currentScroll += (targetScroll - currentScroll) * 0.07;
+
+  items.forEach((item, i) => {
+    // Determine 't' (normalized progress along the trajectory)
+    // We use the index to offset items, but currentScroll moves the entire set
+    let t = (i * spacing) - currentScroll;
+
+    // B. Map t to Coordinates (The Spiral Trajectory)
+    // Instead of using 'i' for the angle, we use 't' so the spiral is fixed in space
+    const angle = t * 0.004; // Adjust multiplier for spiral tightness
+    const radius = 200;      // Constant radius
+    
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+    const z = t;             // Depth is mapped directly to our progress value
+
+    // C. Lock Properties to the Coordinate
+    // We calculate scale and effects based on 'z' (the current position)
+    // This ensures Property Persistence: if an item is at z=500, it always has scale X.
+    
+    const depthFactor = 0.2;
+    const blurFactor = 0.5;
+
+    // Standard perspective scale: 1 / (1 + depth)
+    // We use Math.max to prevent division by zero or negative scaling
+    const scale = 1 / (1 + Math.max(0, z * depthFactor));
+    const blur = Math.max(0, z * blurFactor);
+    
+    // Calculate opacity based on distance from a "focus point" (e.g., z = 0)
+    const opacity = Math.max(0, 1 - Math.abs(z) / 1000);
+
+    // Apply transformations
+    item.style.transform = `translate3d(${x}px, ${y}px, ${-z}px) scale(${scale})`;
+    item.style.filter = `blur(${blur}px)`;
+    item.style.opacity = opacity;
+    item.style.zIndex = Math.round(10000 - z); // Ensure correct stacking
+  });
+
+  requestAnimationFrame(update);
+}
+
+window.addEventListener("scroll", () => {
+  targetScroll = window.scrollY;
+});
+
+update();
+</script>
+
+</body>
+</html>
