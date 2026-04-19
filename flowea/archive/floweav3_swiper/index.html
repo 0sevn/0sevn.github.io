@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FloWea</title>
+<link rel="stylesheet" href="w3.css">
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#454545">
+  <!-- QR Code Generator -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<!-- QR Scanner -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./serviceWorker.js')
+        .then(() => console.log('✅ Service Worker registered!'))
+        .catch(err => console.error('⚠️ Service Worker registration failed:', err));
+      }
+    </script>
+</head>
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<body>
+    <div style="position:fixed; left:0;text-align:right;margin-top: -100px;">
+        <input type="submit" value=" " class="icon help w3-animate-right" title="Help" onclick="showHelp()">
+    </div>
+    <div style="position:fixed; right:0;text-align:right;margin-top: -100px;">
+        <div class="">
+            <input type="submit" value=" " class="icon settings w3-animate-left" title="Settings" onclick="showTaskEdit()">
+            <input type="submit" value=" " class="icon darklight_mode w3-animate-left" title="Toggle light/dark mode" onclick="toggleTheme()">
+            <br>
+            
+            <input type="submit" value=" " class="icon history w3-animate-left" title="History" onclick="showHistory()">
+        </div>   
+    </div>
+<!-- Mid navigation -->
+<div class="mid-container">
+    <div class="tab-wrap">
+        <div class="tabs">
+            <div class="tabs" id="tabsContainer"></div>
+            <input type="submit" id="delete_tab" value=" " class="icon delete" onclick="deleteTab()" title="Delete tab">
+            <input type="submit" id="add_tab" value=" " class="icon add_tab" onclick="addNewTab()" title="Add tab">
+        </div>    
+        <div class="healthbar" title="FOvea, a small depression within the retina where visual acuity is the highest.">
+            &nbsp;
+        </div>
+    </div>
+    
+    <br>
+    <div>
+      <input type="text" id="enter_task" placeholder="Enter Task">
+      <input type="submit" id="add" value=" " class="icon add" title="Add task">
+      <input type="submit" id="purge" value=" " class="icon purge" title="Purge checked tasks to History" disabled>
+
+        <!-- list elements -->
+        <div id="sort_list" style="padding: 5px;">
+            <ul id="todo_list" style="list-style: none;" class="connected-sortable">
+                
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="howto" id="helpCard" onclick="closeHelp()">
+  <img src="img/help2.png" alt="" style="width: 100%;">
+</div>
+
+<!-- Purged list -->
+<nav class="w3-sidebar w3-bar-block w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:75%;font-weight:bold;display:none;right:0;background-color: var(--card-bg); margin-top: 135px;border: 1px solid #ff8c8c; border-radius: 4px;" id="historyCard">
+  <!-- sync controls card -->
+  <div style="position:fixed; right:0;text-align:right;margin-top: 20px;">
+        <input type="submit" value=" " class="icon rss" title="Sync controls" onclick="showSync()">
+    </div>   
+</div>
+    <!-- Purge history list -->
+        <div style="margin-top: 20px;  color: var(--text-color);">
+            <ul id="purge_list" style="list-style: none;padding-left: 5%;">
+            </ul>
+        </div>
+
+    <!-- Import/export buttons -->
+    <div class="fileops" id="syncControls" style="display: none;">
+        <div id="manualSyncUI"></div>
+      <div id="qr-reader" style="width: 300px;"></div>
+      <div style="border: 1px solid #ddd; border-radius: 10px;">
+        <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
+            <a id="exportHistoryLink" style="display: none;">Export</a>
+            <br>
+            <!-- <label for="FileInputLabel"><b>Import</b></label> -->
+            <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input>
+          </div>
+    </div>
+    <!-- <div id="root"></div> -->
+</nav>
+
+
+<!-- JS vanilla script -->
+<script src="script.js"></script>
+<script src="tab_script.js"></script>
+
+<div id="toast" class="toast">
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,221 @@
+@font-face {
+  font-family: 'PPWoodland';
+  src: url('/font/PPWoodland-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-display: swap;
+}
+
+
+[data-theme="dark"] {
+  --plum: #26151a;
+  --dark-plum: #1a0e11;
+
+  /* --bg-light: #47242e; */
+  --bg-light: #372727;
+  --bg-dark: #1a1311;
+  --bg: #271c1a;
+  /* --bg: #26151a; */
+  /* --bg-highlight: #5c3348; */
+  --highlight: #bd7d2a;
+  --highlight-text: var(--bg);
+
+  --bg-code: var(--bg-light);
+  --text-code: var(--pale-pink-light);
+
+  --bg-mark: var(--yellow);
+  --text-mark: var(--bg);
+
+  --bg-faint: var(--bg-light);
+
+  /* --yellow: #ebab38; */
+  --yellow: #d09c3d;
+  --pale-yellow: #f1b06b;
+  --faint-yellow: #f1b06b6e;
+
+  --orange: #dd6a32;
+  --light-orange: #e27352;
+  --pale-orange: #d8845c;
+  --faint-orange: #d8845c82;
+
+  --red: #ca2727;
+  --pale-red: #d75c5c;
+
+  --pink: #ef7373;
+  --pale-pink: #c98686;
+  /* --pale-pink-2: #925a5a; */
+  --pale-pink-light: #e4adad;
+
+  /* --text: #e9d0c1d4; */
+  --text: #c6b0a2;
+  --text-faint: #bd896f;
+  /* --text-faint: #cf9cab; */
+
+  --border: #673f39;
+  --border-warning: var(--pale-red);
+  /* --highlight: #b3597759; */
+  /* --highlight: #5b3d47; */
+  --highlight: #bd7d2a;
+
+  --accent: var(--yellow);
+  --complement: var(--pale-orange);
+
+  --link: var(--pale-yellow);
+  --link-hover: var(--pale-orange);
+  --link-decoration: var(--faint-yellow);
+  --link-decoration-thickness: 1px;
+  --link-decoration-hover: var(--faint-orange);
+
+  --h1: var(--yellow);
+  --h2: var(--pale-orange);
+  --h3: var(--pale-pink);
+  --h4: var(--pale-orange);
+
+  --ul-mark: var(--pale-red);
+  --ul-mark-2: var(--pale-orange);
+  --ol-mark: var(--pink);
+
+  --aside-ref-underline: #4a322c;
+
+  --toc-heading: var(--pale-orange);
+
+  --bg-faint: var(--bg-light);
+  --bg-footer: var(--bg-light);
+
+  --post-date: var(--pale-orange);
+  --lede: var(--pale-pink);
+}
+/* ========================================
+
+Fonts
+======================================== */
+
+:root {
+  --font-body: 'be vietnam pro', sans-serif;
+  --font-heading: 'PPWoodland', var(--font-body);
+  --font-title: 'PPWoodland', var(--font-body);
+  --font-mono: 'space mono', monospace;
+
+
+  --font-size: 24px;
+  --font-xxs: .6em;
+  --font-xs: .7em;
+  --font-sm: .8em;
+  --font-md: 20px;
+  /* --font-lg: 4.5em; */
+  --font-lg: 1.5em;
+  --font-xl: clamp(3em, 8vw, 4.5em);
+  
+  --font-size-code: .8em;
+}
+
+
+body {
+  background: var(--bg-dark);
+  
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--font-size);
+  line-height: 1.6;
+
+  box-sizing: border-box;
+
+  position: relative;
+  margin: 0;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+
+  padding-left: var(--sp-edge-hairline);
+  padding-right: var(--sp-edge-hairline);
+
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.post,
+.page {
+  width: 100%;
+  max-width: var(--container);
+  /* margin-left: var(--sp-edge-hairline);
+  margin-right: var(--sp-edge-hairline); */
+}
+
+.post__header,
+.page-header {
+  width: 100%;
+  box-sizing: border-box;
+  /* padding: 10em 2em 3em; */
+  padding: var(--vertical-sp-xxxl) var(--sp-edge) var(--vertical-sp-lg);
+
+  text-align: center;
+}
+
+.post__title,
+.page__title {
+  /* text-align: center; */
+  font-size: var(--font-xl);
+}
+.post__date {
+  grid-column: 1 / -1;
+  margin-bottom: 1em;
+
+  color: var(--post-date);
+  font-size: .75em;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.post__content {
+  background: var(--bg);
+  border-radius: 24px;
+  width: 100%;
+
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+
+
+
+/* Page Styling
+=================================== */
+
+
+.page__desc {
+  max-width: var(--measure-sm);
+  margin-left: auto;
+  margin-right: auto;
+
+  font-size: var(--font-sm);
+}
+.page__desc > p:first-of-type {
+  margin-top: .75em;
+}
+
+  .polygonous {
+    position: absolute;
+  width: 100%;
+  height: 350px;
+  background-color: #89ACA1;
+  /* generates a five pointed star */
+  clip-path: polygon(53% 0, 64% 7%, 77% 6%, 100% 22%, 100% 36%, 0 36%, 0 18%, 13% 12%, 20% 14%, 37% 3%); 
+  z-index: -1;
+    margin: 0px;
+}
+  .polygonous2 {
+    position: absolute;
+    top: 10px;
+  width: 100%;
+  height: 350px;
+  background-color: #00578E;;
+  /* generates a five pointed star */
+  clip-path: polygon(53% 0, 64% 7%, 77% 6%, 100% 22%, 100% 36%, 0 36%, 0 18%, 13% 12%, 20% 14%, 37% 3%); 
+  z-index: 2;
+  margin: 0px;
+}

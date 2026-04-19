@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FloWea</title>
+<link rel="stylesheet" href="w3.css">
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#454545">
+<!-- in your <head> <zombies> -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script> -->
+  <!-- <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script> -->
+
+  <!-- QR Code Generator -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<!-- QR Scanner -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./serviceWorker.js')
+        .then(() => console.log('✅ Service Worker registered!'))
+        .catch(err => console.error('⚠️ Service Worker registration failed:', err));
+      }
+    </script>
+</head>
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<body>
+    <div style="position:fixed; left:0;text-align:right;margin-top: -100px;">
+        <input type="submit" value=" " class="icon help w3-animate-right" title="Help" onclick="showHelp()">
+    </div>
+    <div style="position:fixed; right:0;text-align:right;margin-top: -100px;">
+        <div class="">
+            <input type="submit" value=" " class="icon darklight_mode w3-animate-left" title="Toggle light/dark mode" onclick="toggleTheme()">
+            <br><br>
+            <input type="submit" value=" " class="icon history w3-animate-left" title="History" onclick="showHistory()">
+        </div>   
+    </div>
+<!-- Mid navigation -->
+<div class="mid-container">
+    <div class="tab-wrap">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('work')">Work</div>
+            <div class="tab" onclick="switchTab('personal')">Personal</div>
+
+        </div>    
+        <div class="healthbar" title="FOvea, a small depression within the retina where visual acuity is the highest.">
+            &nbsp;
+        </div>
+    </div>
+    
+    <br>
+    <div>
+      <input type="text" id="enter_task" placeholder="Enter Task">
+      <input type="submit" id="add" value=" " class="icon add" title="Add task">
+      <input type="submit" id="purge" value=" " class="icon purge" title="Purge checked tasks" disabled>
+
+        <!-- list elements -->
+        <div id="sort_list" style="padding: 5px;">
+            <ul id="todo_list" style="list-style: none;" class="connected-sortable">
+                
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="howto" id="helpCard" onclick="closeHelp()">
+  <img src="img/help2.png" alt="" style="width: 100%;">
+</div>
+
+<!-- Purged list -->
+<nav class="w3-sidebar w3-bar-block w3-animate-right w3-top w3-text-light-grey w3-large" style="z-index:999;width:75%;font-weight:bold;display:none;right:0;background-color: var(--card-bg); margin-top: 135px;border: 1px solid #ddd;" id="historyCard">
+  <!-- sync controls card -->
+  <div style="position:fixed; right:0;text-align:right;margin-top: 20px;">
+        <input type="submit" value=" " class="icon rss" title="Sync controls" onclick="showSync()">
+    </div>   
+</div>
+    <!-- Purge history list -->
+        <div style="margin-top: 20px;  color: var(--text-color);">
+            <ul id="purge_list" style="list-style: none;padding-left: 5%;">
+            </ul>
+        </div>
+
+    <!-- Import/export buttons -->
+    <div class="fileops" id="syncControls" style="display: none;">
+        <div id="manualSyncUI"></div>
+      <div id="qr-reader" style="width: 300px;"></div>
+        <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
+            <a id="exportHistoryLink" style="display: none;">Export</a>
+            <br>
+            <!-- <label for="FileInputLabel"><b>Import</b></label> -->
+            <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input>
+    </div>
+    <!-- <div id="root"></div> -->
+</nav>
+
+<script type="module">
+// --- Firebase imports ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import {
+  getFirestore,
+  addDoc,
+  collection,
+  query,
+  where,
+  getDoc,
+  setDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+import {
+  getAuth,
+  signInAnonymously,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+// --- React imports ---
+import React, { useState, useEffect } from "https://esm.sh/react@18.2.0";
+import ReactDOM from "https://esm.sh/react-dom@18.2.0";
+
+// --- Firebase config ---
+const firebaseConfig = {
+  apiKey: "AIzaSyC5IM5dasyavKCHczWIUlqoFThxLUtTZps",
+  authDomain: "flowea-d43ef.firebaseapp.com",
+  projectId: "flowea-d43ef",
+  storageBucket: "flowea-d43ef.appspot.com",
+  messagingSenderId: "701455113224",
+  appId: "1:701455113224:web:1f89c2ae60b37a075605bd",
+  measurementId: "G-JCRVR188LP"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const handleSyncFromCustomUid = async () => {
+  if (!customUid) return alert("Please enter a User ID.");
+
+  try {
+    localStorage.setItem("customSyncUID", customUid); // ← Store custom UID
+    await downloadAndMergeTasksFromFirestore(customUid);
+    localStorage.setItem("syncConfirmed", "true");
+    alert("Data successfully loaded from Firestore.");
+  } catch (err) {
+    alert("Failed to load data from Firestore.");
+    console.error(err);
+  }
+};
+
+  const syncStatusDiv = document.createElement("div");
+  syncStatusDiv.id = "syncStatus";
+  syncStatusDiv.style.position = "fixed";
+  syncStatusDiv.style.bottom = "10px";
+  syncStatusDiv.style.right = "10px";
+  syncStatusDiv.style.padding = "8px";
+  syncStatusDiv.style.background = "#333";
+  syncStatusDiv.style.color = "#fff";
+  syncStatusDiv.style.fontSize = "12px";
+  syncStatusDiv.style.borderRadius = "4px";
+  syncStatusDiv.style.display = "none";
+  document.body.appendChild(syncStatusDiv);
+
+const showStatus = (message) => {
+  syncStatusDiv.innerText = message;
+  syncStatusDiv.style.display = "block";
+  setTimeout(() => (syncStatusDiv.style.display = "none"), 5000);
+};
+
+const activeTab = "work";
+const activeTabList = activeTab + "List";
+const activePurgeList = activeTab + "PurgeList";
+
+const autoSyncOnLoad = async (uid) => {
+console.log("start autosyncOnLoad")
+  if (!uid) return;
+    const localSync = localStorage.getItem("LastSync") || null;
+  try {
+    const userDoc = await getDoc(doc(db, "users", uid));
+    const userData = userDoc.data() || {};
+    const remoteSync = userData.lastSync || null;
+
+    const localDate = localSync ? new Date(localSync) : null;
+    const remoteDate = remoteSync ? new Date(remoteSync) : null;
+    console.log("Local date:", localDate);
+    console.log("Remote date:", remoteDate);
+
+    const formatDate = (date) => date ? date.toLocaleString("en-GB", {dateStyle: "medium", timeStyle: "short", }) : "never";
+
+    const hasConfirmed = localStorage.getItem("syncConfirmed") === "true";
+    console.log("check dates1")
+    if (remoteDate && (!localDate || remoteDate > localDate)) {
+      console.log("newr data in firestore, check confirmed")
+      if (!hasConfirmed) {
+        const confirmDownload = confirm(
+          `Newer data found in Firestore (synced ${formatDate(remoteDate)}).\n
+          Local data was last synced ${formatDate(localDate)}.\n\n
+          Load tasks and purged history from Firestore?`
+        );
+        if (confirmDownload) {
+          await downloadAndMergeTasksFromFirestore(uid);
+          localStorage.setItem("syncConfirmed", "true");
+          showStatus("Downloaded and merged from Firestore.");
+          return;
+        }
+      }
+    }
+    console.log("check dates2")
+    if (localDate && (!remoteDate || localDate > remoteDate)) {
+      
+      console.log("newr data in firestore, check confirmed")
+      if (!hasConfirmed) {
+        const confirmUpload = confirm(
+          `Your local data is newer (synced ${formatDate(localDate)}).\n
+          Firestore last sync was ${formatDate(remoteDate)}.\n\n
+          Upload local tasks and purged history to Firestore?`
+        );
+        if (confirmUpload) {
+          await uploadTasksToFirestore(uid);
+          localStorage.setItem("syncConfirmed", "true");
+          showStatus("Uploaded local data to Firestore.");
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Sync error:", error);
+  }
+};
+
+  // Function to upload tasks to Firestore
+  const uploadTasksToFirestore = async (uid) => {
+    console.log("Uploading tasks for UID:", uid);  // Debug line
+    const localWorkData = JSON.parse(localStorage.getItem(activeTabList) || "[]");
+    const localPersonalData = JSON.parse(localStorage.getItem("personalList") || "[]");
+    const localWorkPurgeData = JSON.parse(localStorage.getItem(activePurgeList) || "[]");
+    // const localSync = localStorage.getItem("LastSync") || null;
+
+    await setDoc(doc(db, "users", uid), {
+      workListData: localWorkData,
+      personalListData: localPersonalData,
+      purgeListData: localWorkPurgeData,
+      lastSync: new Date().toISOString()
+    }, { merge: true });
+
+    localStorage.setItem("LastSync", new Date().toISOString());
+  };
+
+  // Function to download and merge tasks from Firestore
+  const downloadAndMergeTasksFromFirestore = async (uid) => {
+    const userDoc = await getDoc(doc(db, "users", uid));
+    if (!userDoc.exists()) {
+      console.warn("No tasks in Firestore.");
+      return;
+    }
+
+    const data = userDoc.data();
+    localStorage.setItem("workList", JSON.stringify(data.workListData || []));
+    localStorage.setItem("personalList", JSON.stringify(data.personalListData || []));
+    localStorage.setItem("workPurgeList", JSON.stringify(data.purgeListData || []));
+    localStorage.setItem("LastSync", data.lastSync || new Date().toISOString());
+  };
+
+// --- React App Component ---
+const SyncControls = () => {
+  const [user, setUser] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [customUid, setCustomUid] = useState(localStorage.getItem("customSyncUID") || "");
+  const [lastSync, setLastSync] = useState(localStorage.getItem("LastSync"));
+  const [syncing, setSyncing] = useState(false);
+  const saveUserData = async (uid, data) => {
+  await setDoc(doc(db, "users", uid), data, { merge: true });
+  };
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      const storedUID = localStorage.getItem("customSyncUID");
+
+      if (!currentUser) {
+        await signInAnonymously(auth);
+      } else {
+        setUser(currentUser);
+        setUserData({ lastSignedIn: new Date() });
+        await saveUserData(currentUser.uid, { lastSignedIn: new Date() });
+
+        if (storedUID) {
+          await autoSyncOnLoad(storedUID);
+          setLastSync(localStorage.getItem("LastSync"));
+        }
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const handleManualSync = async () => {
+    if (!user) return;
+    setSyncing(true);
+    await autoSyncOnLoad(user.uid);
+    setLastSync(localStorage.getItem("LastSync"));
+    setSyncing(false);
+  };
+
+  const handleCustomUidSync = async () => {
+    if (!customUid) return alert("Please enter a User ID.");
+    try {
+      localStorage.setItem("customSyncUID", customUid);
+      await downloadAndMergeTasksFromFirestore(customUid);
+      localStorage.setItem("syncConfirmed", "true");
+      setLastSync(localStorage.getItem("LastSync"));
+      alert("Data successfully loaded from Firestore.");
+    } catch (err) {
+      alert("Failed to load data from Firestore.");
+      console.error(err);
+    }
+  };
+
+  return React.createElement("div", {
+    style: {
+      padding: "12px",
+      border: "1px solid #ddd",
+      borderRadius: "10px",
+      maxWidth: "400px",
+      // width: "450px",
+      margin: "20px auto",
+      fontFamily: "sans-serif"
+    }
+  }, [
+
+    
+    React.createElement("h3", { key: "title" }, "Sync Controls"),
+    React.createElement("button", {
+      key: "copyBtn",
+      onClick: () => {
+        navigator.clipboard.writeText(user?.uid || "");
+        alert("User ID copied to clipboard!");
+      },
+      className: "icon copy",
+      style: {
+
+        width: "25px",
+        height: "25px"
+      }
+    }, ""),
+    React.createElement("p", { key: "uid" }, `User ID: ${user?.uid || "Loading..."}`),
+
+    
+
+    React.createElement("div", { key: "customSync" }, [
+      React.createElement("input", {
+        type: "text",
+        placeholder: "Enter UID to sync",
+        value: customUid,
+        onChange: e => setCustomUid(e.target.value),
+        style: { marginRight: "8px", padding: "0px", width: "70%" }
+      }),
+      React.createElement("button", {
+        onClick: handleCustomUidSync,
+        className: "icon rss",
+        style: {
+          padding: "12px 0px",
+          // backgroundColor: "#28a745",
+          color: "#fff",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+          width: "35px",
+          height: "35px"
+        }
+      }, "")
+    ]),
+    
+    React.createElement("p", { key: "lastSync" }, `Last Sync: ${lastSync ? new Date(lastSync).toLocaleString() : "Never"}`),
+    React.createElement("button", {
+      key: "manualSync",
+      onClick: handleManualSync,
+      disabled: syncing,
+      className: "icon connect",
+      style: {
+        padding: "6px 0px",
+        marginBottom: "20px",
+        // backgroundColor: "#007bff",
+        color: "#fff",
+        border: "none",
+        borderRadius: "4px",
+        cursor: "pointer",
+        width: "35px",
+        height: "35px"
+      }
+    }, syncing ? "Syncing..." : "")
+  ]);
+};
+
+ReactDOM.render(React.createElement(SyncControls), document.getElementById("manualSyncUI"));
+</script>
+<script>
+  //     React.createElement("div", { key: "qrContainer" }, [
+//       React.createElement("p", { key: "qrLabel" }, "Scan to sync this user ID:"),
+//       React.createElement("canvas", { id: "qrCanvas", key: "qrCanvas" })
+//     ]),
+
+//     React.createElement("button", { key: "scanBtn", onClick: startQrScan }, "Start QR Scan")
+    console.log('other script running');
+    let activeTab = 'work'; // Default active tab personalTab
+    let activeTabList = activeTab + 'List';
+    let activeTabPurgeList = activeTab + 'PurgeList'; // Default active tab Purge list
+
+    function switchTab(tab) {
+        activeTab = tab;
+        activeTabList = activeTab + 'List';
+        activeTabPurgeList = activeTab + 'PurgeList'; // Default active tab Purge list
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+        // updateHealthBar();
+        displayData();
+        const list =  [];
+        const plistElement = document.getElementById("purge_list");
+        plistElement.innerHTML = list.map(item => `<li>${item}</li>`).join("");
+    var purgeList = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
+                // Append each item from the parsed JSON to the list
+                purgeList.forEach(item => {
+                const purgedWeek = item.purgedWeek || getWeekNumber(new Date(item.purgedAt));
+
+                // Check if the week header already exists, otherwise create it
+                if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
+                    var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:16px;">Week ${purgedWeek} - ${new Date().getFullYear()}</li>`);
+                    $('#purge_list').append(weekHeadline);
+                }
+
+                var newPurgeItem = $('<li><span style="font-size:13px; color:light-grey;">' + item.text + ' <p class="time"> ' +' '+ item.timestamp + '</p></span></li>');
+                $(`.week-${purgedWeek}`).after(newPurgeItem);
+
+                // console.log('new purge item:', newPurgeItem);
+            });
+    }
+
+ 
+    function togglePurgeButton() {
+  const anyChecked = $('#todo_list input[type="checkbox"]:checked').length > 0;
+  $('#purge').prop('disabled', !anyChecked);
+}
+    function displayData() {
+        //reset list to refresh display
+        const list =  [];
+        const listElement = document.getElementById("todo_list");
+        listElement.innerHTML = list.map(item => `<li>${item}</li>`).join("");
+        
+        // Load tasks from local storage on page load
+        var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+        // counter = todoList.length;
+        
+        i=0;
+        todoList.forEach(item => {
+            const category = item.category;
+            var newListItem = $('<li id="item-'+i+'"><span><input type="checkbox" class="task-checkbox" ' + (item.checked ? 'checked' : '') + '> <span class="task-text"> ' + item.text + ' '+'</span> <p class="time"> ' + item.timestamp + ' </p></span><input type="submit" class="icon edit" value="" title="Edit task"><input type="submit" class="icon delete" value=" " title="Delete task"></li>');
+            $('#todo_list').append(newListItem);
+            // Append the task to the correct category's list
+            // $(`#${category}-list`).append(newListItem);
+            i++;
+        });
+        togglePurgeButton();
+    }
+
+    displayData(); // Load initial data
+    
+$(function() {
+// sortable list
+    $("#sort_list").sortable({
+        axis: "y",
+        connectWith: ".connected-sortable",
+        cursor: "move",
+        opacity: 0.5,
+        update: function(event, ui) {
+            const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+
+    // Get the new order of tasks from the DOM
+    const newOrder = $('#todo_list li').map(function() {
+        return $(this).attr('id');
+    }).get();
+
+    // Update the `id` property of each task in the todoList to match the new order
+    newOrder.forEach((id, index) => {
+        todoList.find(task => task.id === id).id = index + 1;
+    });
+
+    // Update local storage with the reordered todoList
+    localStorage.setItem(activeTabList, JSON.stringify(todoList));
+        }
+    }).disableSelection(); // Prevent text selection on mobile
+
+    var counter = 0;
+
+//Create a new task
+//render to page, local storage and update healthBar
+    function enterTask() {
+        
+        // var text = $('#enter_task').val();
+        var text = $('#enter_task').val().trim();
+        const date = new Date();
+        console.log('date',date)
+        const options = { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'};
+        const formattedDate = date.toLocaleString('en-GB', options);
+        console.log('formattedDate',formattedDate)
+        // en-US
+        // var time = new Date().toLocaleString();
+        if (text !== '') {  // Ensure the input isn't empty
+            var newListItem = $(
+                '<li id="item-'+counter+'"><span><input type="checkbox" class="task-checkbox"> ' +
+                '<span class="task-text">' + text + ' '+'</span>' +
+                ' <p class="time">' +formattedDate + '</p></span>' +
+                '<input type="submit" class="icon edit" value=" " title="Edit task">' +
+                '<input type="submit" class="icon delete" value=" " title="Delete task"></li>'
+            );
+            
+            var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+            todoList.push({ text: text, timestamp: formattedDate });
+            localStorage.setItem(activeTabList, JSON.stringify(todoList));
+
+            // Update LastSync timestamp
+            localStorage.setItem("LastSync", new Date().toISOString());
+
+            $('#todo_list').append(newListItem);
+
+            counter++;
+            console.log('Counter after adding task:', counter); // Log the counter value
+
+            // Update the update HealthBar after adding a new task
+            updateHealthBar();
+
+            // Clear the input box
+            $('#enter_task').val('');
+        }
+    }
+
+    function updateTaskInStorage(index, newText, checked) {
+        var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+        todoList[index].text = newText;
+        todoList[index].checked = checked;
+        localStorage.setItem(activeTabList, JSON.stringify(todoList));
+
+        // Update LastSync timestamp
+        localStorage.setItem("LastSync", new Date().toISOString());
+    }
+
+    function deleteTask() {
+        var listItem = $(this).closest('li');
+        var index = $('#todo_list li').index(listItem);
+        listItem.remove();
+        counter--;
+        console.log('Counter after deleting task:', counter); // Log the counter value
+
+        // Remove the task from local storage
+        var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+        todoList.splice(index, 1); // Remove the task at the corresponding index
+        localStorage.setItem(activeTabList, JSON.stringify(todoList));
+        updateHealthBar();
+    }
+
+    function updateHealthBar() {
+        // Retrieve tasks from local storage
+        const tasks = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+
+        // Count unchecked tasks
+        const uncheckedTasks = tasks.filter(task => !task.checked).length;
+
+        var baseSize = 10; // Base size of the healthbar
+        var sizeIncrement = 6; // Increase size per task
+
+        // Calculate new size based on task count
+        var newSize = baseSize + (uncheckedTasks * sizeIncrement*sizeIncrement);
+
+        // Update the --healthbar-size CSS variable for the healthbar element
+        document.querySelector('.healthbar').style.setProperty('--healthbar-size', newSize + 'px');
+        if (uncheckedTasks>7) {
+            document.querySelector('.healthbar').style.setProperty('--health-color', '#e25a5aaf');
+        }
+        else {
+            document.querySelector('.healthbar').style.setProperty('--health-color', '#6ae25aaf');
+        }
+        console.log('healthBar updated. New size:', newSize + 'px');
+
+        // Update LastSync timestamp
+        localStorage.setItem("LastSync", new Date().toISOString());
+    }
+    
+    const purgeMessages = [
+  "Letting go of completed tasks feels good. 🎉",
+  "Cleared with purpose. ✨",
+  "You’re crushing it. 🚀",
+  "Nothing like a clean slate. 🌿",
+  "You made space for new ideas. 🧠",
+  "Progress feels good, doesn’t it? 😌",
+  "Done and dusted. 💨",
+  "Refreshed and recharged. 🔋",
+];
+    function purgeList() {
+        // Get the todoList from localStorage
+        var todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+        // Get the purgeList from localStorage
+        var purgeList = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
+        console.log('activetablist', activeTabList); // Log the counter value
+        console.log('activePurgelist', activeTabPurgeList); // Log the counter value
+        // Select all checked list items from #todo_list
+        $('#todo_list input[type="checkbox"]:checked').each(function() {
+            var listItem = $(this).closest('li');
+            var index = $('#todo_list li').index(listItem);
+
+            // Get task details
+            var text = listItem.find('span .task-text').text();
+            var time = listItem.find('.time').text();
+            // console.log(listItem);
+            console.log('Purge item index:', index, 'text:', text, 'time:', time);
+            const options = { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'};
+            const formattedDate = time.toLocaleString('en-GB', options);
+            // Remove the task from the DOM
+            listItem.remove();
+
+            // Remove the corresponding task from todoList
+                const removedItem = todoList.splice(index, 1)[0];
+                const purgedAt = new Date().toLocaleString(); // Record the purge time
+                const purgedWeek = getWeekNumber(new Date(purgedAt)); // Get the week number
+                removedItem.purgedAt = purgedAt;
+                removedItem.purgedWeek = purgedWeek; // Store the week number
+                console.log(purgedWeek);
+
+            // Add the removed task to purgeList
+            purgeList.push(removedItem);
+            
+            // Check if a week header already exists for current week
+            if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
+                // Add a headline for the week if it doesn't exist
+                var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:12px">Week: ${purgedWeek} - ${new Date().getFullYear()}</li>`);
+                $('#purge_list').append(weekHeadline);
+            }
+
+            // Add the purged task under the appropriate week header
+            var newPurgeItem = $('<li><span>' + text + '  '+' <p class="time"> ' +' '+ formattedDate + ' </p></span></li>');
+            $(`.week-${purgedWeek}`).after(newPurgeItem);
+        });
+
+        // Update the localStorage after modification
+        localStorage.setItem(activeTabList, JSON.stringify(todoList)); // Update todoList in local storage
+        localStorage.setItem(activeTabPurgeList, JSON.stringify(purgeList)); // Store the new purgeList in local storage
+
+        // Update counter and healthBar
+        counter = $('#todo_list li').length; // Update the counter based on remaining tasks
+        updateHealthBar();
+
+        // alert('Checked tasks moved to purge history list!');
+        const randomMessage = purgeMessages[Math.floor(Math.random() * purgeMessages.length)];
+        showToast(randomMessage);
+        }
+
+    // Function to get the week number of a given date
+    function getWeekNumber(date) {
+        
+        var firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+        var pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+        return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+
+        // //read week text
+        // var weekText = $('#enter_week').val();
+        // return weekText
+    }
+
+    $(".connected-sortable").sortable({
+        connectWith: ".connected-sortable",
+        cursor: "move",
+        opacity: 0.5,
+        // ... other options
+    });
+
+    $('#add').on('click', enterTask);
+    $('#purge').on('click', purgeList);
+
+    // Trigger add task when pressing Enter key
+    $('#enter_task').on('keypress', function(e) {
+        if (e.which === 13) {  // Enter key code
+            enterTask();
+        }
+    });
+
+    // Attach a delegated event listener to handle checkbox changes for existing and new tasks
+    $('#todo_list').on('change', '.task-checkbox', function() {
+    const index = $(this).closest('li').index();
+    const tasks = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+    tasks[index].checked = $(this).is(':checked');
+    localStorage.setItem(activeTabList, JSON.stringify(tasks));
+
+    
+
+    updateHealthBar();
+    togglePurgeButton();
+    $(this).closest('li').toggleClass('bold', !$(this).is(':checked'));
+    console.log('Checkbox changed:')
+    });
+    
+
+    // Edit functionality
+    $('#todo_list').on('click', '.edit', function() {
+        var taskText = $(this).siblings('span').find('.task-text');
+        var originalText = taskText.text();
+
+        // Make the task text editable
+        taskText.attr('contenteditable', 'true').focus();
+
+        // Disable editing when Enter is pressed or focus is lost
+        taskText.on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent new line creation
+                taskText.attr('contenteditable', 'false');
+
+        // Save the updated text to local storage // Update local storage when the task content changes
+                var index = $(this).closest('li').index();
+                updateTaskInStorage(index, $(this).text());
+        
+            }
+        });
+
+        // Also stop editing when the text field loses focus
+        taskText.on('blur', function() {
+        taskText.attr('contenteditable', 'false');
+        
+        // Save the updated text to local storage
+        var index = $(this).closest('li').index();
+        updateTaskInStorage(index, $(this).text());
+        });
+    });
+
+    // Event delegation for delete button
+    $('#todo_list').on('click', '.delete', deleteTask);
+
+    var purgeList = JSON.parse(localStorage.getItem(activeTabPurgeList) || '[]');
+
+        // Check if jsonContent is an array
+        if (Array.isArray(purgeList)) {
+            // Append each item from the parsed JSON to the list
+            purgeList.forEach(item => {
+                const purgedWeek = item.purgedWeek || getWeekNumber(new Date(item.purgedAt));
+
+                // Check if the week header already exists, otherwise create it
+                if ($(`#purge_list .week-${purgedWeek}`).length === 0) {
+                    var weekHeadline = $(`<li class="week-header week-${purgedWeek}" style="font-size:16px;">Week ${purgedWeek} - ${new Date().getFullYear()}</li>`);
+                    $('#purge_list').append(weekHeadline);
+                }
+                
+                var newPurgeItem = $('<li><span style="font-size:13px; color:light-grey;">' + item.text + ' <p class="time"> ' +' '+ item.timestamp + '</p></span></li>');
+                $(`.week-${purgedWeek}`).after(newPurgeItem);
+
+                console.log('new purge item:', newPurgeItem);
+            });
+        } else {
+            // Handle case where jsonContent is an object
+            console.warn('JSON content is not an array, handling as a single object.');
+            var newListItem = $('<li>').text('Text: ' + purgeList.text + ', Timestamp: ' + purgeList.timestamp);
+            $('#purge_list').append(newListItem);
+            console.log('new list item:', newListItem);
+        }
+    updateHealthBar();
+});
+
+//Exports the contents of local storage to a file in JSON format
+//https://stackoverflow.com/questions/61586888/javascript-export-local-storage
+function exportHistory() {  
+    console.log("started"); 
+    const purgeHistory = JSON.stringify(localStorage.getItem(activeTabPurgeList) , null, 2); //indentation in json format, human readable
+    var filetime = new Date().toLocaleString();
+
+    const blob = new Blob([purgeHistory], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+
+    console.log(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = activeTab+'_working_history_' + filetime + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    console.log("finished");    
+}
+
+//import to local storage**/
+document.getElementById('jsonFileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0]; // Get the selected file
+
+    if (file) {
+        const reader = new FileReader();
+
+        // Define what happens when the file is loaded
+        reader.onload = function(e) {
+
+            try {
+                // Parse the file content as JSON
+                const jsonContent = JSON.parse(e.target.result);
+                // Store JSON content in local storage
+                localStorage.setItem(activeTabPurgeList, jsonContent);
+
+                // Clear the current list before appending new items
+                // $('#todo_list').empty();
+                console.log('JSON data successfully stored in local storage:', jsonContent);
+                alert('JSON data has been stored in local storage.');
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+                alert('Invalid JSON file. Please try again.');
+            }
+        };
+
+        // Read the file as a text (which should be JSON)
+        reader.readAsText(file);
+    } else {
+        console.log('No file selected.');
+    }
+});
+
+
+// Toggle light/dark mode
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    // Change icon image
+    const themeToggleIcon = document.querySelector('.darklight_mode');
+    if (themeToggleIcon) {
+        themeToggleIcon.style.backgroundImage = isLight
+            ? 'url(img/dark_mode.png)'
+            : 'url(img/light_mode.png)';
+    }
+}
+
+// On page load, apply saved theme
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    const themeToggleIcon = document.querySelector('.darklight_mode'); // Declare it here
+
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        if (themeToggleIcon) {
+            themeToggleIcon.style.backgroundImage = 'url(img/dark_mode.png)';
+        }
+    } else {
+        // Optionally set light mode icon if no theme is saved or it's 'dark'
+        if (themeToggleIcon) {
+            themeToggleIcon.style.backgroundImage = 'url(img/light_mode.png)';
+        }
+    }
+});
+
+
+
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.style.visibility = "visible";
+    toast.style.opacity = "1";
+    toast.style.bottom = "50px";
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.bottom = "30px";
+        setTimeout(() => {
+            toast.style.visibility = "hidden";
+        }, 500);
+    }, 3000);
+}
+
+function closeHelp() {
+    document.getElementById("helpCard").style.display = "none";
+}
+function showHelp() {
+    document.getElementById("helpCard").style.display = "block";
+    // console.log('activetablist', activeTabList);
+    // displayData();
+}
+
+function showHistory() {
+    const visibleHist = document.getElementById("historyCard").style.display;
+    // displayData();
+    if (visibleHist === 'none') {
+      document.getElementById("historyCard").style.display = "block";
+    } else if (visibleHist === 'block') {
+      document.getElementById("historyCard").style.display = "none";
+    }
+} 
+
+function showSync() {
+    const visibleSync = document.getElementById("syncControls").style.display;
+    // displayData();
+    if (visibleSync === 'none') {
+      document.getElementById("syncControls").style.display = "block";
+    } else if (visibleSync === 'block') {
+      document.getElementById("syncControls").style.display = "none";
+    }
+} 
+</script>
+
+<div id="toast" class="toast">
+
+</div>
+
+</body>
+</html>
