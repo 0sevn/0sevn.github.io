@@ -798,8 +798,6 @@ window.handleManualSync = function() {
         alert("This is your current device ID!");
         return;
     }
-
-
             // if (window.pullFullSync) {
             //     window.pullFullSync(remoteId);
             // } else {

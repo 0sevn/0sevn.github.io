@@ -72,38 +72,24 @@ window.initializeFirebaseSync = async function() {
 let syncTimeout = null;
 
 window.pushFullSync = function() {
-    // 1. Initial Safety Checks
-    if (!window.userId || localStorage.getItem('cloudSyncEnabled') !== 'true') {
-        return;
-    }
+    if (!window.userId || localStorage.getItem('cloudSyncEnabled') !== 'true') return;
 
-    // 2. Show "Pending" state in the HUD
-    window.updateStatusHUD('Saving in 2s...', '#f39c12'); // Yellow/Orange
-
-    // 3. Clear any existing timer (Debounce)
+    window.updateStatusHUD('Saving in 2s...', '#f39c12');
     if (syncTimeout) clearTimeout(syncTimeout);
 
-    // 4. Start a new timer
     syncTimeout = setTimeout(async () => {
-        console.log("Debounce finished. Pushing to cloud...");
+        console.log("Pushing to cloud...");
         window.updateStatusHUD('Syncing...', 'orange');
 
         try {
-            // Use window.allTabs (master_tabs) instead of old tabList
+            // Get the modern tab list
             const masterTabs = JSON.parse(localStorage.getItem("master_tabs") || '[]');
-            // const tabList = JSON.parse(localStorage.getItem("tabList") || '["work", "personal"]');
-
-            // Filter the tabList to only include tabs that are NOT local-only
             const syncedTabs = masterTabs.filter(tab => localStorage.getItem(`tabLocked_${tab.id}`) !== 'true');
-            // const syncedTabList = tabList.filter(id => localStorage.getItem(`tabLocked_${id}`) !== 'true');
 
             const state = {
-                // tabList: syncedTabList,
-                master_tabs: syncedTabs, // Standardize to match your Backup logic
+                master_tabs: syncedTabs, 
                 routine_config: window.routineConfig,
-                tabCounter: localStorage.getItem("tabCounter"),
-                activeTab: window.activeTab,
-                // activeTab: localStorage.getItem("activeTab"),
+                activeTab: localStorage.getItem("activeTab"),
                 data: {}
             };
 
@@ -113,43 +99,36 @@ window.pushFullSync = function() {
                 state.data[`${id}List`] = JSON.parse(localStorage.getItem(`${id}List`) || '[]');
                 state.data[`${id}PurgeList`] = JSON.parse(localStorage.getItem(`${id}PurgeList`) || '[]');
             });
-                // Check if this specific tab is locked to local storage
-            //     const isLocalOnly = localStorage.getItem(`tabLocked_${id}`) === 'true';
-                
-            //     if (!isLocalOnly) {
-            //         state.data[`tabName_${id}`] = localStorage.getItem(`tabName_${id}`);
-            //         state.data[`${id}List`] = JSON.parse(localStorage.getItem(`${id}List`) || '[]');
-            //         state.data[`${id}PurgeList`] = JSON.parse(localStorage.getItem(`${id}PurgeList`) || '[]');
-            //     } else {
-            //         console.log(`Tab ${id} is locked. Skipping cloud upload.`);
-            //     }
-            // });
 
             await setDoc(doc(db, "users", window.userId), {
                 allData: state,
                 lastUpdated: serverTimestamp()
             }, { merge: true });
 
-            localStorage.setItem('lastLocalPushTime', Date.now() + 1000); // Small forward-buffer to prevent feedback loops
-            document.getElementById('cloudPullBtn').classList.add('hidden');
+            localStorage.setItem('lastLocalPushTime', (Date.now() + 1000).toString());
+            
+            // --- SAFE UI UPDATE ---
+            // const pullBtn = document.getElementById('cloudPullBtn');
+            // if (pullBtn) pullBtn.classList.add('hidden');
+            
             window.updateStatusHUD('Cloud Active', '#4CAF50');
             
         } catch (e) {
             console.error("Sync Error:", e);
             window.updateStatusHUD('Sync Error', 'red');
         }
-    }, 2000); // <--- Change this number to 5000 for a 5-second delay
+    }, 2000);
 };
 
 window.pullFullSync = async function(remoteUid) {
     window.updateStatusHUD('Pulling...', 'orange');
-    
+    console.log('pullsync');
     try {
         const docSnap = await getDoc(doc(db, "users", remoteUid));
 
         if (docSnap.exists()) {
             const remoteData = docSnap.data().allData;
-
+console.log(remoteData.master_tabs);
             // 1. Clear current local data (except basic settings)
             const keysToKeep = ['theme', 'cloudSyncEnabled', 'editButtonsVisible'];
             Object.keys(localStorage).forEach(key => {
@@ -206,8 +185,6 @@ let isInitialLoad = true;
 window.startCloudWatcher = function() {
     if (!window.userId) return;
     
-    // Use a local variable to track the last time THIS device successfully pushed
-    // This prevents the device from "pulling back" its own changes immediately after saving
     onSnapshot(doc(db, "users", window.userId), (docSnap) => {
         if (docSnap.exists()) {
             const remoteData = docSnap.data().allData;
@@ -216,20 +193,25 @@ window.startCloudWatcher = function() {
             const cloudTime = docSnap.data().lastUpdated?.toMillis() || 0;
             const lastLocalPush = parseInt(localStorage.getItem('lastLocalPushTime') || 0);
 
-            // LOGIC: If Cloud is newer than our last push (with a 500ms buffer for network jitter)
-            if (cloudTime > (lastLocalPush + 1000)) {
-                console.log("Cloud change detected! Auto-syncing...");
-                
-                // 1. Sync the Tab List (The "Skeleton")
+            if (cloudTime > (lastLocalPush + 500)) { // 500ms buffer
+                console.log("Cloud change detected! Rebuilding UI...");
+
+                // 1. Sync the Master Tab List (The Map)
                 if (remoteData.master_tabs) {
                     localStorage.setItem("master_tabs", JSON.stringify(remoteData.master_tabs));
-                    window.allTabs = remoteData.master_tabs; // Refresh the global variable in memory
+                    window.allTabs = remoteData.master_tabs; // Update the memory variable
                 }
                 
-                // 2. Inject Data (The "Content")
+                // 2. Sync Routine Config (The Schedule)
+                if (remoteData.routine_config) {
+                    localStorage.setItem("routine_config", JSON.stringify(remoteData.routine_config));
+                    window.routineConfig = remoteData.routine_config;
+                }
+
+                // 3. Inject Content (The Lists)
                 if (remoteData.data) {
                     Object.entries(remoteData.data).forEach(([key, value]) => {
-                        // Check if tab is locked LOCALLY on this device
+                        // Check if tab is locked locally
                         const tabIdMatch = key.match(/tabName_(.*)|(.*)List|(.*)PurgeList/);
                         const extractedId = tabIdMatch ? (tabIdMatch[1] || tabIdMatch[2] || tabIdMatch[3]) : null;
                         const isLockedLocally = localStorage.getItem(`tabLocked_${extractedId}`) === 'true';
@@ -240,20 +222,15 @@ window.startCloudWatcher = function() {
                         }
                     });
                 }
-                
-                // 3. Update active tab (optional, can be jarring if user is typing)
-                if (remoteData.activeTab) {
-                    localStorage.setItem("activeTab", remoteData.activeTab);
-                }
 
-                // 4. Update the "Known" time so we don't trigger again until a NEW cloud change happens
+                // 4. Trigger UI Refresh
                 localStorage.setItem('lastLocalPushTime', cloudTime.toString());
-
-                // 5. Tell script.js to refresh the visuals
-                if (window.refreshUIFromSync) {
-                    window.refreshUIFromSync();
-                }
                 
+                // CRITICAL: Call these to make the changes visible immediately
+                if (typeof initTabs === 'function') initTabs();
+                if (typeof renderRoutineBar === 'function') renderRoutineBar();
+                if (window.displayData) window.displayData();
+
                 window.updateStatusHUD('Cloud Updated', '#4CAF50');
             }
         }
@@ -411,6 +388,7 @@ https://m.co/se/sv-SE/stationer/
         </div>
     </div>
     <div class="mid-container">
+        <div id="sync_status" style="font-size: 10px; font-weight: bold;"></div>
 <div class="health_bar_container">
         <div id="health_bar" class="healthbar" title="FOvea, a small depression within the retina where visual acuity is the highest.">   
         </div>
