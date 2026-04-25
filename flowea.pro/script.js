@@ -19,7 +19,9 @@ window.displayData = function() {
 }
 
 // 
-
+// Ensure activeTab is never null
+window.activeTab = localStorage.getItem('activeTab') || (window.allTabs[0] ? window.allTabs[0].id : null);
+window.activeTabList = window.activeTab + "List";
 // ----------- RENDERING --------------
 document.querySelectorAll(".tab").forEach(tab => {
   const tabId = tab.getAttribute("data-tab-id");
@@ -673,6 +675,7 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('keydown', (e) => {
     if (e.key.toLowerCase() === 'a' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
         const dash = document.getElementById("leftDashboard");
+        renderDiagnostics();
         dash.classList.toggle("hidden");
         if (!dash.classList.contains("hidden")) updateDashboardUI();
     }
@@ -1368,4 +1371,70 @@ function checkBoardCompletion() {
     } else {
         container.removeClass("board-complete");
     }
+}
+
+function renderDiagnostics() {
+    const configContainer = document.getElementById('display_config');
+    const dataContainer = document.getElementById('display_data');
+    
+    if (!configContainer || !dataContainer) return;
+
+    // 1. Define the System Keys we want to track
+    const systemKeys = [
+        'routine_config', 
+        'activeTab', 
+        'lastLocalPushTime', 
+        'cloudSyncEnabled', 
+        'master_tabs', 
+        'userId' // Grabbed from memory if not in storage
+    ];
+
+    configContainer.innerHTML = '<h4>System Config</h4>';
+    systemKeys.forEach(key => {
+        const value = localStorage.getItem(key) || (window[key] ? JSON.stringify(window[key]) : 'null');
+        configContainer.appendChild(createCollapsibleItem(key, value));
+    });
+
+    // 2. Iterate through allTabs to show Tab Data
+    dataContainer.innerHTML = '<h4>Tab Data</h4>';
+    const masterTabs = JSON.parse(localStorage.getItem('master_tabs') || '[]');
+    
+    masterTabs.forEach(tab => {
+        const tabFolder = document.createElement('details');
+        tabFolder.className = 'diag-tab-folder';
+        tabFolder.innerHTML = `<summary><strong>Tab: ${tab.name || tab.id}</strong> (${tab.id})</summary>`;
+        
+        const tabContent = document.createElement('div');
+        tabContent.style.paddingLeft = "15px";
+
+        // Show Active List
+        const listKey = `${tab.id}List`;
+        tabContent.appendChild(createCollapsibleItem('Active List', localStorage.getItem(listKey)));
+
+        // Show Purge List
+        const purgeKey = `${tab.id}PurgeList`;
+        tabContent.appendChild(createCollapsibleItem('Purge History', localStorage.getItem(purgeKey)));
+
+        tabFolder.appendChild(tabContent);
+        dataContainer.appendChild(tabFolder);
+    });
+}
+
+// Helper to create the collapsible UI
+function createCollapsibleItem(key, rawValue) {
+    const details = document.createElement('details');
+    details.className = 'diag-item';
+    
+    let displayValue = rawValue;
+    // Try to prettify if it's JSON
+    try {
+        const parsed = JSON.parse(rawValue);
+        displayValue = JSON.stringify(parsed, null, 2);
+    } catch (e) { /* leave as is */ }
+
+    details.innerHTML = `
+        <summary>${key}</summary>
+        <pre style="background: #222; color: #adff2f; padding: 10px; font-size: 11px; overflow-x: auto;">${displayValue}</pre>
+    `;
+    return details;
 }

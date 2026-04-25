@@ -21,7 +21,27 @@ const ROUTINE_CONTEXTS = {
 window.routineConfig = JSON.parse(localStorage.getItem('routine_config')) || ROUTINE_CONTEXTS;
 
 // --- Global State ---
-window.allTabs = JSON.parse(localStorage.getItem('master_tabs') || '[]');
+// --- Global State ---
+// 1. Try to get existing tabs
+let storedTabs = JSON.parse(localStorage.getItem('master_tabs') || '[]');
+
+// 2. If no tabs exist (New User / Cleared Data), create the Default Tab
+if (storedTabs.length === 0) {
+    const defaultTab = {
+        id: "tab_" + Date.now(), // Unique ID
+        name: "TabName",
+        icon: "📝",
+        mode: "Work", // Default category
+        order: 0
+    };
+    storedTabs = [defaultTab];
+    localStorage.setItem('master_tabs', JSON.stringify(storedTabs));
+    localStorage.setItem(`tabName_${defaultTab.id}`, defaultTab.name);
+    // Set as active so the first task has a destination
+    localStorage.setItem('activeTab', defaultTab.id);
+}
+
+window.allTabs = storedTabs;
 window.editingTabId = null;
 window.isManualOverride = false; // Prevents auto-switching if the user manually picks a tab
 
@@ -505,6 +525,12 @@ function updateSegments() {
     });
 }
 
+function openSyncDashboard() {
+    const syncDash = $('#syncDashboard'); // Using jQuery for consistency
+    syncDash.toggleClass('hidden');
+    
+    if (!dash.classList.contains("hidden")) updateDashboardUI();
+}
 function openCommandbar() {
     const combar = $('#commandBar'); // Using jQuery for consistency
     combar.toggleClass('hidden');

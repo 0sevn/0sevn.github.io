@@ -382,7 +382,7 @@ https://m.co/se/sv-SE/stationer/
     <div class="week-header">
         <div id="week_header" class="status-text"></div>
         <span id="active_context_label" class="context-label" onclick="openCommandbar()" style="cursor: pointer;">Loading current mode</span>
-        <div class="flex space-x-2 status-hud">
+        <div id="active_sync" class="flex space-x-2 status-hud" onclick="openSyncDashboard()" style="cursor: pointer;">
             <div id="syncStatusDot" class="status-dot"></div>
             <span id="syncStatusText" class="status-text">Local Only</span>
         </div>
@@ -589,14 +589,28 @@ https://m.co/se/sv-SE/stationer/
 <div id="leftDashboard" class="left-dashboard hidden w3-animate-left" style="width: 90%;" >
     <div class="dashboard-content">
         <div class="dashboard-header">
-            <h3>History list</h3>
+            <h3>Diagnostics dashboard</h3>
             <span class="close-hint">Press 'A' to close</span>
         </div>
-        <small id="lastSyncTimeDisplay"></small>
-        <div class="tab-sync-settings">
-            
+        <div id="display_config" class="tab-sync-settings">
+            Show all current configuration keys from Local storage here, for example:
+            routine_config: parameters
+            active_tab: current 
+            last_Sync: time
+            lastLocalPushTime: time
+            cloudSyncEnabled: state
+            SyncID: Current ID
+            master_tabs: parameters
         </div>
-
+        <div id="display_data" class="tab-sync-settings">
+            Tab1 >
+                Tasklist
+            Tab2 >
+                Tasklist
+            ...
+            TabX >
+                Tasklist
+        </div>
 
     </div>
 </div>

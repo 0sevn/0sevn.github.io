@@ -1406,3 +1406,30 @@ input:checked + .slider:before { transform: translateX(20px); }
     color: white;
     white-space: nowrap;
 }
+
+.tab-sync-settings h4 {
+    border-bottom: 1px solid #555;
+    margin-top: 20px;
+    color: #54a0ff;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.diag-item summary, .diag-tab-folder summary {
+    cursor: pointer;
+    padding: 8px;
+    background: #444;
+    margin-bottom: 2px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.diag-item summary:hover {
+    background: #555;
+}
+
+pre {
+    border-left: 3px solid #54a0ff;
+    margin: 5px 0 15px 10px;
+}
+
