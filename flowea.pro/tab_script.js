@@ -529,7 +529,7 @@ function openSyncDashboard() {
     const syncDash = $('#syncDashboard'); // Using jQuery for consistency
     syncDash.toggleClass('hidden');
     
-    if (!dash.classList.contains("hidden")) updateDashboardUI();
+    if (!syncDash.hasClass('hidden')) updateDashboardUI();
 }
 function openCommandbar() {
     const combar = $('#commandBar'); // Using jQuery for consistency
