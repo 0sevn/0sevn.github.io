@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Spiral Poplog</title>
+<link rel="stylesheet" href="style.css">
 <style>
   body {
     margin: 0;
@@ -128,6 +129,58 @@
     display: none;
     z-index: 1000;
   }
+
+  body {
+    /* background-color: var(--bg-color);
+    font-family: var(--font-main);
+    color: var(--text-primary); */
+    overflow-x: hidden; /* Prevent body scroll, handle in container */
+}
+
+/* --- Timeline Container (Desktop Horizontal) --- */
+.timeline-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    overflow-x: auto; /* Horizontal Scroll */
+    overflow-y: hidden;
+    padding: 0 10vw; /* Spacing on sides */
+    gap: 80px;
+    scroll-behavior: auto;
+    /* Custom Scrollbar Styling */
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-glow) var(--bg-color);
+}
+
+/* Hide scrollbar for cleaner look (optional) */
+.timeline-container::-webkit-scrollbar {
+    height: 8px;
+}
+.timeline-container::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+.timeline-container::-webkit-scrollbar-thumb {
+    background-color: var(--accent-glow);
+    border-radius: 10px;
+}
+
+/* --- The Central Line --- */
+.timeline-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 2500px; /* Long enough to cover all items */
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--accent-glow) 20%, 
+        var(--accent-secondary) 80%, 
+        transparent 100%);
+    z-index: 0;
+    transform: translateY(-50%);
+}
 </style>
 </head>
 <body class="list-mode">
@@ -138,13 +191,29 @@
     <button onclick="switchList('misc')">Misc</button>
     <button id="toggleBtn" onclick="toggleLayout()">Switch to Spiral View</button>
 </header>
+<script>
+    const container = document.querySelector('.timeline-container');
 
+    container.addEventListener('wheel', (evt) => {
+        // Check if we are in desktop view (horizontal mode)
+        // The breakpoint 900px matches your CSS media query
+        if (window.innerWidth > 900) {
+            // Prevent the default vertical scroll
+            evt.preventDefault();
+            
+            // Scroll horizontally by the amount the user scrolled vertically
+            // 'evt.deltaY' is the vertical scroll amount
+            container.scrollLeft += evt.deltaY;
+        }
+    });
+  </script>
 <div class="scene">
     <div class="spiral" id="spiral"></div>
 </div>
+<!-- <main id="timeline_container"> -->
 
-<div id="listContainer" class="list-mode-container"></div>
-
+  <div id="listContainer" class="list-mode-container"></div>
+<!-- </main> -->
 <div id="postPopover" popover class="popover">
     <button popovertarget="postPopover" popovertargetaction="hide" style="float:right">×</button>
     <div id="popoverContent"></div>
@@ -156,9 +225,104 @@
 const dataSets = {
     movies: [
         {
+          id: 0,
+          title: "Time masters & Fantastic planet",
+          description: "Back to back, french sci fi",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-12"
+        },
+        {
+          id: 0,
+          title: "Riki-Oh",
+          description: `Some bad movies are not just good but great, and here is one of the best.
+          At the height of martial arts driven movie plots, in a future where prisons are run by private corporations, with conflicting interests, a martial artist is sentenced to serve time for the death of drug dealing criminals.
+          Filled with inexplicable moments that make you wonder where the ideas came from, gratuitous violence, 
+          but 
+          `,
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        },
+        {
+          id: 22,
+          title: "Left-handed girl",
+          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl walks the line between good and evil and finds her way straight into your heart",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        },
+        {
+          id: 21,
+          title: "Franz K",
+          description: "TBD",
+          status: "inactive", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-20"
+        },{
+          id: 20,
+          title: "Peak everything",
+          description: "TBD ",
+          status: "inactive", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-20"
+        },
+        {
+          id: 19,
+          title: "The master and margarita",
+          description: "",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-12"
+        },
+        {
+          id: 18,
+          title: "Project hail mary",
+          description: `Other similar genre films that did it better 
+          Strange choice to include forced volunteering into saving civilization, end of days never looked more pleasant`,
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-09"
+        },
+        {
+          id: 17,
+          title: "Sirat",
+          description: `
+          The path, an exciting adventure set to transfixing beats. Dad and son search for missing daughter at desert rave dad and son search for . 
+          With the knowledge that every step might be your last, it becomes clear that the journey is the <u> final </u> destination. 
+          The plot unravels into all sorts of absurdity that is life.
+          Gorgeous desert landscapes and outdoor rave soundscapes`,
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-03-22"
+        },
+        {
+          id: 16,
+          title: "Hamnet",
+          description: "William shakespear the father, anne/agnes hathaway the mother, hamlet the son all  , sisters? ",
+          status: "active", // or "inactive"
+          category: "Roy",
+          date: "2026-03-15"
+        },
+        {
+          id: 15,
+          title: "Is this thing on",
+          description: `Charming Will Arnett and Laura Dern, great chemistry. Dad finding his voice, 
+          when love wins`,
+          status: "active", // or "inactive"
+          category: "Roy",
+          date: "2026-03-07"
+        },
+        {
           id: 14,
           title: "Sentimental value",
-          description: "Slow burn, and make belief story with promises of great art without showing great art, laying out the emotional blocks until the very end. <br> Last scene is a breathtaking culmination of everything unsaid, confirming it never needed to be said. Entire theater was left reeling, end credits accompanied by quiet sobs, clinging to the feeling of resolve for just a moment longer.  ",
+          description: `Successful director and absentee father attempts to repair relationship with daughters through one last project.
+          Heavy topics handled with care and feel light hearted. 
+          While the meta story is ok, the promises of great art and the twists and turns getting there turn out to be the greatest piece of art
+          Obstacles laid out in the set up continue building until the end when the emotional moments star sneaking up on you. 
+          The very last scene is a breathtaking culmination of everything unsaid, that never needed to be said. 
+          <br> Entire theater was left reeling, end credits accompanied by quiet sobs, 
+          clinging to the feeling of resolve for just a moment longer.`,
           status: "active", // or "inactive"
           category: "Roy",
           date: "2026-02-22"
@@ -166,7 +330,7 @@ const dataSets = {
         {
           id: 13,
           title: "Iloveruss",
-          description: "the life",
+          description: "the life in LA, silver screens, performing, identity, social ineptitude",
           status: "active", // or "inactive"
           category: "Capitol",
           date: "20-02-2026"
@@ -174,7 +338,8 @@ const dataSets = {
         {
           id: 12,
           title: "Rental Family",
-          description: "Endearing, about Loneliness, finiding your place and purpose, abandonment and repair, and doing it all over and over again",
+          description: `Endearing, about Loneliness, finiding your place and purpose, abandonment and repair.
+          And doing it all over and over again against the backdrop of modern Japan`,
           status: "active", // or "inactive"
           category: "Roy",
           date: "14-02-2026"
@@ -190,7 +355,13 @@ const dataSets = {
         {
           id: 10,
           title: "No other choice",
-          description: "Survival instinct, protecting the self",
+          description: `The ends justify the means? 
+          When a man, steeped in a civil culture of honor and regard for others, is pushed to his limits trying to providing for his family and keeping an (exquisite) roof over their heads, 
+          survival instinct kicks in and the brewing emotions underneath the polite surface boil over.
+          In accepting this new equilibrium of reality, the line is blurred between being wellprepared for an interview and figuring out who the potential candidates are for the specific role and getting rid of your competition  
+          --
+          Interesting cinema, photography, and a glimpse into a future where AI is coming for all of our jobs, cost reduction driven mergers and acquisitions, dark/lights-out factories (robot run 24/7).
+          When plans fold and your success depends on your ability to adapt, its a fumbling, imperfect journey where luck, and happenstance more than certainty prevails`,
           status: "active", // or "inactive"
           category: "Capitol",
           date: "08-02-2026"
@@ -198,7 +369,13 @@ const dataSets = {
         {
           id: 9,
           title: "Pillion",
-          description: "Rinding (Backseat rug), Captivating! Moments of complete immersion in the characters (ie not actors) dedication to the part. Exploring the unsustainable outsourcing of a submissive self.",
+          description: ` 
+          Beatiful movie, captivating cinematography and sound design that conveys the liberating feeling of riding, front or Pillion (backseat rug).
+          Exploring the unsustainable outsourcing of a submissive self and relationship dynamics rarely depicted in typical romcoms.
+          Funny, sweet and innocent moments balanced by tension of ultimatums, power dynamics, few words, layered emotion and complete immersion, great cast performance.
+          In the end this complicated romance propels the two main characters on separate paths, one well known, and one ready for what's next.
+          What we come across, informs who we become.           
+          `,
           status: "active",
           category: "Roy",
           date: "07-02-2026"
@@ -206,7 +383,12 @@ const dataSets = {
         {
           id: 8,
           title: "Bugonia",
-          description: "Remake of Save the Green Planet! (2003), futility and ideological insignificance. ",
+          description: `
+          Interesting juxtaposition when corporate CEO's life is thrown into chaos as she has to try to convince conspiracy nuts she is who she says she is.
+          When those in charge are as weird and crazy as the those on the lowest level of society, futility and ideological insignificance is what's left.
+          Stark contrasts and similarities between media trained corporate speak vs conspiratorial speak, justifying a desired outcome.
+            (Remake of Save the Green Planet!, 2003), 
+          `,
           status: "active",
           category: "Capitol",
           date: "04-02-2026"
@@ -214,7 +396,9 @@ const dataSets = {
         {
           id: 7,
           title: "Marty supreme",
-          description: "big budged actors, small budget acting. There are no small roles, and yet.. deals and relationships seem as unnatural as the CGI pingpong balls. (paltrow in two lovers..) made it challenging to suspend disbelief. overall underwhelming",
+          description: `Big budget actors, small budget acting. There are no small roles, and yet.. 
+          deals and relationships seem as unnatural as the CGI pingpong balls. (paltrow in two lovers..) 
+          made it challenging to suspend disbelief. overall underwhelming`,
           status: "inactive",
           category: "Roy",
           date: "03-02-2026"
@@ -245,6 +429,13 @@ const dataSets = {
         },
         {
           id: 3,
+          title: "One battle after another",
+          description: " ",
+          status: "active", // or "inactive"
+          category: "Roy",
+          date: "2025-10-24"},
+        {
+          id: 2,
           title: "The brutalist",
           description: "Black out..",
           status: "inactive",
@@ -252,7 +443,7 @@ const dataSets = {
           date: "25-01-2026"
         },
         {
-          id: 2,
+          id: 1,
           title: "Dune",
           description: "Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
           status: "inactive",
@@ -260,26 +451,87 @@ const dataSets = {
           date: "25-01-2026"
         },
         {
-          id: 1,
+          id: 0,
           title: "The creator",
-          description: "Pretty dystopia",
+          description: "Pretty dystopia, Ai has greater heart than humans, it's evolution, ",
           status: "inactive",
           category: "M harms / bio?",
           date: "25-01-2026"
         },
         {
-          id: 15,
+          id: 0,
           title: "Mulholland drive",
           description: "Typical thought provoking and at times surreal and unsettling Lynch tropes. What is reality, are senses and perception to be trusted? Symbolic representations of the desire to know when there is nothing to learn, but the subconscious fear and guilt of the unmet promises of the ego.. When the dream and romantic expectations turn out to be a 'corrupt' reality. Non-linear storyline is momentarily jumpy and disjointed but the effect lingers and still holds up 25 years later ",
           status: "active", // or "inactive"
           category: "Roy",
           date: "2026-02-23"},
-        { id: 13, title: "Iloveruss", description: "The life.", category: "Capitol", date: "2026-02-20" },
-        { id: 15, title: "Mulholland Drive", description: "Lynchian dreamscapes and corrupt reality.", category: "Roy", date: "2026-02-23" },
-        { id: 12, title: "Rental Family", description: "Finding place and purpose.", category: "Roy", date: "2026-02-14" },
-        { id: 11, title: "The Secret Agent", description: "Prazer - storytelling at its best.", category: "Roy", date: "2026-02-10" }
+        {
+          id: 0,
+          title: "Gandahar",
+          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl finds her way into your heart",
+          status: "inactive", // or "inactive"
+          category: "Capitol",
+          date: "2026-05-17"
+        },
+        
+        {
+          id: 0,
+          title: "Miami connection",
+          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl finds her way into your heart",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        },
+        {
+          id: 0,
+          title: "Gymkata",
+          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl finds her way into your heart",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        },
+        {
+          id: 0,
+          title: "Riki-Oh",
+          description: "Some bad movies are actually entertaining,  family drama abundant and the little left handed girl finds her way into your heart",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        },
+        {
+          id: 0,
+          title: "Gymkata",
+          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl finds her way into your heart",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        },
+        {
+          id: 0,
+          title: "Riki-Oh",
+          description: "Some bad movies are just bad, this is not one of them.  entertaining,  family drama abundant and the little left handed girl finds her way into your heart",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        },
+        {
+          id: 0,
+          title: "Riki-Oh",
+          description: "Some bad movies are actually entertaining,  family drama abundant and the little left handed girl finds her way into your heart",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        }
     ],
     books: [
+              {
+    id: 17,
+    title: "The Urge",
+    author: "Austin Kleon",
+    description: "Anything and everything around the Thought provoking, meta",
+    status: "active",
+    category: "28-01-2026"
+  },
         {
     id: 16,
     title: "Steal like an artist",
@@ -289,10 +541,26 @@ const dataSets = {
     category: "28-01-2026"
   },
   {
+    id: 16,
+    title: "When everyone knows that everyone knows",
+    author: "Steven Pinker",
+    description: "Anything and everything around the Thought provoking, meta",
+    status: "active",
+    category: "28-01-2026"
+  },
+  {
+    id: 16,
+    title: "The urge",
+    author: "Carl Erik Fisher",
+    description: "History of addiction, phenomenal book on a topic that will be getting more attention if it isn't already.",
+    status: "active",
+    category: "28-01-2026"
+  },
+  {
     id: 15,
     title: "How to be well",
     author: "Amy Larocca",
-    description: "Anything and everything around the drive to be fit and well. About our vulnerability, a desire to outsource the one thing in our control, how we feel. And our simultaneous willingness to exploit the vulnerability of the realities we contend with ",
+    description: "Anything and everything around the drive to be fit and well. About our innate vulnerabilities and propensity to exploit the same., a desire to outsource the one thing in our control, how we feel. And our simultaneous willingness to exploit the vulnerability of the realities we contend with ",
     status: "active",
     category: "28-01-2026"
   },
@@ -426,6 +694,22 @@ const dataSets = {
   },
   {
     id: 0,
+    title: "Cannery road",
+    author: "G.. ",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "Cannery road",
+    author: "G.. ",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
     title: "8 ruels of love",
     author: "Walter Isaacson",
     description: "The Algorithm, First principles, ",
@@ -442,7 +726,15 @@ const dataSets = {
   },
   {
     id: 0,
-    title: "atomic habits",
+    title: "Ambient findability",
+    author: "Walter Isaacson",
+    description: "Ambient occlusion ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "You are the one you are looking for",
     author: "Walter Isaacson",
     description: "The Algorithm, First principles, ",
     status: "inactive",
@@ -450,31 +742,102 @@ const dataSets = {
   },
   {
     id: 0,
-    title: "space adventure..arnie??",
+    title: "Misbehaving",
+    author: "Richard H. Thaler",
+    description: "Econs, predictably irrational behaviors and decision making, limited information-processing capabilities, heuristics, framing, loss aversion.. exploit nudging and choice architecture ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "Hypercapitalism",
+    author: "Richard H. Thaler",
+    description: "Sociological impact of exploiting for the sake of exploits, /cant leave money on the table ",
+    status: "inactive",
+    category: "22-01-2022"
+  },
+   {
+    id: 0,
+    title: "The tipping point",
     author: "Walter Isaacson",
     description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+    {
+    id: 0,
+    title: "Mind in Motion",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },  {
+    id: 0,
+    title: "Atomic habits",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "space adventure..arnie??.. ",
+    author: "??",
+    description: "?? ",
     status: "inactive",
     category: "22-01-2024"
   },
   {
     id: 0,
     title: "ultra runner",
-    author: "Walter Isaacson",
+    author: "??",
+    description: "?? ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "Paradox of choice",
+    author: "Richard H. Thaler",
+    description: "Econs, predictably irrational behaviors and decision making, limited information-processing capabilities, heuristics, framing, loss aversion.. exploit nudging and choice architecture ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "Thinking fast and slows",
+    author: "Khaneman",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },{
+    id: 0,
+    title: "A confederacy of dunces",
+    author: "JJ",
     description: "The Algorithm, First principles, ",
     status: "inactive",
     category: "22-01-2024"
   },
   {
     id: 0,
-    title: "thinking fast and slows",
-    author: "Walter Isaacson",
+    title: "Dubliners",
+    author: "JJ",
     description: "The Algorithm, First principles, ",
     status: "inactive",
     category: "22-01-2024"
-  },{
+  },
+    {
     id: 0,
-    title: "thinking fast and slows",
-    author: "Walter Isaacson",
+    title: "Färjenäs, hyperventil, ..",
+    author: "P&P",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "Sherlock holmes",
+    author: "JJ",
     description: "The Algorithm, First principles, ",
     status: "inactive",
     category: "22-01-2024"
@@ -482,8 +845,84 @@ const dataSets = {
     ],
     misc: [
         { id: 201, title: "Art Exhibition", description: "Contemporary works in London.", category: "Art", date: "2026-02-01" }
-    ]
-};
+    ],
+    tv: [
+      {
+        
+          id: 2,
+          title: "Blecktrumman",
+          description: "makrill.. poly /aha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+      {
+          id: 2,
+          title: "Blecktrumman",
+          description: "makrill.. poly /aha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+      {
+          id: 2,
+          title: "jean luc goddard",
+          description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 2,
+          title: "Diabolik",
+          description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 2,
+          title: "Salt of the earth",
+          description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 2,
+          title: "Jesus christ superstar",
+          description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 2,
+          title: "Hair",
+          description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 2,
+          title: "Rocky Horror Picture show",
+          description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 1,
+          title: "Triangle of sadness",
+          description: "Relax your triangle of sadness,",
+          status: "inactive",
+          category: "M harms / bio?",
+          date: "25-01-2026"
+        },
+    ]  
+
+  };
 
 let currentLayout = 'list';
 let currentData = 'movies';
