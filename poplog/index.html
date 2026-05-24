@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Spiral Poplog</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    margin: 0;
+    background: #000;
+    overflow-x: hidden;
+    font-family: system-ui, sans-serif;
+    color: white;
+  }
+
+  /* Fixed background scene for Spiral Mode */
+  .scene {
+    position: fixed;
+    inset: 0;
+    perspective: 1200px;
+    overflow: hidden;
+    pointer-events: none; /* Allows scrolling through the scene */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .spiral {
+    position: relative;
+    transform-style: preserve-3d;
+    pointer-events: auto; /* Re-enable clicks for items */
+    /* top: 50%; cool effect tunnel*/
+    /* left: 50%; */
+  }
+
+  .item {
+    all: unset;
+    position: absolute;
+    width: 400px; /* Slightly smaller for better spiral density */
+    height: 180px;
+    padding: 5px;
+    margin: 20px; /* Center alignment */
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(5px);
+    /* border: 1px solid rgba(255, 255, 255, 0.1); */
+    border-radius: 12px;
+    color: white;
+    transition: background 0.3s, border 0.3s, transform 0.1s;
+    cursor: pointer;
+    will-change: transform, opacity;
+  }
+
+  .item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  .item img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 8px;
+  }
+
+  .title { font-size: 16px; font-weight: bold; }
+
+  /* List Mode Styles */
+  .list-mode-container {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 100px 20px;
+  }
+
+  .list-mode .list-mode-container { display: flex; }
+  .list-mode .scene { display: none; }
+
+  .list-item {
+    width: 100%;
+    max-width: 600px;
+    background: #111;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #333;
+  }
+
+  /* UI Elements */
+  .menu {
+    position: fixed;
+    top: 0; width: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 15px;
+    z-index: 2000;
+    text-align: center;
+    border-bottom: 1px solid #333;
+  }
+
+  button {
+    background: #222;
+    color: white;
+    border: 1px solid #444;
+    padding: 8px 16px;
+    margin: 0 5px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  button:hover { background: #444; }
+
+  .popover {
+    width: 420px;
+    max-width: 90%;
+    padding: 30px;
+    border-radius: 12px;
+    background: #111;
+    color: white;
+    border: 1px solid #333;
+  }
+
+  .popover::backdrop {
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(8px);
+  }
+
+  #scrollTopBtn {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    display: none;
+    z-index: 1000;
+  }
+
+  body {
+    /* background-color: var(--bg-color);
+    font-family: var(--font-main);
+    color: var(--text-primary); */
+    overflow-x: hidden; /* Prevent body scroll, handle in container */
+}
+
+
+</style>
+</head>
+<body class="list-mode">
+
+<header class="menu">
+    <button onclick="switchList('movies')">Movies</button>
+    <button onclick="switchList('books')">Books</button>
+    <button onclick="switchList('misc')">Misc</button>
+    <button id="toggleBtn" onclick="toggleLayout()">Switch to Spiral View</button>
+</header>
+<div class="scene">
+    <div class="spiral" id="spiral"></div>
+</div>
+<!-- <main id="timeline_container"> -->
+
+  <div id="listContainer" class="list-mode-container"></div>
+<!-- </main> -->
+<div id="postPopover" popover class="popover">
+    <button popovertarget="postPopover" popovertargetaction="hide" style="float:right">×</button>
+    <div id="popoverContent"></div>
+</div>
+
+<button id="scrollTopBtn" onclick="scrollToTop()">↑ Top</button>
+
+<script>
+const dataSets = {
+    movies: [
+        {
+          id: 0,
+          title: "Time masters",
+          description: "Back to back french Sci-Fi.  <i>Close your minds.</i> ",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-05-12/14"
+        },
+        {
+          id: 0,
+          title: "Riki-Oh",
+          description: `Some bad movies are not just good but great and here's one of the best.
+          At the height of martial arts driven movie plots, in a future where prisons are run by private corporations, with conflicting interests, a martial artist is sentenced to serve time for the death of drug dealing criminals.
+          Filled with hilariously inexplicable moments and incredibly detailed effects from completely unrealistc and gratuitous violence.  
+          `,
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-05-06"
+        },
+        {
+          id: 22,
+          title: "Left-handed girl",
+          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl walks the line between good and evil and finds her way straight into your heart",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        },
+        {
+          id: 21,
+          title: "Franz K",
+          description: "TBD",
+          status: "inactive", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-20"
+        },{
+          id: 20,
+          title: "Peak everything",
+          description: "TBD ",
+          status: "inactive", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-20"
+        },
+        {
+          id: 19,
+          title: "The master and margarita",
+          description: "",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-12"
+        },
+        {
+          id: 18,
+          title: "Project hail mary",
+          description: `Other similar genre films that did it better 
+          Strange choice to include forced volunteering into saving civilization, end of days never looked more pleasant`,
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-09"
+        },
+        {
+          id: 17,
+          title: "Sirat",
+          description: `
+          The path, an exciting adventure set to transfixing beats. Dad and son search for missing daughter at desert rave dad and son search for . 
+          With the knowledge that every step might be your last, it becomes clear that the journey is the <u> final </u> destination. 
+          The plot unravels into all sorts of absurdity that is life.
+          Gorgeous desert landscapes and outdoor rave soundscapes`,
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-03-22"
+        },
+        {
+          id: 16,
+          title: "Hamnet",
+          description: "William shakespear the father, anne/agnes hathaway the mother, hamlet the son all  , sisters? ",
+          status: "active", // or "inactive"
+          category: "Roy",
+          date: "2026-03-15"
+        },
+        {
+          id: 15,
+          title: "Is this thing on",
+          description: `Charming Will Arnett and Laura Dern, great chemistry. Dad finding his voice, 
+          when love wins`,
+          status: "active", // or "inactive"
+          category: "Roy",
+          date: "2026-03-07"
+        },
+        {
+          id: 14,
+          title: "Sentimental value",
+          description: `Successful director and absentee father attempts to repair relationship with daughters through one last project.
+          Unspoken regrets, slow drift into irrelevance - Heavy topics can be handled with care and feel light hearted. 
+          While the meta story is ok, the promises of great art and the twists and turns getting there turn out to be the greatest piece of art
+          Obstacles laid out in the set up continue building until the end when the emotional moments star sneaking up on you. 
+          The very last scene is a breathtaking culmination of everything unsaid, that never needed to be said. 
+          <br> Entire theater was left reeling, end credits accompanied by quiet sobs, 
+          clinging to the feeling of resolve for just a moment longer.`,
+          status: "active", // or "inactive"
+          category: "Roy",
+          date: "2026-02-22"
+        },
+        {
+          id: 13,
+          title: "Iloveruss",
+          description: "the LA life, silver screens, performing, identity, social ineptitude",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "20-02-2026"
+        },
+        {
+          id: 12,
+          title: "Rental Family",
+          description: `Endearing, about Loneliness, finiding your place and purpose, abandonment and repair.
+          And doing it all over and over again against the backdrop of modern Japan`,
+          status: "active", // or "inactive"
+          category: "Roy",
+          date: "14-02-2026"
+        },
+        {
+          id: 11,
+          title: "The secret agent",
+          description: "Prazer - storytelling at its best. Fantastic lead, visually compelling,  ",
+          status: "active", // or "inactive"
+          category: "Roy",
+          date: "10-02-2026"
+        },
+        {
+          id: 10,
+          title: "No other choice",
+          description: `The ends justify the means? 
+          When a man, steeped in a civil culture of honor and regard for others, is pushed to his limits trying to providing for his family and keeping an (exquisite) roof over their heads, 
+          survival instinct kicks in and the brewing emotions underneath the polite surface boil over.
+          In accepting this new equilibrium of reality, the line is blurred between being wellprepared for an interview and figuring out who the potential candidates are for the specific role and getting rid of your competition  
+          --
+          Interesting cinema, photography, and a glimpse into a future where AI is coming for all of our jobs, cost reduction driven mergers and acquisitions, dark/lights-out factories (robot run 24/7).
+          When plans fold and your success depends on your ability to adapt, its a fumbling, imperfect journey where luck, and happenstance more than certainty prevails`,
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "08-02-2026"
+        },
+        {
+          id: 9,
+          title: "Pillion",
+          description: ` 
+          Beatiful movie, captivating cinematography and sound design that conveys the liberating feeling of riding, front or Pillion (backseat rug).
+          Exploring the unsustainable outsourcing of a submissive self and relationship dynamics rarely depicted in typical romcoms.
+          Funny, sweet and innocent moments balanced by tension of ultimatums, power dynamics, few words, layered emotion and complete immersion, great cast performance.
+          In the end this complicated romance propels the two main characters on separate paths, one well known, and one ready for what's next.
+          What we come across, informs who we become.           
+          `,
+          status: "active",
+          category: "Roy",
+          date: "07-02-2026"
+        },
+        {
+          id: 8,
+          title: "Bugonia",
+          description: `
+          Hard hitting juxtaposition when corporate CEO's life is thrown into chaos as she has to try to convince conspiracy nuts she is who she says she is.
+          When those in charge are as weird and crazy as the those on the lowest level of society, futility and ideological insignificance is what's left.
+          Stark contrasts and similarities between media trained corporate speak vs conspiratorial speak, justifying a desired outcome.
+            (Remake of Save the Green Planet!, 2003), 
+          `,
+          status: "active",
+          category: "Capitol",
+          date: "04-02-2026"
+        },
+        {
+          id: 7,
+          title: "Marty supreme",
+          description: `Fast paced, high energy, snappy dialogue, stressful and irreverent.
+          Big budget actors, no small roles, and yet.. Difficult to suspend disbelief and take certain cast members seriously.
+          Deals and relationships make little sense and seem as unnatural as the CGI pingpong balls. (paltrow better in two lovers..) 
+          Overall underwhelming`,
+          status: "inactive",
+          category: "Roy",
+          date: "03-02-2026"
+        },
+        {
+          id: 6,
+          title: "The love that remains",
+          description: `Mundane everyday moments veiled in mythical and fantastical air, light and nature that is fairy tale Iceland.
+          Once husband and wife, still artistic mother and fisherman father, trying to find personal and professional balance. 
+          Juggling their individual pursuits, and responsibilities raising a family. 
+          Floating in the sea, waiting for "it" to happen.. Haunting rooster? Masculinity? 
+          (If this is all there is, then let's start dancing).  `,
+          status: "active",
+          category: "Draken",
+          date: "27-01-2026"
+        },
+        {
+          id: 5,
+          title: "The testament of Ann Lee",
+          description: "seeking, community and spiritual awakening in the quaker/shaker movement",
+          status: "active",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 4,
+          title: "A private life",
+          description: "A psychiatrist in Paris faces her convictions (Vie privée, fr)",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 3,
+          title: "One battle after another",
+          description: " ",
+          status: "active", // or "inactive"
+          category: "Roy",
+          date: "2025-10-24"},
+        {
+          id: 2,
+          title: "The brutalist",
+          description: "Black out..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 1,
+          title: "Dune",
+          description: "Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 0,
+          title: "The creator",
+          description: "Pretty dystopia, Ai has greater heart than humans, it's evolution, ",
+          status: "inactive",
+          category: "M harms / bio?",
+          date: "25-01-2026"
+        },
+        {
+          id: 0,
+          title: "Mulholland drive",
+          description: "Typical thought provoking and at times surreal and unsettling Lynch tropes. What is reality, are senses and perception to be trusted? Symbolic representations of the desire to know when there is nothing to learn, but the subconscious fear and guilt of the unmet promises of the ego.. When the dream and romantic expectations turn out to be a 'corrupt' reality. Non-linear storyline is momentarily jumpy and disjointed but the effect lingers and still holds up 25 years later ",
+          status: "active", // or "inactive"
+          category: "Roy",
+          date: "2026-02-23"},
+        {
+          id: 0,
+          title: "Gandahar",
+          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl finds her way into your heart",
+          status: "inactive", // or "inactive"
+          category: "Capitol",
+          date: "2026-05-17"
+        },
+        
+        {
+          id: 0,
+          title: "Miami connection",
+          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl finds her way into your heart",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        },
+        {
+          id: 0,
+          title: "Gymkata",
+          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl finds her way into your heart",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        },
+        {
+          id: 0,
+          title: "Riki-Oh",
+          description: "Some bad movies are actually entertaining,  family drama abundant and the little left handed girl finds her way into your heart",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        },
+        {
+          id: 0,
+          title: "Gymkata",
+          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl finds her way into your heart",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        },
+        {
+          id: 0,
+          title: "Riki-Oh",
+          description: "Some bad movies are just bad, this is not one of them.  entertaining,  family drama abundant and the little left handed girl finds her way into your heart",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        },
+        {
+          id: 0,
+          title: "Riki-Oh",
+          description: "Some bad movies are actually entertaining,  family drama abundant and the little left handed girl finds her way into your heart",
+          status: "active", // or "inactive"
+          category: "Capitol",
+          date: "2026-04-28"
+        }
+    ],
+    books: [
+              {
+    id: 17,
+    title: "The Urge",
+    author: "Austin Kleon",
+    description: "Anything and everything around the Thought provoking, meta",
+    status: "active",
+    category: "28-01-2026"
+  },
+        {
+    id: 16,
+    title: "Steal like an artist",
+    author: "Austin Kleon",
+    description: "Anything and everything around the Thought provoking, meta",
+    status: "active",
+    category: "28-01-2026"
+  },
+  {
+    id: 16,
+    title: "When everyone knows that everyone knows",
+    author: "Steven Pinker",
+    description: "Anything and everything around the Thought provoking, meta",
+    status: "active",
+    category: "28-01-2026"
+  },
+  {
+    id: 16,
+    title: "The urge",
+    author: "Carl Erik Fisher",
+    description: "History of addiction, phenomenal book on a topic that will be getting more attention if it isn't already.",
+    status: "active",
+    category: "28-01-2026"
+  },
+  {
+    id: 15,
+    title: "How to be well",
+    author: "Amy Larocca",
+    description: "Anything and everything around the drive to be fit and well. About our innate vulnerabilities and propensity to exploit the same., a desire to outsource the one thing in our control, how we feel. And our simultaneous willingness to exploit the vulnerability of the realities we contend with ",
+    status: "active",
+    category: "28-01-2026"
+  },
+  {
+    id: 15,
+    title: "I know why the caged bird sings",
+    author: "Maya Angelou",
+    description: "Thought provoking, meta",
+    status: "active",
+    category: "16-01-2026"
+  },
+  {
+    id: 14,
+    title: "Stranger in a strange land",
+    author: "Robert A. Heinlein",
+    description: "Thought provoking, meta",
+    status: "active",
+    category: "16-01-2026"
+  },
+  {
+    id: 13,
+    title: "The worlds I see",
+    author: "Fei-Fei Li",
+    description: "Thought provoking, meta",
+    status: "active",
+    category: "14-12-2025"
+  },
+  {
+    id: 12,
+    title: "The body keeps the score",
+    author: "Bessel van der Kolk, M.D.",
+    description: "Thought provoking, meta",
+    status: "active",
+    category: "27-09-2025"
+  },
+  {
+    id: 11,
+    title: "Meditations for mortals",
+    author: "Oliver Burkeman",
+    description: "Thought provoking, at the edge of consciousness",
+    status: "active",
+    category: "27-09-2025"
+  },
+  {
+    id: 11,
+    title: "Twelve angry men",
+    author: "Reginald Rose",
+    description: "Thought provoking, at the edge of consciousness",
+    status: "active",
+    category: "24-09-2025"
+  },
+  {
+    id: 10,
+    title: "The denial of death",
+    author: "Ernest Becker",
+    description: "Thought provoking, at the edge of consciousness, meta ideas",
+    status: "active",
+    category: "05-09-2025"
+  },
+  {
+    id: 9,
+    title: "Revenge of the tipping point",
+    author: "Malcolm Gladwell",
+    description: "Following up on",
+    status: "active",
+    category: "31-08-2025"
+  },
+  {
+    id: 8,
+    title: "Little brother",
+    author: "Cory Doctorow",
+    description: "Well researched, industry, corporate interest technology push, no pull",
+    status: "active",
+    category: "27-08-2025"
+  },
+  {
+    id: 7,
+    title: "Death of a Salesman",
+    author: "Arthur Miller",
+    description: "Brief time, avoiding the inescapable truth",
+    status: "active",
+    category: "05-04-2025"
+  },
+  {
+    id: 6,
+    title: "Mood Machine",
+    author: "Liz Pelly",
+    description: "Well researched, historical record of industry interests, and the basic human needs for stimulation driving them",
+    status: "active",
+    category: "02-04-2025"
+  },
+  {
+    id: 5,
+    title: "To the temple of tranquility.. and step on it!",
+    author: "Ed Begley Jr.",
+    description: "US/California life",
+    status: "active",
+    category: "21-03-2025"
+  },
+  {
+    id: 4,
+    title: "McTeague",
+    author: "Frank Norris",
+    description: "Seminal works, life in and around SF, ",
+    status: "inactive",
+    category: "14-03-2025"
+  },
+  {
+    id: 3,
+    title: "Range",
+    author: "David Epstein",
+    description: "Promising title, ultimately disappointing cliche, striving for atomic habits",
+    status: "inactive",
+    category: "17-02-2025"
+  },
+  {
+    id: 2,
+    title: "The subtle art of not giving a f**k",
+    author: "Mark Manson",
+    description: "Bro privilege, chose your pain, system (truth vs manipulation)",
+    status: "inactive",
+    category: "06-02-2025"
+  },
+  {
+    id: 1,
+    title: "Elon Musk",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2025"
+  },
+  {
+    id: 0,
+    title: "Cannery road",
+    author: "G.. ",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "Cannery road",
+    author: "G.. ",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "8 ruels of love",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "kinesiska boken om k'rlek",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "Ambient findability",
+    author: "Walter Isaacson",
+    description: "Ambient occlusion ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "You are the one you are looking for",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "Misbehaving",
+    author: "Richard H. Thaler",
+    description: "Econs, predictably irrational behaviors and decision making, limited information-processing capabilities, heuristics, framing, loss aversion.. exploit nudging and choice architecture ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "Hypercapitalism",
+    author: "Richard H. Thaler",
+    description: "Sociological impact of exploiting for the sake of exploits, /cant leave money on the table ",
+    status: "inactive",
+    category: "22-01-2022"
+  },
+   {
+    id: 0,
+    title: "The tipping point",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+    {
+    id: 0,
+    title: "Mind in Motion",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },  {
+    id: 0,
+    title: "Atomic habits",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "space adventure..arnie??.. ",
+    author: "??",
+    description: "?? ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "ultra runner",
+    author: "??",
+    description: "?? ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "Paradox of choice",
+    author: "Richard H. Thaler",
+    description: "Econs, predictably irrational behaviors and decision making, limited information-processing capabilities, heuristics, framing, loss aversion.. exploit nudging and choice architecture ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "Thinking fast and slows",
+    author: "Khaneman",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },{
+    id: 0,
+    title: "A confederacy of dunces",
+    author: "JJ",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "Dubliners",
+    author: "JJ",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+    {
+    id: 0,
+    title: "Färjenäs, hyperventil, ..",
+    author: "P&P",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "Sherlock holmes",
+    author: "JJ",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  }
+    ],
+    misc: [
+        { id: 201, title: "Art Exhibition", description: "Contemporary works in London.", category: "Art", date: "2026-02-01" }
+    ],
+    tv: [
+      {
+        
+          id: 2,
+          title: "Blecktrumman",
+          description: "makrill.. poly /aha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+      {
+          id: 2,
+          title: "Blecktrumman",
+          description: "makrill.. poly /aha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+      {
+          id: 2,
+          title: "jean luc goddard",
+          description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 2,
+          title: "Diabolik",
+          description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 2,
+          title: "Salt of the earth",
+          description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 2,
+          title: "Jesus christ superstar",
+          description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 2,
+          title: "Hair",
+          description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 2,
+          title: "Rocky Horror Picture show",
+          description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
+          status: "inactive",
+          category: "Draken",
+          date: "25-01-2026"
+        },
+        {
+          id: 1,
+          title: "Triangle of sadness",
+          description: "Relax your triangle of sadness,",
+          status: "inactive",
+          category: "M harms / bio?",
+          date: "25-01-2026"
+        },
+    ]  
+
+  };
+
+let currentLayout = 'list';
+let currentData = 'movies';
+let targetScroll = 0;
+let currentScroll = 0;
+let itemElements = [];
+let isLoopRunning = false; // Prevents the infinite update loop when not in spiral mode
+
+
+function render() {
+    const spiral = document.getElementById("spiral");
+    const listContainer = document.getElementById("listContainer");
+    
+    spiral.innerHTML = '';
+    listContainer.innerHTML = '';
+    itemElements = [];
+
+    const items = dataSets[currentData];
+    
+    // Adjust scroll height dynamically based on layout
+    if (currentLayout === 'spiral') {
+        const spacing = 500;
+        document.body.style.height = (items.length * spacing + window.innerHeight) + "px";
+    
+        // Generate placeholder/wrapper elements for the spiral to manage calculations efficiently
+        // We only fill/render the visible 5-10 items during the update() loop.
+       items.forEach((post, i) => {
+        // Create Spiral Element
+
+        const el = document.createElement("button");
+        el.className = "item";
+        el.setAttribute("popovertarget", "postPopover");
+        el.innerHTML = `
+            <img src="${currentData}/${post.title}.jpg" onerror="this.src='https://via.placeholder.com/400x140?text=${encodeURIComponent(post.title)}'"/>
+            <div class="title">${post.title}</div>
+        `;
+        el.onclick = () => showDetails(post);
+        el.style.display = 'none'; // Hidden by default until in viewport range
+        spiral.appendChild(el);
+        itemElements.push({ element: el, data: post });
+
+        // Create List Element
+        const listEl = document.createElement("div");
+        listEl.className = "list-item";
+        listEl.innerHTML = `<h3>${post.title}</h3><p>${post.description}</p><small>${post.date}</small>`;
+        listContainer.appendChild(listEl);
+    });
+    // Fire up the animation loop only when entering spiral mode
+        if (!isLoopRunning) {
+            isLoopRunning = true;
+            requestAnimationFrame(update);
+        }
+      } else {
+        // --- LIST MODE --- 
+        // No spiral elements calculated or rendered. Standard efficient DOM printing.
+        document.body.style.height = 'auto';
+        isLoopRunning = false; // Halts the update() loop execution
+
+        items.forEach((post) => {
+            const listEl = document.createElement("div");
+            listEl.className = "list-item";
+            listEl.innerHTML = `<h3>${post.title}</h3><p>${post.description}</p><small>${post.date}</small>`;
+            listContainer.appendChild(listEl);
+        });
+    }
+
+   
+}
+
+function showDetails(post) {
+    const content = document.getElementById("popoverContent");
+    content.innerHTML = `
+        <h2>${post.title}</h2>
+        <img src="${currentData}/${post.title}.jpg" style="width:100%; border-radius:8px;" onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'"/>
+        <p style="line-height:1.6; font-size:1.1rem;">${post.description}</p>
+      <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+      <div style="opacity:0.6;">
+        Space: ${post.category} <br> 
+        Logged: ${post.date}
+      </div>
+    `;
+}
+
+// let rafId = null;
+
+function update() {
+    // Hard exit condition: completely stops the RAF loop if layout is not spiral
+    if (currentLayout !== 'spiral' || !isLoopRunning) {
+        isLoopRunning = false;
+        return; 
+    }
+
+        currentScroll += (targetScroll - currentScroll) * 0.08;
+        const spacing = 600;
+
+        // Determine target boundaries for rendering elements (roughly 5-10 items in focus range)
+ // --- Focus Logic ---
+            const focusStart = -730;
+            const focusEnd = -150;
+            const transitionMargin = 200; // Smooth fade-in/out distance
+
+            // Anything outside this window gets dynamically unloaded from DOM/hidden
+    const visibilityBufferStart = focusStart - transitionMargin-250;
+    const visibilityBufferEnd = focusEnd + transitionMargin+2500;
+
+        itemElements.forEach((itemObj, i) => {
+          const { element, data } = itemObj;
+          const t = (i * spacing) - currentScroll;
+
+// Performance Check: Is the item within the 5-10 item viewable window?
+        if (t >= visibilityBufferStart && t <= visibilityBufferEnd) {
+            
+            // Lazy load HTML content only when it becomes visible
+            if (!element.innerHTML) {
+                element.innerHTML = `
+                    <img src="${currentData}/${data.title}.jpg" onerror="this.src='https://via.placeholder.com/400x140?text=${encodeURIComponent(data.title)}'"/>
+                    <div class="title">${data.title}</div>
+                `;
+            }
+            element.style.display = 'block';
+
+            
+            const angle = t * 0.004; 
+            const radius = 250;
+            
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            const z = t; 
+
+           
+            // Calculate how "focused" the item is (1 = center of focus area, 0 = far away)
+            // This creates a plateau of visibility between -700 and -100
+            let focusFactor = 0;
+            if (z >= focusStart && z <= focusEnd) {
+                focusFactor = 1;
+            } else if (z < focusStart) {
+                focusFactor = Math.max(0, 1 - (focusStart - z) / transitionMargin);
+            } else {
+                focusFactor = Math.max(0.3, 1 - (z - focusEnd) / transitionMargin);
+            }
+
+            // Apply logic to styles
+            const scale = 1 / (1 + Math.max(0, z * 0.0015));
+            const blur = (1 - focusFactor) * 10; // Max blur of 10px when out of focus
+            const opacity = focusFactor;         // 0 when out of focus, 1 when in focus
+
+            element.style.transform = `translate3d(${x}px, ${y}px, ${-z}px) scale(${scale})`;
+            element.style.filter = `blur(${blur}px)`;
+            element.style.opacity = opacity;
+            element.style.zIndex = Math.round(10000 - z);
+            
+            // Matches your existing logic
+            element.style.pointerEvents = (z < focusStart || z > focusEnd) ? 'none' : 'auto';
+          } else {
+            // Out of viewport range -> Hide completely & free memory
+            if (element.style.display !== 'none') {
+                element.style.display = 'none';
+                element.innerHTML = ''; // Clears the heavy images/DOM when not in view
+            }
+          }
+        });
+    requestAnimationFrame(update);
+}
+
+function toggleLayout() {
+    currentLayout = currentLayout === 'list' ? 'spiral' : 'list';
+    document.body.className = currentLayout + '-mode';
+    document.getElementById('toggleBtn').innerText = currentLayout === 'spiral' ? 'Switch to List View' : 'Switch to Spiral View';
+    
+    // Clear out alternate view DOM immediately on layout change
+    if (currentLayout === 'list') {
+        document.getElementById("spiral").innerHTML = '';
+        itemElements = [];
+    }
+    
+    render();
+}
+
+function switchList(key) {
+    currentData = key;
+    render();
+    window.scrollTo(0, 0);
+}
+
+window.addEventListener("scroll", () => {
+    targetScroll = window.scrollY;
+    const btn = document.getElementById("scrollTopBtn");
+    btn.style.display = window.scrollY > 300 ? "block" : "none";
+});
+
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Start
+render();
+// update();
+</script>
+
+</body>
+</html>
