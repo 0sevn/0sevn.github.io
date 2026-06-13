@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+<title>FloWea</title>
+<link rel="stylesheet" href="w3.css">
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#454545">
+  <!-- QR Code Generator -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script> -->
+<!-- QR Scanner -->
+<!-- <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script> -->
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
+
+<!-- Firebase -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyC5IM5dasyavKCHczWIUlqoFThxLUtTZps",
+          authDomain: "flowea-d43ef.firebaseapp.com",
+          projectId: "flowea-d43ef",
+          storageBucket: "flowea-d43ef.firebasestorage.app",
+          messagingSenderId: "701455113224",
+          appId: "1:701455113224:web:1f89c2ae60b37a075605bd",
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Expose Firebase functions to the global scope
+    window.updateDoc = updateDoc;
+    window.setDoc = setDoc;
+    window.doc = doc;
+    window.db = db; // Useful for debugging
+
+    // Attach the function to the window object so script.js can see it
+    window.initializeFirebaseSync = async function() {
+    
+
+
+    updateStatusHUD('Connecting...', 'orange');
+    try {
+        const cred = await signInAnonymously(auth);
+        
+        // 1. Check all possible sources for a shared ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const syncIdParam = urlParams.get('syncId');
+        const savedSyncId = localStorage.getItem('syncId');
+
+        // 2. Priority Logic: URL Parameter > LocalStorage Link > New Anonymous ID
+        if (syncIdParam) {
+            window.userId = syncIdParam;
+            localStorage.setItem('syncId', syncIdParam); // Save for future refreshes
+        } else if (savedSyncId && savedSyncId !== "null") {
+            window.userId = savedSyncId;
+        } else {
+            // No shared ID found, use this device's unique ID
+            window.userId = cred.user.uid;
+            localStorage.setItem('syncId', cred.user.uid); 
+        }
+        
+        // Update UI and start the real-time listener
+        document.getElementById('userUidDisplay').textContent = window.userId;
+        updateStatusHUD('Cloud Active', '#4CAF50');
+        
+        window.startCloudWatcher();
+
+    } catch (error) {
+        console.error("Auth Error:", error);
+        updateStatusHUD('Error', 'red');
+    }
+};
+
+let syncTimeout = null;
+
+window.pushFullSync = async function() {
+    // if (!window.userId || localStorage.getItem('cloudSyncEnabled') !== 'true') return;
+    if (!window.userId) return;
+
+    // console.log("SUBSCRIBER PUSH", activeTabId, now);
+
+    const activeTabId = localStorage.getItem("activeTab");
+    const allTabs = JSON.parse(localStorage.getItem('master_tabs') || "[]");
+    const currentTab = allTabs.find(t => t.id === activeTabId);
+
+    if (!currentTab) return;
+
+    // Prepare data
+    const listKey = `${activeTabId}List`;
+    const purgeKey = `${activeTabId}PurgeList`;
+    const nameKey = `tabName_${activeTabId}`;
+
+    // --- CASE A: YOU ARE EDITING A SHARED TAB ---
+        // Identify if we are on a remote tab
+        // UPDATING OWNER'S CLOUD: Only update the data lists
+        if (currentTab.remoteOwnerId) {
+            const ownerId = currentTab.remoteOwnerId;
+            const updateData = {};
+            const now = Date.now();
+
+            // Push tasks and history back to owner
+            updateData[`allData.data.${listKey}`] = JSON.parse(localStorage.getItem(listKey) || "[]");
+            updateData[`allData.data.${purgeKey}`] = JSON.parse(localStorage.getItem(purgeKey) || "[]");
+            updateData[`allData.data.${activeTabId}LastUpdated`] = now;
+            updateData[`allData.data.${activeTabId}UpdatedBy`] = window.userId;
+
+            updateData["lastUpdated"] = serverTimestamp();
+            localStorage.setItem(`${activeTabId}LastUpdated`, now.toString());
+
+            try {
+                
+                await updateDoc(doc(db, "users", ownerId), updateData);
+                window.updateStatusHUD('Remote Sync OK', 'cyan');
+            } catch (e) {
+                console.error("Remote push failed:", e);
+                window.updateStatusHUD('Remote Fail', 'red');
+            }
+            return; // EXIT HERE so we don't run the local sync logic
+        }
+    
+    // --- CASE B: OWNER UPDATING THEIR OWN DATA ---
+    // 2. Guard against missing Tab Data
+    if (!window.allTabs || !Array.isArray(window.allTabs)) {
+        console.warn("Push postponed: allTabs not initialized.");
+        return;
+    }
+
+    if (syncTimeout) clearTimeout(syncTimeout);
+    window.updateStatusHUD('Saving in 2s...', '#f39c12')
+    
+    syncTimeout = setTimeout(async () => {
+        console.log("Pushing to cloud...");
+        window.updateStatusHUD('Syncing...', 'orange');
+// 
+        try {
+            // Filter: Only push your OWN tabs (ones without a remoteOwnerId)
+            const tabsToPush = allTabs.filter(tab => {
+                const isLocked = localStorage.getItem(`tabLocked_${tab.id}`) === 'true';
+                return !isLocked && !tab.remoteOwnerId;
+            });
+
+            const state = {
+                master_tabs: tabsToPush, 
+                routine_config: window.routineConfig,
+                activeTab: activeTabId,
+                data: {}
+            };
+
+            // Collect data for your own tabs
+            tabsToPush.forEach(tab => {
+                const id = tab.id;
+                // state.data[`tabName_${id}`] = localStorage.getItem(`tabName_${id}`);
+                // replace
+                state.data[`tabName_${id}`] = localStorage.getItem(`tabName_${id}`) || tab.name || "Untitled";
+
+
+                state.data[`${id}List`] = JSON.parse(localStorage.getItem(`${id}List`) || '[]');
+                state.data[`${id}PurgeList`] = JSON.parse(localStorage.getItem(`${id}PurgeList`) || '[]');
+                const now = Date.now();
+
+                state.data[`${id}LastUpdated`] = now;
+                state.data[`${id}UpdatedBy`] = window.userId;
+
+                localStorage.setItem(`${id}LastUpdated`, now.toString());
+                // Note: Category is stored inside the 'tab' object in master_tabs
+            });
+
+            await setDoc(doc(db, "users", window.userId), {
+                allData: state,
+                lastUpdated: serverTimestamp()
+            }, { merge: true });
+
+            localStorage.setItem('lastLocalPushTime', (Date.now() + 1000).toString());
+            window.updateStatusHUD('Cloud Active', '#4CAF50');
+            
+            // --- SAFE UI UPDATE ---
+            // const pullBtn = document.getElementById('cloudPullBtn');
+            // if (pullBtn) pullBtn.classList.add('hidden');
+            
+        } catch (e) {
+            console.error("Sync Error:", e);
+            window.updateStatusHUD('Sync Error', 'red');
+        }
+    }, 2000);
+};
+
+window.importSharedTab = async function(targetUserId, targetTabId) {
+    // If called without arguments (from the button), ask for the Share Code
+    if (!targetUserId) {
+        const code = prompt("Paste the Share Code (ID|TabID):");
+        if (!code || !code.includes('|')) return;
+        [targetUserId, targetTabId] = code.split('|');
+    }
+
+    try {
+        updateStatusHUD('Fetching Tab...', 'orange');
+        const docSnap = await getDoc(doc(db, "users", targetUserId));
+        
+        if (!docSnap.exists()) return alert("Source SyncID not found.");
+
+        const remoteData = docSnap.data().allData;
+        const remoteTabs = remoteData.master_tabs || [];
+        const targetTab = remoteTabs.find(t => t.id === targetTabId);
+
+        // Inside window.importSharedTab in index.html
+        if (targetTab) {
+            const id = targetTabId;
+            
+            // 1. Set the individual name key immediately so the UI doesn't revert
+            localStorage.setItem(`tabName_${id}`, targetTab.name);
+
+            // 2. Create the Pointer Tab object
+            const sharedTab = { 
+                ...targetTab, 
+                remoteOwnerId: targetUserId, 
+                // icon: "🔗" 
+            };
+
+            // 3. Add to master list
+            window.allTabs.push(sharedTab);
+            localStorage.setItem('master_tabs', JSON.stringify(window.allTabs));
+            
+            // 4. Initial data pull for BOTH live list and history (PurgeList)
+            if (remoteData.data) {
+                const listData = remoteData.data[`${id}List`] || [];
+                const purgeData = remoteData.data[`${id}PurgeList`] || [];
+                
+                localStorage.setItem(`${id}List`, JSON.stringify(listData));
+                localStorage.setItem(`${id}PurgeList`, JSON.stringify(purgeData));
+            }
+
+            alert(`Subscribed to ${targetTab.name}!`);
+            location.reload();
+        } else {
+            alert("Tab ID not found in that user's cloud data.");
+        }
+    } catch (e) {
+        console.error("Shared Tab Import Failed:", e);
+        updateStatusHUD('Import Fail', 'red');
+    }
+};
+
+
+window.pullFullSync = async function(remoteUid) {
+    window.updateStatusHUD('Pulling...', 'orange');
+    console.log('pullsync');
+    try {
+        const docSnap = await getDoc(doc(db, "users", remoteUid));
+
+        if (docSnap.exists()) {
+            const remoteData = docSnap.data().allData;
+console.log(remoteData.master_tabs);
+            // 1. Clear current local data (except basic settings)
+            const keysToKeep = ['theme', 'cloudSyncEnabled', 'editButtonsVisible'];
+            Object.keys(localStorage).forEach(key => {
+                if (!keysToKeep.includes(key)) localStorage.removeItem(key);
+            });
+
+            // 2. Inject core tab state using the NEW structure
+            localStorage.setItem("master_tabs", JSON.stringify(remoteData.master_tabs));
+            localStorage.setItem("routine_config", JSON.stringify(remoteData.routine_config));
+            localStorage.setItem("activeTab", remoteData.activeTab);
+            localStorage.setItem("tabCounter", remoteData.tabCounter);
+            localStorage.setItem('lastLocalPushTime', Date.now()); 
+
+// 3. Inject all tab names and lists from the remote 'data' object
+if (remoteData.data) {
+    Object.entries(remoteData.data).forEach(([key, value]) => {
+        // NEW: Check if this specific tab is locked LOCALLY before overwriting
+        // We extract the ID from keys like "tabName_work" or "workList"
+        const tabIdMatch = key.match(/tabName_(.*)|(.*)List|(.*)PurgeList/);
+        const extractedId = tabIdMatch ? (tabIdMatch[1] || tabIdMatch[2] || tabIdMatch[3]) : null;
+        
+        const isLockedLocally = localStorage.getItem(`tabLocked_${extractedId}`) === 'true';
+
+        if (!isLockedLocally) {
+            const valStr = typeof value === 'object' ? JSON.stringify(value) : value;
+            localStorage.setItem(key, valStr);
+        } else {
+            console.log(`Skipping pull for locked tab: ${extractedId}`);
+        }
+    });
+}
+
+            window.updateStatusHUD('Synced', '#4CAF50');
+            
+            // 4. Final step: Alert then Reload
+            alert("Sync successful! Reloading your lists...");
+            window.location.href = window.location.pathname; 
+
+        } else {
+            // This runs if the ID is valid but no document exists for it
+            alert("Cloud data not found for this ID.");
+            window.updateStatusHUD('Error', 'red');
+        }
+    } catch (e) {
+        // This runs if the internet is down or permissions are denied
+        console.error("Pull failed:", e);
+        window.updateStatusHUD('Fail', 'red');
+        alert("Pull failed. Check console for details.");
+    }
+};
+
+let isInitialLoad = true;
+
+window.startCloudWatcher = function() {
+    if (!window.userId) return;
+
+    // console.log("REMOTE RECEIVED", id, remoteTimestamp, localTimestamp);
+// 2. Listen to SHARED tabs from other users
+    // Inside your shared tabs loop in startCloudWatcher
+    window.allTabs.forEach(tab => {
+        console.log("WATCHING SHARED TAB", tab.id);
+        if (tab.remoteOwnerId) {
+            // Inside startCloudWatcher loop for remoteOwnerId
+            onSnapshot(doc(db, "users", tab.remoteOwnerId), (docSnap) => {
+                if (docSnap.exists()) {
+                    const remoteData = docSnap.data().allData;
+                    const id = tab.id;
+
+                    if (remoteData.data) {
+                        // SYNC NAME: Prevents reverting to "TabName"
+                        // Find latest owner version of the tab
+const remoteTabs = remoteData.master_tabs || [];
+
+const ownerTab = remoteTabs.find(t => t.id === id);
+
+if (ownerTab) {
+
+    // Preserve subscriber-only properties
+    const localTab =
+        window.allTabs.find(t => t.id === id);
+        // Preserve subscriber-only fields
+        // const existing = window.allTabs[localIndex];
+
+    const updatedTab = {
+        ...ownerTab,
+
+        // KEEP subscriber linkage
+        remoteOwnerId: tab.remoteOwnerId,
+        // remoteOwnerId: existing.remoteOwnerId,
+        // KEEP subscriber icon override if desired
+        // icon: localTab?.icon || "🔗"
+    };
+
+    // Update memory
+    const tabIndex =
+        window.allTabs.findIndex(t => t.id === id);
+
+    if (tabIndex !== -1) {
+        window.allTabs[tabIndex] = updatedTab;
+    }
+
+    // Persist master_tabs
+    localStorage.setItem(
+        'master_tabs',
+        JSON.stringify(window.allTabs)
+    );
+
+    // Persist tab name cache
+    localStorage.setItem(
+        `tabName_${id}`,
+        ownerTab.name || "Untitled"
+    );
+
+    console.log(
+            "SYNCED TAB NAME:",
+            ownerTab.name
+        );
+
+    // Re-render tabs immediately
+    if (typeof initTabs === 'function') {
+        initTabs();
+    }
+}
+
+                        // SYNC LIVE LIST
+                        // 
+                        const remoteTimestamp = remoteData.data[`${id}LastUpdated`] || 0;
+                        const localTimestamp = parseInt(localStorage.getItem(`${id}LastUpdated`) || '0');
+                        // Ignore older cloud data
+                        if (remoteTimestamp >= localTimestamp) {
+                            // Ignore our own echoed updates
+                            const updatedBy = remoteData.data[`${id}UpdatedBy`];
+                            if (updatedBy !== window.userId) {
+                                if (remoteData.data[`${id}List`]) {
+                                    localStorage.setItem(`${id}List`, JSON.stringify(remoteData.data[`${id}List`]));
+                                }
+                                if (remoteData.data[`${id}PurgeList`]) {
+                                    localStorage.setItem(`${id}PurgeList`, JSON.stringify(remoteData.data[`${id}PurgeList`]));
+                                }
+                                localStorage.setItem(`${id}LastUpdated`, remoteTimestamp.toString());
+                                console.log(`Applied remote update for ${id}`);
+                            }
+                        }
+                    }
+                    
+                    // Refresh UI if we are looking at this tab
+                    if (window.activeTab === id && window.displayData) window.displayData();
+                }
+            });
+        }
+    });
+
+    onSnapshot(doc(db, "users", window.userId), (docSnap) => {
+        if (docSnap.exists()) {
+            const remoteData = docSnap.data().allData;
+            if (!remoteData) return;
+
+            const cloudTime = docSnap.data().lastUpdated?.toMillis() || 0;
+            const lastLocalPush = parseInt(localStorage.getItem('lastLocalPushTime') || 0);
+
+            if (cloudTime > (lastLocalPush + 500)) { // 500ms buffer
+                console.log("Cloud change detected! Rebuilding UI...");
+
+                // 1. Sync the Master Tab List (The Map)
+                if (remoteData.master_tabs) {
+                    localStorage.setItem("master_tabs", JSON.stringify(remoteData.master_tabs));
+                    window.allTabs = remoteData.master_tabs; // Update the memory variable
+                }
+                
+                // 2. Sync Routine Config (The Schedule)
+                if (remoteData.routine_config) {
+                    localStorage.setItem("routine_config", JSON.stringify(remoteData.routine_config));
+                    window.routineConfig = remoteData.routine_config;
+                }
+
+                // 3. Inject Content (The Lists)
+                if (remoteData.data) {
+                    Object.entries(remoteData.data).forEach(([key, value]) => {
+                        // Check if tab is locked locally
+                        const tabIdMatch = key.match(/tabName_(.*)|(.*)List|(.*)PurgeList/);
+                        const extractedId = tabIdMatch ? (tabIdMatch[1] || tabIdMatch[2] || tabIdMatch[3]) : null;
+                        const isLockedLocally = localStorage.getItem(`tabLocked_${extractedId}`) === 'true';
+
+                        if (!isLockedLocally) {
+                            const valStr = typeof value === 'object' ? JSON.stringify(value) : value;
+                            localStorage.setItem(key, valStr);
+                        }
+                    });
+                }
+
+                // 4. Trigger UI Refresh
+                localStorage.setItem('lastLocalPushTime', cloudTime.toString());
+                
+                // CRITICAL: Call these to make the changes visible immediately
+                if (typeof initTabs === 'function') initTabs();
+                if (typeof renderRoutineBar === 'function') renderRoutineBar();
+                if (window.displayData) window.displayData();
+
+                window.updateStatusHUD('Cloud Updated', '#4CAF50');
+            }
+        }
+    });
+};
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./serviceWorker.js')
+        .then(() => console.log('✅ Service Worker registered!'))
+        .catch(err => console.error('⚠️ Service Worker registration failed:', err));
+      }
+    </script>
+
+    <style>
+</style>
+
+</head>
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<!-- <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script> -->
+<body>
+
+
+<!-- <div style="z-index: 99;"> -->
+    <!-- <div class="top-icons" style="left:0;text-align:left;"> -->
+        <!-- <input type="submit" value=" " class="icon help w3-animate-right" title="Help" onclick="showHelp()"> -->
+        <!-- ?<input type="submit" value=" " class="icon settings1 w3-animate-right" title="Help" onclick="showHelp()"> -->
+         <!-- <input type="submit" value=" " class="icon settings w3-animate-right" title="Settings" onclick="showTaskEdit()"> -->
+            <!-- <input type="submit" value=" " class="icon darklight_mode w3-animate-left" title="Toggle light/dark mode" onclick="toggleTheme()"> -->
+            <!-- <br> -->
+            
+            <!-- <input type="submit" value=" " class="icon history w3-animate-right" title="History" onclick="showHistory()"> -->
+        
+    <!-- </div> -->
+<div id="favBar" class="topnav hidden">
+    <!-- Life  -->
+    <div class="dropdown">
+
+        <button class="dropbtn"><a href="https://workflowy.com/" target="_blank">Life</a></button>
+        <div class="dropdown-content">
+            <a href="https://streamsquid.com/#/playlists/spotify/cat/chill" target="_blank">Stream squid</a>
+            <a href="https://www.youtube.com/watch?v=svLzmFuSBhk" target="_blank">3D fractals</a>
+            <a href="https://www.zooniverse.org/projects/zookeeper/galaxy-zoo/classify" target="_blank">Zooniverse galaxy classifier</a>
+            <a href="https://www.youtube.com/user/shiffman" target="_blank">The coding train</a>
+<hr>Kring
+https://m.co/se/sv-SE/stationer/
+            <a href="https://www.twitch.tv/videos/307268441" target="_blank">Gassy mexican Twitch</a>
+
+            <a href="https://acko.net/blog/occupy-www-street-en/" target="_blank">acko design</a>
+        </div>
+    </div>
+    <!-- Work -->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="http://catiadoc.free.fr/online/CATIAfr_C2/stlugCATIAfrs.htm" target="_blank">Work</a></button>
+        <div class="dropdown-content">
+            <a href="https://dined.io.tudelft.nl/en/about">Dined ergo database</a>
+            <a href="http://catiadoc.free.fr/online/CATIAfr_C2/stlugCATIAfrs.htm">STL rapid prototyping</a>
+            <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A42010X0731%2803%29">Eurlex</a>
+<hr>Ergonomics
+            <a href="http://www2.me.rochester.edu/courses/ME204/nx_help/index.html#uid:index">NX manual</a>
+            <a href="https://resources.rand3d.com/videos-webcasts/making-sense-of-catia-v5-v6-and-the-transition-to-the-3dexperience">V5 to v6 transition</a>
+            <a href="https://www.fictiv.com/articles/gdt-101-an-introduction-to-geometric-dimensioning-and-tolerancing">GDnT</a>
+        </div>
+    </div>
+<!-- News SE-->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="http://www.gp.se/">News SWE</a></button>
+        <div class="dropdown-content">
+            
+            <a href="http://www.svt.se/">SVT</a>
+            <a href="http://www.sr.se/">SR</a>
+            <a href="http://www.ur.se/">UR</a>
+            <hr>På gång
+            <a href="http://www.gp.se/">GP</a>            
+            <a href="http://www.goteborg.se/">Göteborg/Hanoi/LA/SF</a>
+            
+        </div>
+    </div>
+    <!-- News -->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="https://www.sfgate.com/">News US</a></button>
+        <div class="dropdown-content">
+            
+            <a href="https://www.noevalleyvoice.com/">Noe Valley Voice</a>
+            <a href="https://sfstandard.com/">SF Standard</a>
+            <a href="https://missionlocal.org/">Mission local</a>
+            <a href="https://48hills.org/">48 hills</a>
+            https://riniart.com/index.html
+
+            https://thefrisc.com/
+            https://www.axios.com/local/san-francisco/things-to-do
+            https://sf.eater.com/
+            https://sfist.com/
+            Hoodline, Broke Ass Stuart, DotheBay, SF.funcheap, SF Station, SF Examiner, 7x7, NextDoor , LA Times
+            politico
+            elpais
+            pbs, npr, kqed
+            <hr>På gång
+            https://www.eventbrite.com/d/ca--san-francisco/all-events/
+            
+            <a href="https://www.kqed.org/podcasts">The Atlantic</a>
+            <a href="https://www.theatlantic.com/world/">The Atlantic</a>
+            <a href="http://www.newyorker.com/">The New Yorker</a>
+            <a href="https://boingboing.net/">Boingboing</a>
+        </div>
+    </div>
+        <!-- Bostad -->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="https://www.sverigehuset.se/projekt/jarntorgsgatanxbrogatan">Bostad</a></button>
+        <div class="dropdown-content">
+            <a href="https://www.goteborgenergi.se/">Goteborg energi</a>
+            <a href="https://www.sbc.se/">SBC</a>
+            <hr>På gång
+            <a href="http://www.boplats.se/">Boplats</a>
+            <a href="http://lexin.nada.kth.se/sve-eng.html" target="_blank">LexinKon</a>
+            <a href="http://www.gotlib.goteborg.se/" target="_blank">GOTLIB</a>
+            <a href="http://www.lib.chalmers.se/" target="_blank">Chalmers bibliotek</a>
+        </div>
+    </div>
+    <!-- Hobby -->
+    <div class="dropdown">
+        <button class="dropbtn"><a href="https://www.sverigehuset.se/projekt/jarntorgsgatanxbrogatan">Hobby</a></button>
+        <div class="dropdown-content">
+            
+            <a href="http://www.kobbs.se/main.htm">te</a>
+            <a href="http://www.omte.se/">Om te</a>
+            <a href="http://www.nyfikenvital.org/?q=node/144">Nyfiken</a>
+            <a href="http://home.swipnet.se/~w-58525/te/">Tedrickarnas hörna</a>
+            <hr>
+        </div>
+    </div>
+</div>
+
+<!-- Mid navigation -->
+<div class="wrap-container">
+    <div class="week-header">
+        <!-- onclick="openFocusmatrix()" -->
+         <!-- onclick="openSyncDashboard()" -->
+        <div id="week_header" class="status-text panel-trigger-btn" data-panel="focus_matrix"></div>
+        <span id="active_context_label" class="context-label" onclick="openCommandbar()" style="cursor: pointer;">Loading current mode</span>
+        <div id="active_sync" class="flex space-x-2 status-hud panel-trigger-btn" data-panel="sync_panel">
+            <div id="syncStatusDot" class="status-dot"></div>
+            <span id="syncStatusText" class="status-text">Local Only</span>
+            <!-- <button class="panel-trigger-btn" data-panel="command_bar">
+    🛠️ Command Bar
+</button> -->
+        </div>
+    </div>
+    <div class="mid-container">
+        <div id="sync_status" style="font-size: 10px; font-weight: bold;"></div>
+<div class="health_bar_container">
+        <div id="health_bar" class="healthbar" title="FOvea, a small depression within the retina where visual acuity is the highest.">   
+        </div>
+</div>
+            <div id="sort_list" class="sort_list">
+                <ul id="todo_list" class="sortable-list">
+                    <!-- list elements -->
+                </ul>
+            </div>
+            <div class="task-ops">
+                <input type="text" id="enter_task" placeholder="Enter Task">
+                <input type="submit" id="add" value=" " class="icon add" title="Add task">
+                <input type="submit" id="purge" value=" " class="icon purge" title="Purge checked tasks to History" disabled>
+            </div>
+    </div>
+    <div class="tab-wrap">   
+        <div class="tabs">
+            <div class="tabs" id="tabsContainer"></div>
+                <input type="submit" id="add_tab" value=" " class="icon add_tab w3-animate-left" title="Add tab" onclick="openNewTabCreator()">
+                <input type="submit" id="shelf_toggle_btn" value=" " class="icon shelf w3-animate-left" title="Book shelf" onclick="toggleShelveStatus()">
+        </div>   
+    </div> 
+</div>
+
+<div style="z-index: 99;">
+    <div class="top-icons" style="left:0;text-align:left;">         
+        <input type="submit" value=" " class="icon history w3-animate-right" title="History" onclick="showHistory()">
+        <input type="submit" value=" " class="icon darklight_mode w3-animate-bottom" title="Toggle light/dark mode" onclick="toggleTheme()">
+        <li class="panel-trigger-btn fas fa-chart-bar" data-panel="statistics_panel" title="View Stats">
+            🎯 View Stats, telemetry
+        </li>
+    </div>
+</div><br>
+
+<div class="howto" id="helpCard" onclick="closeHelp()">
+  <img src="img/help2.png" alt="" style="width: 100%;">
+</div>
+
+<!-- Purged list -->
+<nav id="historyCard" class="purge_list_container hidden w3-animate-bottom" style="height: 220px;">
+    <label>Purged tasks</label>
+        <div id="tabSyncList1" class="tab-sync-list" style="margin: 10px; height: 400px; display: block;">
+
+            <!-- Purge history list -->
+            <div style="color: var(--text-color);">
+                <ul id="purge_list" style="list-style: none;padding-left: 5%;">
+                </ul>
+            </div>
+        </div>    
+</nav>
+
+<!-- JS vanilla script -->
+<script src="tab_script.js"></script>
+<script src="script.js"></script>
+<!-- SORTABLE SCRIPT -->
+<script>
+    // sortable list
+        const list = document.querySelector('.sortable-list');
+        let draggingItem = null;
+        list.addEventListener('dragstart', (e) => {
+            draggingItem = e.target;
+            e.target.classList.add('dragging');
+        });
+        list.addEventListener('dragend', (e) => {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.sortable-item')
+                .forEach(item => item.classList.remove('over'));
+            draggingItem = null;
+            
+            if (window.saveNewOrder) window.saveNewOrder();
+        });
+        list.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const draggingOverItem = getDragAfterElement(list, e.clientY);
+            document.querySelectorAll('.sortable-item').forEach
+                (item => item.classList.remove('over'));
+            if (draggingOverItem) {
+                draggingOverItem.classList.add('over');
+                list.insertBefore(draggingItem, draggingOverItem);
+            } else {
+                list.appendChild(draggingItem); 
+            }
+        });
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll
+                ('.sortable-item:not(.dragging)')];
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+    </script>
+    <script>
+        window.initRoutineMatrix();
+// console.log("asdf");
+    </script>
+<div id="toast" class="toast"></div>
+
+
+<!-- Command bar -->
+<div id="commandBar" class="command-bar hidden w3-animate-bottom">
+    <div class="context-icons-row">
+        <div class="context-btn" data-context="Morning" title="Morning">🌅</div>
+        <div class="context-btn" data-context="Work" title="Work">💻</div>
+        <div class="context-btn" data-context="Gym" title="Gym">🏋️</div>
+        <div class="context-btn" data-context="Evening" title="Evening">🌆</div>
+        <div class="context-btn" data-context="Night" title="Night">🌙</div>
+        <span id="edit_active_tab_btn" class="edit-icon-btn w3-animate-bottom" onclick="openCommandsettings()" style="cursor: pointer;">⚙️</span>
+    </div>
+    
+
+    <div id="commandsettings" class="routine-dashboard hidden">
+        <div id="routine_container">
+            <div id="segment_display" class="routine-bar"></div>
+            <div id="handle_container"></div>
+        </div>
+        <div class="bar-labels">
+            <span>00:00</span>
+            <span>12:00</span>
+            <span>24:00</span>
+        </div>
+    </div>
+</div>
+
+<!-- context settings -->
+<div id="tab_settings_card" class="bottom-sheet">
+    <div class="sheet-header" style="display: flex; justify-content: space-around; margin-left: 10px;">
+        <!-- Edit Tab -->
+         <div id="sheet_title">woiebvwvbw;o</div>
+        <div style="margin-top: 0px; padding-top: 1px; border-top: 1px solid #444;">
+        <label>Collaboration</label>
+        <button onclick="generateTabShareCode()" class="w3-button w3-blue w3-round w3-small" style="width:100%;">
+            🔗 Generate Share Code
+        </button>
+        <p id="share_code_display" style="font-size: 10px; color: #adff2f; word-break: break-all; margin-top: 5px;"></p>
+    </div>
+        <button onclick="closeTabSettings()" >✕</button>
+    </div>
+    
+    <div class="sheet-body">
+        <input type="text" id="tab_name_input" placeholder="Tab name">
+        <div class="category-selector">
+            <button class="cat-opt" data-val="Morning">🌅</button>
+            <button class="cat-opt" data-val="Work">💻</button>
+            <button class="cat-opt" data-val="Gym">🏋️</button>
+            <button class="cat-opt" data-val="Evening">🌆</button>
+            <button class="cat-opt" data-val="Night">🌙</button>
+        </div>
+
+        <label>Tab Mode</label>
+        <select id="tab_mode_select">
+            <option value="list">Standard List</option>
+            <option value="checkin">Check-in Grid</option>
+        </select>
+
+        <!-- <button id="save_tab_btn" class="icon save">Save Changes</button> -->
+        <input type="submit" id="save_tab_btn" value=" " class="icon save" title="Save Changes">
+        <!-- <input type="submit" id="delete_tab_btn" value=" " class="icon delete" title="Delete Tab"> -->
+    </div>
+</div>
+
+
+<div id="universal_panel_wrapper" data-active-panel="" class="">
+    <div class="panel-header">
+        <h3 class="panel-header-title">Panel Title</h3>
+        <button class="panel-close-btn" onclick="$('#universal_panel_wrapper').removeClass('open')">×</button>
+    </div>
+    
+    <div class="panel-body-content"></div>
+</div>
+
+<div id="radial_menu_overlay" class="radial-backdrop">
+    <div class="radial-center-hub">
+        <div class="radial-inner-circle">
+            <span class="hub-icon">⚡</span>
+            <span class="hub-label">PANELS</span>
+        </div>
+        <div id="radial_slices_container"></div>
+    </div>
+</div>
+
+</body>
+</html>
