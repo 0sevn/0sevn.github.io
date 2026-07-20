@@ -7,7 +7,7 @@
 <style>
   body {
     margin: 0;
-    background: #000;
+    background: #2e2e2e;
     overflow-x: hidden;
     font-family: system-ui, sans-serif;
     color: white;
@@ -79,6 +79,15 @@
   .list-item {
     width: 100%;
     max-width: 600px;
+    background: #111;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #333;
+  }
+    .list-item2 {
+    width: 100%;
+    max-width: 800px;
     background: #111;
     margin-bottom: 20px;
     padding: 15px;
@@ -171,12 +180,31 @@ const dataSets = {
           id: 0,
           title: "The Odyssey",
           description: `
-          Modern adaptation of Homer´s classic tragedy.
-          After shaking the thought that Jason Bourne is leading the journey back to Ithica
-          Maladapted protagonist, paves his own way, but comes across failure after failure. 
-          Striking resemblence to the Kalevala saga. Historical accuracy aside, the sincerity of the tragic journey, experience of loss, unjust challenge, discovering the grains of motivation to find your own path, why these stories stand the test of time.
-          At times, sequnces of static foreground character with slightly 
-          In the face of his most difficult challenge, our protagonists life hangs in the balance and a benevolent Calypso nurses him back to health.
+          It's not easy to view works of a director and actors that have told so many iconic tales, with fresh eyes. 
+          And don't be surprised if, for a brief moment, the thought of a buff Jason Bourne leading the journey back to Ithica makes you smile,
+          before this modern adaptation of Homer´s classic tragedy earns it's rightful place and lures you into one perilous quest after another.
+
+          <br><br>
+          After a few jumps back and forth along the timeline, the premise is set. Troy has been defeated, to the victors go the spoils and those still alive may begin their arduous and long-awaited return. 
+          But before finding his way home, Odysseus will have to conquer his demons and find himself.
+          <br><br>
+          The journey covers themes of identity, individual contribution, leadership and servitude and the true effect of ones cause.
+          
+          
+          Executing the Trojan horse scheme, meant breaking Zeus's law and disrupting the order, starting a chain of events and forks in the road that lead him to question the cost of victory.
+          He tries to reason and plead with the gods to get his men back home safely, but as his challenges become increasingly difficult to overcome his cunning only leaves him with the lesser of two evils.
+          In the face of his most difficult challenge (losing all his men to Poseidon's sea) our protagonists life hangs in the balance and a benevolent Calypso nurses him back to health and begrudgingly lets him come home.
+
+<br><br>
+          In one particularly emotional ending scene, Odyessus, in disguise as a simple beggar, lays bare to his beloved Penelope why he could not return for so long. 
+          While the deceptive strategy was successful, the compromise and sacrifice made in waging war to conquer Troy also meant that he would not be coming back to the home he once knew.
+Not only would home not be the same, but would his loved ones still accept him after the changes he himself has been through.
+          <br><br>
+          The story bears close resemblence to the Kalevala saga (a poor mans Odyssey if you will), The story of the maladapted protagonist, searching for what's his yet can't seem to get anything right.
+          Historical accuracy aside, the sincerity of the tragic journeyman, experience of loss, unjust setbacks and perseverence on the smallest grains of hope to keep following your path, are why these stories stand the test of time.
+          <br><br>// To answer the question if the ends truly justify the means? The most steadfast and cunning man can be humbled, and will need mental flexibility to learn from mistakes and adapt to the world around him, to accept that he can be accepted the way he is.
+          
+          At times, sequnces of static actor, moving background character with slightly 
           `,
           status: "inactive", // or "inactive"
           category: "Capitol",
@@ -186,11 +214,11 @@ const dataSets = {
           id: 0,
           title: "The Furious",
           description: `
-          This instant, non-stop action from the very first frame. 
-          In a similar vein as Ong Bak or The Raid, but the range of martial arts styles on display here is staggering, 
-          No character is a pure specialist in any one form, although some are visibly more proficient in some styles than others, but mostly they seamlessly flow from one to the other as the situation requires and makes. 
-          Everything from empty hand, close combat techniques, bladed and non-bladed weapons/implemetns, equal parts entertainment content as effective and devastating.
-          Towards the end the action becomes repetitive and the  by the second half and the premise doesn't gets a chance to evolve`,
+          Instant, non-stop action from the very first frame. 
+          In similar vein to Ong Bak or The Raid, the range of martial arts styles on display here is staggering. <br><br>
+          No character is a pure specialist in any one form, although some of the performers are visibly more proficient in some styles. They mostly seamlessly flow from one to the other as the situation requires. 
+          From empty hand, close combat styles to bladed and non-bladed weapons/implemetns, equal parts entertainment and effective and devastating techniques.<br><br>
+          Towards the end an attempted moral justification overshadows the original story and the action becomes slightly repetitive and dull taking away from what's otherwise very well choreographed and executed inal fight. `,
           status: "inactive", // or "inactive"
           category: "Capitol",
           date: "2026-06-17"
@@ -198,8 +226,8 @@ const dataSets = {
         {
           id: 0,
           title: "Kalevala",
-          description: `Kullervo, son of Kallervo embarks on an odyssey to discover the truth, what lies beyond teloneva, gyllene viggens ägg.
-          A true anti hero story, the 12 century collected poems and legends collected by Elias Lönnrot, finish national epic exploring the generational toils and turmoils in a magical setting.
+          description: `Kullervo, son of Kallervo embarks on an odyssey to discover the truth. What lies beyond teloneva (gyllene viggens ägg)?<br>
+          A true anti-hero story, the 12th-century poems and legends collected by Elias Lönnrot, a finish national epic exploring the generational toils and turmoils set in magical Finnish landscapes.
           Atheticity aside, it's a story that defines the history, spirit and identity of a nation. Work that deserves a spot on the same stage as the greek tragedies or the shakespearean legends.`,
           status: "inactive", // or "inactive"
           category: "Capitol",
@@ -218,7 +246,7 @@ const dataSets = {
         {
           id: 0,
           title: "Time masters",
-          description: "Back to back french Sci-Fi. Moebius scenic illustations<i>Close your minds.</i> ",
+          description: "Back to back french Sci-Fi. Moebius scenic illustations<br><br><i>Close your minds (..it stinks!)</i> ",
           status: "active", // or "inactive"
           category: "Capitol",
           date: "2026-05-12/14"
@@ -235,8 +263,8 @@ const dataSets = {
           id: 0,
           title: "Riki-Oh",
           description: `Some bad movies are not just good but great and here's one of the best.
-          At the height of martial arts driven movie plots, in a future where prisons are run by private corporations, with conflicting interests, a martial artist is sentenced to serve time for the death of drug dealing criminals.
-          Filled with hilariously inexplicable moments and incredibly detailed effects from completely unrealistc and gratuitous violence.  
+          At the height of martial arts driven movie plots, set in a future where prisons are run by private corporations with conflicting interests, a martial artist is sentenced to serve time for the death of drug dealing criminals.
+          Filled with hilariously inexplicable moments, incredibly detailed and completely unrealistc and gratuitous violence. 
           `,
           status: "active", // or "inactive"
           category: "Capitol",
@@ -245,7 +273,7 @@ const dataSets = {
         {
           id: 22,
           title: "Left-handed girl",
-          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl walks the line between good and evil and finds her way straight into your heart",
+          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl walks the line between good and evil to finds her way straight into your heart",
           status: "active", // or "inactive"
           category: "Capitol",
           date: "2026-04-28"
@@ -276,8 +304,8 @@ const dataSets = {
         {
           id: 18,
           title: "Project hail mary",
-          description: `Other similar genre films that did it better 
-          Strange choice to include forced volunteering into saving civilization, end of days never looked more pleasant`,
+          description: `Pretty and pleasant, buy End of days has looked better in similar genre films.
+          Strange choice to include forced volunteering into saving civilization.. `,
           status: "active", // or "inactive"
           category: "Capitol",
           date: "2026-04-09"
@@ -286,10 +314,10 @@ const dataSets = {
           id: 17,
           title: "Sirat",
           description: `
-          The path, an exciting adventure set to transfixing beats. Dad and son search for missing daughter at desert rave dad and son search for . 
+          The path of gorgeous desert landscapes and outdoor rave soundscapes is an exciting adventure set to transfixing beats. Dad and son search for missing daughter at desert rave. 
           With the knowledge that every step might be your last, it becomes clear that the journey is the <u> final </u> destination. 
           The plot unravels into all sorts of absurdity that is life.
-          Gorgeous desert landscapes and outdoor rave soundscapes`,
+          `,
           status: "active", // or "inactive"
           category: "Capitol",
           date: "2026-03-22"
@@ -305,8 +333,7 @@ const dataSets = {
         {
           id: 15,
           title: "Is this thing on",
-          description: `Charming Will Arnett and Laura Dern, great chemistry. Dad finding his voice, 
-          when love wins`,
+          description: `Charming Will Arnett and Laura Dern, great chemistry. Dad finding his voice, when love prevails!`,
           status: "active", // or "inactive"
           category: "Roy",
           date: "2026-03-07"
@@ -315,12 +342,12 @@ const dataSets = {
           id: 14,
           title: "Sentimental value",
           description: `Successful director and absentee father attempts to repair relationship with daughters through one last project.
-          Unspoken regrets, slow drift into irrelevance - Heavy topics can be handled with care and feel light hearted. 
-          While the meta story is ok, the promises of great art and the twists and turns getting there turn out to be the greatest piece of art
-          Obstacles laid out in the set up continue building until the end when the emotional moments star sneaking up on you. 
+          Characters filled with unspoken regrets and a slow drift into irrelevance - Proof that heavy topics can be handled with care and feel light hearted. 
+          While the meta story is ok (a promises of great art) the twists and turns getting there turn out to be the greatest piece of art.
+          Obstacles laid out thoughtfully in the set up and continue building until the end when the emotional moments start sneaking up on you.  
+          <br> <br>
           The very last scene is a breathtaking culmination of everything unsaid, that never needed to be said. 
-          <br> Entire theater was left reeling, end credits accompanied by quiet sobs, 
-          clinging to the feeling of resolve for just a moment longer.`,
+          Entire theater was left reeling, end credits accompanied by quiet sobs, clinging to the feeling of resolve for just a moment longer.`,
           status: "active", // or "inactive"
           category: "Roy",
           date: "2026-02-22"
@@ -336,7 +363,7 @@ const dataSets = {
         {
           id: 12,
           title: "Rental family",
-          description: `Endearing, about Loneliness, finiding your place and purpose, abandonment and repair.
+          description: `Endearing, about loneliness, finiding your place and purpose, abandonment and repair.
           And doing it all over and over again against the backdrop of modern Japan`,
           status: "active", // or "inactive"
           category: "Roy",
@@ -345,7 +372,7 @@ const dataSets = {
         {
           id: 11,
           title: "The secret agent",
-          description: "Prazer - storytelling at its best. Fantastic lead, visually compelling,  ",
+          description: "Prazer - Fantastic lead, visually compelling storytelling at its best",
           status: "active", // or "inactive"
           category: "Roy",
           date: "10-02-2026"
@@ -357,9 +384,9 @@ const dataSets = {
           When a man, steeped in a civil culture of honor and regard for others, is pushed to his limits trying to providing for his family and keeping an (exquisite) roof over their heads, 
           survival instinct kicks in and the brewing emotions underneath the polite surface boil over.
           In accepting this new equilibrium of reality, the line is blurred between being wellprepared for an interview and figuring out who the potential candidates are for the specific role and getting rid of your competition  
-          --
-          Interesting cinema, photography, and a glimpse into a future where AI is coming for all of our jobs, cost reduction driven mergers and acquisitions, dark/lights-out factories (robot run 24/7).
-          When plans fold and your success depends on your ability to adapt, its a fumbling, imperfect journey where luck, and happenstance more than certainty prevails`,
+          --<br> <br>
+          Interesting cinema, photography, and a glimpse into a future where AI is coming for all of our jobs, cost reduction driven mergers and acquisitions, dark/lights-out factories (24/7 automation).
+          When plans fold and your success depends on your ability to adapt, its a fumbling, imperfect journey where luck, and happenstance more than certainty keeps you going`,
           status: "active", // or "inactive"
           category: "Capitol",
           date: "08-02-2026"
@@ -371,6 +398,7 @@ const dataSets = {
           Beatiful movie, captivating cinematography and sound design that conveys the liberating feeling of riding, front or Pillion (backseat rug).
           Exploring the unsustainable outsourcing of a submissive self and relationship dynamics rarely depicted in typical romcoms.
           Funny, sweet and innocent moments balanced by tension of ultimatums, power dynamics, few words, layered emotion and complete immersion, great cast performance.
+          <br> <br>
           In the end this complicated romance propels the two main characters on separate paths, one well known, and one ready for what's next.
           What we come across, informs who we become.           
           `,
@@ -384,6 +412,7 @@ const dataSets = {
           description: `
           Hard hitting juxtaposition when corporate CEO's life is thrown into chaos as she has to try to convince conspiracy nuts she is who she says she is.
           When those in charge are as weird and crazy as the those on the lowest level of society, futility and ideological insignificance is what's left.
+          <br> <br>
           Stark contrasts and similarities between media trained corporate speak vs conspiratorial speak, justifying a desired outcome.
             (Remake of Save the Green Planet!, 2003), 
           `,
@@ -405,9 +434,10 @@ const dataSets = {
         {
           id: 6,
           title: "The love that remains",
-          description: `Mundane everyday moments veiled in mythical and fantastical air, light and nature that is fairy tale Iceland.
+          description: `Mundane everyday moments veiled in the mythical and fantastical air, light and nature that is fairy tale Iceland.
           Once husband and wife, still artistic mother and fisherman father, trying to find personal and professional balance. 
-          Juggling their individual pursuits, and responsibilities raising a family. 
+          Juggling their individual pursuits and responsibilities raising a family. 
+          <br> <br>tbd
           Floating in the sea, waiting for "it" to happen.. Haunting rooster? Masculinity? 
           (If this is all there is, then let's start dancing).  `,
           status: "active",
@@ -425,7 +455,7 @@ const dataSets = {
         {
           id: 4,
           title: "A private life",
-          description: "A psychiatrist in Paris faces her convictions (Vie privée, fr)",
+          description: "A psychiatrist in Paris faces her convictions (Vie privée, fr). Jodie Foster knocks it out of the park",
           status: "inactive",
           category: "Draken",
           date: "25-01-2026"
@@ -456,7 +486,7 @@ const dataSets = {
         {
           id: 0,
           title: "The creator",
-          description: "Pretty dystopia, Ai has greater heart than humans, it's evolution, ",
+          description: "Pretty dystopia, Ai has greater heart than humans, it's evolution? ",
           status: "inactive",
           category: "M harms / bio?",
           date: "25-01-2026"
@@ -464,7 +494,10 @@ const dataSets = {
         {
           id: 0,
           title: "Mulholland drive",
-          description: "Typical thought provoking and at times surreal and unsettling Lynch tropes. What is reality, are senses and perception to be trusted? Symbolic representations of the desire to know when there is nothing to learn, but the subconscious fear and guilt of the unmet promises of the ego.. When the dream and romantic expectations turn out to be a 'corrupt' reality. Non-linear storyline is momentarily jumpy and disjointed but the effect lingers and still holds up 25 years later ",
+          description: 
+          `Typical thought provoking and at times surreal and unsettling Lynch tropes. 
+          What is reality, are senses and perception to be trusted? Symbolic representations of the desire to know when there is nothing to learn, but the subconscious fear and guilt of the unmet promises of the ego.. 
+          <br>When the dream and romantic expectations turn out to be a 'corrupt' reality. Non-linear storyline is momentarily jumpy and disjointed but the effect lingers and still holds up 25 years later `,
           status: "active", // or "inactive"
           category: "Roy",
           date: "2026-02-23"},
@@ -473,7 +506,7 @@ const dataSets = {
         {
           id: 0,
           title: "Miami connection",
-          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl finds her way into your heart",
+          description: "Excellent B-movie",
           status: "active", // or "inactive"
           category: "Capitol",
           date: "2026-04-28"
@@ -481,7 +514,7 @@ const dataSets = {
         {
           id: 0,
           title: "Gymkata",
-          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl finds her way into your heart",
+          description: "Not worth the price of admission, but some laughs to be had",
           status: "active", // or "inactive"
           category: "Capitol",
           date: "2026-04-28"
@@ -489,7 +522,7 @@ const dataSets = {
         {
           id: 0,
           title: "Riki-Oh",
-          description: "Some bad movies are actually entertaining,  family drama abundant and the little left handed girl finds her way into your heart",
+          description: "Some bad movies are actually entertaining,  ",
           status: "active", // or "inactive"
           category: "Capitol",
           date: "2026-04-28"
@@ -497,7 +530,7 @@ const dataSets = {
         {
           id: 0,
           title: "Gymkata",
-          description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl finds her way into your heart",
+          description: "",
           status: "active", // or "inactive"
           category: "Capitol",
           date: "2026-04-28"
@@ -505,7 +538,7 @@ const dataSets = {
         {
           id: 0,
           title: "Riki-Oh",
-          description: "Some bad movies are just bad, this is not one of them.  entertaining,  family drama abundant and the little left handed girl finds her way into your heart",
+          description: "",
           status: "active", // or "inactive"
           category: "Capitol",
           date: "2026-04-28"
@@ -513,7 +546,7 @@ const dataSets = {
         {
           id: 0,
           title: "Riki-Oh",
-          description: "Some bad movies are actually entertaining,  family drama abundant and the little left handed girl finds her way into your heart",
+          description: "",
           status: "active", // or "inactive"
           category: "Capitol",
           date: "2026-04-28"
@@ -988,8 +1021,8 @@ function render() {
 
         items.forEach((post) => {
             const listEl = document.createElement("div");
-            listEl.className = "list-item";
-            listEl.innerHTML = `<h3>${post.title}</h3><p>${post.description}</p><small>${post.date}</small>`;
+            listEl.className = "list-item2";
+            listEl.innerHTML = `<h3>${post.title}</h3><br><p>${post.description}</p><small>${post.date}</small>`;
             listContainer.appendChild(listEl);
         });
     }
