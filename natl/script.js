@@ -129,12 +129,12 @@ window.renderTaskList = function() {
     switch (tabData.type) {          
         case 'checkin':
             renderGridView(container, tabData);
-            console.log("current tab is checkin", activeTab)
+            // console.log("current tab is checkin", activeTab)
             break;
         case 'list':
         default:
             renderListView(container, tabData);
-            console.log("current tab is standard list", activeTab)
+            // console.log("current tab is standard list", activeTab)
             break;
     }
     togglePurgeButton();
@@ -185,20 +185,20 @@ function renderGridView(container, tabData) {
             let defaults = [""];
             switch (tabData.name) {
                 case 'Gym':
-                    console.log("tabData.name", tabData.name)
+                    // console.log("tabData.name", tabData.name)
                     defaults = ["Lat Pull 40/97", "Row 45/97", "Chest Press 45/97", "Shoulder Press 45/97", "Leg Extension 45/97", "Leg Curl 45/97", "Hip Add, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Zercher 45/97", "Leg raise/Crunches 45/97" ];
                     break;
                 case 'Rehab':
-                    console.log("tabData.name", tabData.name)
+                    // console.log("tabData.name", tabData.name)
                     defaults = ["Ankle mobility","Hip thrusts", "Tummy tucks", "Spinal torsion", "Neck mobility", "Wrist lubrication", "Tendon activation"];
                     break;
                 case 'Yoga':
-                    console.log("tabData.nam", tabData.name)
+                    // console.log("tabData.nam", tabData.name)
                     defaults = ["Sun salutation"];
                     break;
                 case 'Meditation':
                 default:
-                    console.log("tabData.nam", tabData.name)
+                    // console.log("tabData.nam", tabData.name)
                     defaults = ["Body scan"];
                     break;
             }
@@ -529,7 +529,7 @@ window.renderPurgeListPanel = function() {
     if (panelDOM.length && panelDOM.hasClass('open') && panelDOM.attr('data-active-panel') === 'history_panel') {
         const contentContainer = panelDOM.find('.panel-body-content');
         if (contentContainer.length) {
-            console.log(`Live sync triggered: Hot-swapping history context body data for tab ID: ${currentTabId}`);
+            // console.log(`Live sync triggered: Hot-swapping history context body data for tab ID: ${currentTabId}`);
             
             // Re-render the internal HTML content directly using our clean memory fragment layout
             contentContainer.html(fragment.html());
@@ -559,7 +559,7 @@ window.renderPurgeList = function() {
             const hasHistoryScroller = panelBody.querySelector('.history-panel-scroller');
             
             if (hasHistoryScroller) {
-                console.log("Tab shift or purge action detected: Refreshing active history panel content...");
+                // console.log("Tab shift or purge action detected: Refreshing active history panel content...");
                 
                 // Generate a fresh HTML fragment snapshot for the newly activated tab context
                 const freshHistoryFragment = renderPurgeListPanel();
@@ -787,7 +787,7 @@ window.saveNewOrder = function() {
     // 4. Save the cleanly sorted array through the bridge helper
     window.setTabStorageData(currentTabId, reorderedTasks, currentTabType);
     
-    console.log(`Reordering successfully committed for tab: ${currentTabId}`);
+    // console.log(`Reordering successfully committed for tab: ${currentTabId}`);
 
     // 5. Fire off updates to keep health balances and layout configurations unified
     if (typeof updateHealthBar === 'function') updateHealthBar();
@@ -1110,7 +1110,7 @@ $(function () {
 
     // ----------- OTHER -------------
     function showHistory() {
-        console.log('show history');
+        // console.log('show history');
         const dash = document.getElementById("historyCard");
         if (!dash) return;
         dash.classList.toggle("hidden");
@@ -1118,7 +1118,7 @@ $(function () {
 
     function showCommandbar() {
         const togglePanel = document.getElementById("commandBar");
-        console.log('toggle commandbar');
+        // console.log('toggle commandbar');
         if (!togglePanel) return;
         togglePanel.classList.toggle("hidden");
     }
@@ -1147,7 +1147,7 @@ function toggleTheme() {
 //Exports the contents of local storage to a file in JSON format
 //https://stackoverflow.com/questions/61586888/javascript-export-local-storage
 function exportHistory() {  
-    console.log("System Export: Started"); 
+    // console.log("System Export: Started"); 
 
     // 1. Initialize the bundle with core settings and the tab manifest
     const backupBundle = {
@@ -1182,7 +1182,7 @@ function exportHistory() {
     // 5. Cleanup
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    console.log("System Export: Finished. Snapshot saved.");    
+    // console.log("System Export: Finished. Snapshot saved.");    
 }
 
 //import to local storage**/

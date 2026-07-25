@@ -123,7 +123,7 @@ $(document).ready(function() {
         const targetPanelKey = $(this).attr('data-panel'); 
         
         if (targetPanelKey) {
-            console.log(`Button triggered display pass for: ${targetPanelKey}`);
+            // console.log(`Button triggered display pass for: ${targetPanelKey}`);
             
             // Execute the master panel layout transition
             if (typeof window.togglePanelDisplay === 'function') {
@@ -143,7 +143,7 @@ $(document).on('dblclick', '.sortable-item, .checkin-tile, .todo-item', function
     // 1. Extract the unique ID embedded in the element's data attributes
     const itemId = $(this).attr('data-id');
     if (!itemId) {
-        console.warn("Cannot initialize edit sequence: Element missing 'data-id' attribute.");
+        // console.warn("Cannot initialize edit sequence: Element missing 'data-id' attribute.");
         return;
     }
 
@@ -158,20 +158,20 @@ $(document).on('dblclick', '.sortable-item, .checkin-tile, .todo-item', function
     const targetedTaskData = currentTasks.find(item => item.id === itemId);
 
     if (targetedTaskData) {
-        console.log(`Routing Task Model to Edit Panel: ${itemId}`, targetedTaskData);
+        // console.log(`Routing Task Model to Edit Panel: ${itemId}`, targetedTaskData);
         
         // 4. Force reveal the panel, passing the targeted task dataset and context mode
         if (typeof window.togglePanelDisplay === 'function') {
             window.togglePanelDisplay('edit_panel', targetedTaskData, 'task');
         }
     } else {
-        console.error(`Task object matching ID ${itemId} could not be located in local storage arrays.`);
+        // console.error(`Task object matching ID ${itemId} could not be located in local storage arrays.`);
     }
 });
 
 function renderSyncPanel() {
     const shelfView = $('<div class="shelf-panel-view"></div>');
-    const tileGrid = $('<div id="shelf_tiles_container" class="">Locally stored on this device only in free version</div>');
+    const tileGrid = $('<div id="shelf_tiles_container" class="">Locally storage in free version</div>');
     shelfView.append(tileGrid);
     
     // 3. CRITICAL: Return the completed fragment straight back to togglePanelDisplay
@@ -184,7 +184,7 @@ function renderSyncPanel() {
  */
 
 function renderUnifiedForm(itemData, mode) {
-    console.log("render unified EDIT")
+    // console.log("render unified EDIT")
     // 1. Build the form structure template shell
     const formFragment = $(`
         <div class="unified-edit-form">
@@ -307,7 +307,7 @@ function saveUnifiedDataModifications(id, mode, fragment) {
             // 3. CRITICAL INTERACTION FIX: Pass the actual active tab type configuration safely
             // If your custom storage requires the complete object structure, pass activeTabObject instead of currentTabType
             window.setTabStorageData(activeTabId, currentTasks, currentTabType);
-            console.log("Task saved and committed to local storage cleanly:", currentTasks);
+            // console.log("Task saved and committed to local storage cleanly:", currentTasks);
         }
     }
 
@@ -525,7 +525,7 @@ function setTabData(tabId) {
 
 // --- Tab Settings Card Logic ---
 function openTabSettings(tabId = null) {
-    console.log('tab edit', tabId);
+    // console.log('tab edit', tabId);
     window.editingTabId = tabId;
 
     const tab = getTabData(tabId);
@@ -547,12 +547,12 @@ function openTabSettings(tabId = null) {
         //     selectCategoryIcon(window.currentContext || 'Work');
         
         if (isRemote) {
-            console.log(' edit', tabId);
+            // console.log(' edit', tabId);
             $('#sheet_title').text('Tab is remote, Guest Settings (ReadOnly)');
             $('#save_tab_btn').hide(); // Hide save button for subscribers
             // $('#delete_tab_btn').hide();
         } else {
-            console.log('local tab edit', tabId);
+            // console.log('local tab edit', tabId);
             $('#sheet_title').text(tabId ? 'Edit Tab (local)' : 'New Tab');
             $('#save_tab_btn').show();
 
