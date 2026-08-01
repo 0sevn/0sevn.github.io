@@ -33,42 +33,23 @@ document.querySelectorAll(".tab").forEach(tab => {
  * raw and suffixed calls into a single standardized key layout structure.
  */
 
-window.getTabStorageData = function(tabId, typeOrList) {
-    if (!tabId) return [];
+function getTabStorageData(tabId, listType = "active") {
 
-    // 1. Force all variations to route to the standardized "List" suffix key
-    const isPurge = (typeOrList === 'purge' || typeOrList === 'purgeList');
-    const standardKey = isPurge ? `${tabId}PurgeList` : `${tabId}List`;
+    const store = JSON.parse(
+        localStorage.getItem("flowea_tab_data") || "{}"
+    );
 
-    try {
-        // 2. Look inside the unified master state dictionary first (New clean layout)
-        const masterStore = JSON.parse(localStorage.getItem('flowea_tab_data') || '{}');
-        if (masterStore[tabId]) {
-            const targetField = isPurge ? 'purgeList' : 'activeList';
-            if (Array.isArray(masterStore[tabId][targetField])) {
-                return masterStore[tabId][targetField];
-            }
-        }
-
-        // 3. Fallback: Read from the unified legacy key
-        let legacyData = localStorage.getItem(standardKey);
-        
-        // If nothing is found under the standard key, check if it was saved under the raw unsuffixed ID
-        if (!legacyData && !isPurge) {
-            legacyData = localStorage.getItem(tabId);
-        }
-        
-        if (legacyData) {
-            const parsed = JSON.parse(legacyData);
-            if (Array.isArray(parsed)) return parsed;
-            if (parsed && typeof parsed === 'object') return [parsed]; 
-        }
-    } catch (e) {
-        console.error(`Bridge failed reading storage for Tab: ${tabId}`, e);
+    if (!store[tabId]) {
+        store[tabId] = {
+            activeList: [],
+            purgeList: []
+        };
     }
 
-    return [];
-};
+    return listType === "purge"
+        ? store[tabId].purgeList
+        : store[tabId].activeList;
+}
 
 window.setTabStorageData = function(tabId, dataArray, typeOrList) {
     if (!tabId) return;

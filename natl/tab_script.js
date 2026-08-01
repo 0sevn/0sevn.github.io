@@ -1,11 +1,9 @@
-// PANEL CONTROLLER
-// [key]:{title,shortcut,size,position}
-// vertical alignment first, horizontal alignment second
+// PANEL CONTROLLER// [key]:{title,shortcut,size,position}// vertical alignment first, horizontal alignment second
 const UI_PANEL_CONFIG = {
     edit_panel: {
         title: "Edit Panel",
         shortcut: "dblclck", // Triggered via your unified schema routing
-        width: "50%", height: "40%",
+        width: "75%", height: "40%",
         position: "bottom-center",
         animateDirection: "w3-animate-left",
         renderSource: (itemData, type) => renderUnifiedForm(itemData, type)
@@ -28,11 +26,9 @@ const UI_PANEL_CONFIG = {
     }
 };
 
-/**
- * Master Controller to dynamically present any application module
+/** * Master Controller to dynamically present any panel
  * @param {string} panelKey - The key from UI_PANEL_CONFIG
- * @param {...args} injectionData - Optional context variables (like task details for editing)
- */
+ * @param {...args} injectionData - Optional context variables (like task details for editing) */
 window.togglePanelDisplay = function(panelKey, ...injectionData) {
     const config = UI_PANEL_CONFIG[panelKey];
     if (!config) return;
@@ -68,12 +64,17 @@ window.togglePanelDisplay = function(panelKey, ...injectionData) {
     panelDOM.attr('data-active-panel', panelKey).addClass('open');
 };
 
-/**
- * Master Keydown shortcut listener
+function renderSyncPanel() {
+    const shelfView = $('<div class="shelf-panel-view"></div>');
+    const tileGrid = $('<div id="shelf_tiles_container" class="">Locally storage in free version</div>');
+    shelfView.append(tileGrid);
+    
+    // 3. CRITICAL: Return the completed fragment straight back to togglePanelDisplay
+    return shelfView;
+}
+/** * Master Keydown shortcut listener
  * @param {string} panelKey - The key from UI_PANEL_CONFIG
- * @param {...args} injectionData - Optional context variables (like task details for editing)
- */
-
+ * @param {...args} injectionData - Optional context variables (like task details for editing) */
 $(document).ready(function() {
     // Master Orchestration Hook
     $(document).on('keydown', function(e) {
@@ -134,12 +135,11 @@ $(document).ready(function() {
 
 });
 
-// Global edit delegated double-click router for individual list items & check-in tiles
+// Global edit delegated double-click router for // list items & check-in tiles
 $(document).on('dblclick', '.sortable-item, .checkin-tile, .todo-item', function(e) {
     // Prevent text highlighting or accidental sub-element triggers during fast double-tapping
     e.preventDefault();
     e.stopPropagation();
-
     // 1. Extract the unique ID embedded in the element's data attributes
     const itemId = $(this).attr('data-id');
     if (!itemId) {
@@ -148,7 +148,6 @@ $(document).on('dblclick', '.sortable-item, .checkin-tile, .todo-item', function
     }
 
     // 2. Pull the active tab's layout array from storage
-    // (Tasks are scoped inside their active routine navigation tab)
     const activeTabId = window.activeTab;
     if (!activeTabId) return;
 
@@ -169,22 +168,141 @@ $(document).on('dblclick', '.sortable-item, .checkin-tile, .todo-item', function
     }
 });
 
-function renderSyncPanel() {
-    const shelfView = $('<div class="shelf-panel-view"></div>');
-    const tileGrid = $('<div id="shelf_tiles_container" class="">Locally storage in free version</div>');
-    shelfView.append(tileGrid);
-    
-    // 3. CRITICAL: Return the completed fragment straight back to togglePanelDisplay
-    return shelfView;
+// =====================================================================
+// MASTER TAB STORAGE API// --- Global State ---// Default tabs
+window.masterTabs = JSON.parse(localStorage.getItem("master_tabs") || "[]");
+window.editingTabId = null;
+
+if (window.masterTabs.length === 0) {
+    const baseTime = Date.now();
+    const defaultTabs = [
+        { name: "Morning", category: "Morning", type: "list", displayStyle: "list", taskMode: "singular" },
+        { name: "Work", category: "Work", type: "list", displayStyle: "list", taskMode: "singular" },
+        { name: "Exercise", category: "Gym", type: "checkin", displayStyle: "tiles", taskMode: "recurring" },
+        { name: "Evening", category: "Evening", type: "list", displayStyle: "list", taskMode: "singular" },
+        { name: "Night", category: "Night", type: "list", displayStyle: "list", taskMode: "singular" }
+    ];
+
+    window.masterTabs = defaultTabs.map((tabBlueprint, index) => ({
+        id: `tab_${baseTime}_${index}`,
+        name: tabBlueprint.name,
+        category: tabBlueprint.category,
+        order: index,
+        type: tabBlueprint.type,
+        displayStyle: tabBlueprint.displayStyle,
+        taskMode: tabBlueprint.taskMode
+    }));
+
+    localStorage.setItem('master_tabs', JSON.stringify(masterTabs));
+}
+function getMasterTabs() {
+    return window.masterTabs;
 }
 
-/**
- * Global single function to handle shelving and unshelving tabs
- * @param {string} tabId - Target tab identifier
- */
+function setMasterTabs(masterTabs) {
+    window.masterTabs = masterTabs;
+    localStorage.setItem("master_tabs", JSON.stringify(masterTabs));
+}
 
+function getTabData(tabId) {
+    return getMasterTabs().find(tab => tab.id === tabId) || null;
+}
+
+function setTabData(tabId, updates) {
+    const masterTabs = getMasterTabs();
+
+    const index = masterTabs.findIndex(tab => tab.id === tabId);
+    if (index === -1) return null;
+
+    masterTabs[index] = {
+        ...masterTabs[index],
+        ...updates
+    };
+
+    setMasterTabs(masterTabs);
+    return masterTabs[index];
+}
+
+// Global Bridges
+window.openNewTabCreator = () => openTabSettings(null);
+function openTabSettings(tabId = null) {
+    window.editingTabId = tabId;
+    const tab = getTabData(tabId);
+    // const isRemote = tab && !!tab.remoteOwnerId;
+    const card = $('#tab_settings_card');
+    
+        // $('#tab_name_input').prop('disabled', isRemote);
+        // $('#tab_mode_select').prop('disabled', isRemote);
+        // $('.category-icon-picker').css('pointer-events', isRemote ? 'none' : 'auto');
+    if (tabId) {
+        $('#tab_name_input').val(tab.name);
+        $('#tab_mode_select').val(tab.type || 'list');
+        $('#displayStyleToggle').prop('checked', (tab.displayStyle || 'list') === 'tiles');
+        $('#recurringToggle').prop('checked', (tab.taskMode || 'singular') === 'recurring');
+    }
+            $('#sheet_title').text(tabId ? 'Edit Tab' : 'New Tab');
+            $('#save_tab_btn').show();        
+    card.addClass('active');
+}
+function closeTabSettings() {
+    $('#tab_settings_card').removeClass('active');
+    window.editingTabId = null;
+}
+function handleSaveTab() {
+    const name = $('#tab_name_input').val().trim();
+    const type = $('#tab_mode_select').val();
+    const displayStyle = $('#displayStyleToggle').is(':checked') ? 'tiles' : 'list';
+    const taskMode = $('#recurringToggle').is(':checked') ? 'recurring' : 'singular';
+
+    if (!name) return alert("Please provide a name");
+
+    // Refresh memory from storage to be safe
+    window.masterTabs = JSON.parse(localStorage.getItem('master_tabs') || '[]');
+
+    if (window.editingTabId) {
+        const index = window.masterTabs.findIndex(t => t.id === window.editingTabId);
+        if (index !== -1) {
+            window.masterTabs[index] = { ...window.masterTabs[index], name, type, displayStyle, taskMode };
+        }
+    } else {
+        const newId = "tab_" + Date.now();
+        window.masterTabs.push({ id: newId, name, type, displayStyle, taskMode });
+        window.activeTab = newId; 
+    }
+
+    // Update Memory and Storage
+    localStorage.setItem('master_tabs', JSON.stringify(window.masterTabs));
+    
+    // Update UI
+    closeTabSettings();
+    initTabs();
+    
+    if (typeof showToast === 'function') showToast("Tab Saved!");
+}
+function finalizeTabDeletion() {
+    const id = window.activeTab;
+    const masterTabs = getMasterTabs().filter(tab => tab.id !== id);
+        setMasterTabs(masterTabs);
+        const storage = JSON.parse(localStorage.getItem("flowea_tab_data") || "{}");
+
+        delete storage[id];
+
+        localStorage.setItem("flowea_tab_data", JSON.stringify(storage));
+
+        if (window.activeTab === id) {
+            window.activeTab =masterTabs.length? masterTabs[0].id: null;
+
+            localStorage.setItem("activeTab",window.activeTab || "");
+        }
+    closeTabSettings()
+    initTabs();
+
+    if (typeof showToast === 'function') showToast("Tab and data deleted");
+}
+
+/** * Global single function to handle shelving and unshelving tabs
+ * @param {string} tabId - Target tab identifier */
 function renderUnifiedForm(itemData, mode) {
-    // console.log("render unified EDIT")
     // 1. Build the form structure template shell
     const formFragment = $(`
         <div class="unified-edit-form">
@@ -267,161 +385,93 @@ function saveUnifiedDataModifications(id, mode, fragment) {
     }
 
     if (mode === 'tab') {
-        // --- TAB CONFIGURATION DATA PERSISTENCE ---
-        let masterTabs = JSON.parse(localStorage.getItem('master_tabs') || '[]');
-        const idx = masterTabs.findIndex(t => t.id === id);
-        if (idx !== -1) {
-            masterTabs[idx].name = newName;
-            masterTabs[idx].description = newDesc;
-            localStorage.setItem('master_tabs', JSON.stringify(masterTabs));
-        }
+        
+         const updates = {
+            name: newName,
+            description: newDesc,
+            type: $("#tab_mode_select").val() || "list"
+        };
+
+        setTabData(id, updates);
     } else {
-        // --- FIXED: TASK / TILE DATA PERSISTENCE ---
-        const activeTabId = window.activeTab;
-        if (!activeTabId) return;
+        const tab = getTabData(window.activeTab);
+        const tasks = getTabStorageData(tab.id);
+        const index = tasks.findIndex(task => task.id === id);
+        if (index === -1) return;
 
-        // 1. Fetch the complete structural Tab object instead of just the raw type string string
-        const activeTabObject = typeof window.getTabData === 'function' ? window.getTabData(activeTabId) : null;
-        const currentTabType = activeTabObject ? activeTabObject.type : null;
-        
-        // 2. Safely read your working task layout database
-        let currentTasks = window.getTabStorageData(activeTabId, currentTabType) || [];
-        
-        const idx = currentTasks.findIndex(item => item.id === id);
-        if (idx !== -1) {
-            // Update the object properties precisely
-            currentTasks[idx].description = newDesc;
-            currentTasks[idx].updatedAt = new Date().toLocaleString();
+        tasks[index].description = newDesc;
+        tasks[index].updatedAt = new Date().toLocaleString();
 
-            // Handle slider evaluations if metrics are active
-            if (fragment.find('.slider-group').is(':visible')) {
-                const currentSliderVal = fragment.find('#edit_field_slider').val();
-                const goalMetricValue = fragment.find('#lbl_goal').text();
-                
-                currentTasks[idx].text = `${newName} ${currentSliderVal}/${goalMetricValue}`;
-                currentTasks[idx].clicks = parseInt(currentSliderVal, 10);
-            } else {
-                currentTasks[idx].text = newName;
-            }
-
-            // 3. CRITICAL INTERACTION FIX: Pass the actual active tab type configuration safely
-            // If your custom storage requires the complete object structure, pass activeTabObject instead of currentTabType
-            window.setTabStorageData(activeTabId, currentTasks, currentTabType);
-            // console.log("Task saved and committed to local storage cleanly:", currentTasks);
+        // Handle slider evaluations if metrics are active
+        if (fragment.find('.slider-group').is(':visible')) {
+            const currentSliderVal = fragment.find('#edit_field_slider').val();
+            const goalMetricValue = fragment.find('#lbl_goal').text();
+            
+            tasks[index].text =`${newName} ${currentSliderVal}/${goalMetricValue}`;
+            tasks[index].clicks = Number(currentSliderVal);
+        } else {
+            tasks[index].text = newName;
         }
+
+        setTabStorageData(tab.id, tasks);
     }
 
-    // --- REFRESH DISPLAY VIEWPORTS ---
-    $('#universal_panel_wrapper').removeClass('open');
-    
-    if (typeof window.renderTaskList === 'function') window.renderTaskList();
-    if (typeof window.pushFullSync === 'function') window.pushFullSync();
+    // // --- REFRESH DISPLAY VIEWPORTS ---
+    refreshApplication();
 }
 
-// --- Global State ---
-let masterTabs = JSON.parse(localStorage.getItem('master_tabs') || '[]');
+function executeUnifiedDeletion(id, mode) {
 
-if (masterTabs.length === 0) {
-    const baseTime = Date.now();
-    const defaultTabs = [
-        { name: "Morning", category: "Morning", type: "list", displayStyle: "list", taskMode: "singular" },
-        { name: "Work", category: "Work", type: "list", displayStyle: "list", taskMode: "singular" },
-        { name: "Exercise", category: "Gym", type: "checkin", displayStyle: "tiles", taskMode: "recurring" },
-        { name: "Evening", category: "Evening", type: "list", displayStyle: "list", taskMode: "singular" },
-        { name: "Night", category: "Night", type: "list", displayStyle: "list", taskMode: "singular" }
-    ];
+    if (!confirm("Delete this item?"))
+        return;
 
-    masterTabs = defaultTabs.map((tabBlueprint, index) => ({
-        id: `tab_${baseTime}_${index}`,
-        name: tabBlueprint.name,
-        category: tabBlueprint.category,
-        order: index,
-        type: tabBlueprint.type,
-        displayStyle: tabBlueprint.displayStyle,
-        taskMode: tabBlueprint.taskMode
-    }));
+    if (mode === "tab") {
+        const masterTabs = getMasterTabs().filter(tab => tab.id !== id);
+        setMasterTabs(masterTabs);
+        const storage = JSON.parse(localStorage.getItem("flowea_tab_data") || "{}");
 
-    localStorage.setItem('master_tabs', JSON.stringify(masterTabs));
-}
+        delete storage[id];
 
-window.allTabs = masterTabs;
-window.editingTabId = null;
+        localStorage.setItem("flowea_tab_data", JSON.stringify(storage));
 
-window.activeTab = localStorage.getItem('activeTab') || (window.allTabs[0] ? window.allTabs[0].id : null);
-if (window.activeTab) localStorage.setItem('activeTab', window.activeTab);
+        if (window.activeTab === id) {
+            window.activeTab =masterTabs.length? masterTabs[0].id: null;
 
-function handleSaveTab() {
-    const name = $('#tab_name_input').val().trim();
-    const category = $('.cat-opt.selected').data('val');
-    const type = $('#tab_mode_select').val();
-    const displayStyle = $('#displayStyleToggle').is(':checked') ? 'tiles' : 'list';
-    const taskMode = $('#recurringToggle').is(':checked') ? 'recurring' : 'singular';
-
-    if (!name) return alert("Please provide a name and select an icon/category.");
-
-    // Refresh memory from storage to be safe
-    window.allTabs = JSON.parse(localStorage.getItem('master_tabs') || '[]');
-
-    if (window.editingTabId) {
-        const index = window.allTabs.findIndex(t => t.id === window.editingTabId);
-        if (index !== -1) {
-            window.allTabs[index] = { ...window.allTabs[index], name, category, type, displayStyle, taskMode };
+            localStorage.setItem("activeTab",window.activeTab || "");
         }
-    } else {
-        const newId = "tab_" + Date.now();
-        window.allTabs.push({ id: newId, name, category, type, displayStyle, taskMode });
-        window.activeTab = newId; 
-    }
 
-    // Update Memory and Storage
-    localStorage.setItem('master_tabs', JSON.stringify(window.allTabs));
-    
-    // Update UI
-    closeTabSettings();
+    } else {
+        const tab = getTabData(window.activeTab);
+        const tasks = getTabStorageData(tab.id).filter(task => task.id !== id);
+        setTabStorageData(tab.id, tasks);
+    }
+    refreshApplication();
+}
+
+// Start
+document.addEventListener("DOMContentLoaded", () => {
     initTabs();
-    
-    if (typeof showToast === 'function') showToast("Tab Saved!");
-}
-
-/**
- * 4. EVENT LISTENERS
- * Checks every 30 seconds if the hour has shifted
- */
-function initEventListeners() {
-    // Save Button
-    $('#save_tab_btn').off('click').on('click', handleSaveTab);
-
-    // Category and panel buttons are handled elsewhere. No auto-context switching needed in this simplified version.
-
-    // Category Selection in Modal
-    $(document).off('click', '.cat-opt').on('click', '.cat-opt', function() {
-        $('.cat-opt').removeClass('selected');
-        $(this).addClass('selected');
-    });
-}
-
-/**
- * Initializes the Tab UI from the master data.
- */
+    initEventListeners();
+});
+//  * Initializes the Tab UI from the master data.
 function initTabs() {
+    window.activeTab = localStorage.getItem('activeTab') || (window.masterTabs[0] ? window.masterTabs[0].id : null);
+    if (window.activeTab) localStorage.setItem('activeTab', window.activeTab);
+
     // 1. Ensure we have the latest data from memory
     const container = document.getElementById("tabsContainer");
     if (!container) return;
     container.innerHTML = "";
 
     // 2. Render all tabs
-    window.allTabs.forEach(tab => {
+    window.masterTabs.forEach(tab => {
         container.appendChild(createTabElement(tab));
     });
 
     // 3. Set the initial active tab
     switchTab(window.activeTab);
 }
-
-/**
- * Creates the DOM element for a single tab.
- * @param {Object} tab - The tab object from master_tabs.
- */
+/** * Creates the DOM element, looped for every single tab. * @param {Object} tab - The tab object from master_tabs. */
 function createTabElement(tab) {
     const tabEl = document.createElement("div");
     
@@ -444,22 +494,23 @@ function createTabElement(tab) {
     
     // Optional: Keep the label as is, or prepend a small indicator if desired
     span.textContent = tab.name;
+    tabEl.appendChild(span);
 
+    tabEl.onclick = () => switchTab(tab.id);
     // Double-tap/click to open settings
     tabEl.ondblclick = (e) => {
         e.stopPropagation();
         openTabSettings(tab.id);
     };
-
-    tabEl.appendChild(span);
-    tabEl.onclick = () => switchTab(tab.id);
-
     return tabEl;
 }
 
-/**
- * Manages the transition between tabs.
- */
+function initEventListeners() {
+    // Save Button
+    $('#save_tab_btn').off('click').on('click', handleSaveTab);
+    $('#delete_tab_btn').off('click').on('click', finalizeTabDeletion);
+}
+//  * Manages the transition between tabs.
 function switchTab(tabId) {
     if (!tabId) return;
         
@@ -504,135 +555,20 @@ function switchTab(tabId) {
     }
 }
 
-/**
- * Helper to get a tab object from memory.
- */
-// current category or active tab category, latter probably..
-function getTabData(tabId) {
-    // allTabs= look in master_tabs for tabId, then get tablist entry for that tabId
-    return window.allTabs.find(t => t.id === tabId) || 
-           { id: tabId, name: "New Tab", category: 'Work', type: 'list' };
-}
-/**
- * Helper to set a tab object from memory.
- * replace all localstorage calls, simplify
- */
-function setTabData(tabId) {
-    // allTabs= look in master_tabs for tabId, then get tablist for that tabId
-    return window.allTabs.find(t => t.id === tabId) || 
-           { id: tabId, name: "New Tab", category: 'Work', type: 'list' };
-}
-
-// --- Tab Settings Card Logic ---
-function openTabSettings(tabId = null) {
-    // console.log('tab edit', tabId);
-    window.editingTabId = tabId;
-
-    const tab = getTabData(tabId);
-    const isRemote = tab && !!tab.remoteOwnerId;
-    const card = $('#tab_settings_card');
-    
-    // if (tabId) {
-        // Disable inputs if the tab is remote
-        $('#tab_name_input').prop('disabled', isRemote);
-        $('#tab_mode_select').prop('disabled', isRemote);
-        $('.category-icon-picker').css('pointer-events', isRemote ? 'none' : 'auto');
-        $('#tab_name_input').val(tab.name);
-        $('#tab_mode_select').val(tab.type || 'list');
-        $('#displayStyleToggle').prop('checked', (tab.displayStyle || 'list') === 'tiles');
-        $('#recurringToggle').prop('checked', (tab.taskMode || 'singular') === 'recurring');
-        // existing tab read category
-        selectCategoryIcon(tab.category);
-        // new tab, suggest current context category
-        //     selectCategoryIcon(window.currentContext || 'Work');
-        
-        if (isRemote) {
-            // console.log(' edit', tabId);
-            $('#sheet_title').text('Tab is remote, Guest Settings (ReadOnly)');
-            $('#save_tab_btn').hide(); // Hide save button for subscribers
-            // $('#delete_tab_btn').hide();
-        } else {
-            // console.log('local tab edit', tabId);
-            $('#sheet_title').text(tabId ? 'Edit Tab (local)' : 'New Tab');
-            $('#save_tab_btn').show();
-
-        }
-
-    card.addClass('active');
-}
-
-function closeTabSettings() {
-    $('#tab_settings_card').removeClass('active');
-    window.editingTabId = null;
-}
-
-function selectCategoryIcon(val) {
-    $('.cat-opt').removeClass('selected');
-    $(`.cat-opt[data-val="${val}"]`).addClass('selected');
-}
-
-
-function finalizeTabDeletion(tabId) {
-    // 1. Data Purge
-    localStorage.removeItem(`${tabId}List`);
-    localStorage.removeItem(`${tabId}PurgeList`);
-// localStorage.removeItem(`tabName_${tabId}`); // Clean up legacy keys if any
-
-    // 2. Memory Update
-    window.allTabs = window.allTabs.filter(t => t.id !== tabId);
-    localStorage.setItem('master_tabs', JSON.stringify(window.allTabs));
-
-    // 3. Smart UI Reset
-    // Fallback to the first available remaining tab after deletion.
-    const visibleTabs = window.allTabs;
-    
-    // Fallback logic: Visible tab > First available tab > "work"
-    let fallbackTab;
-    if (visibleTabs.length > 0) {
-        fallbackTab = visibleTabs[0].id;
-    } else {
-        // Total Fallback: If no tabs left in this context, go to the first global tab
-        fallbackTab = window.allTabs.length > 0 ? window.allTabs[0].id : "work";
-        window.isManualOverride = false; // Reset override since that context is now empty
-    }
-
-    // 4. Execute the switch and redraw
-    window.activeTab = fallbackTab; 
-    localStorage.setItem("activeTab", fallbackTab);
-
-    // 3. UI Reset
-    // switchTab("work");
-    initTabs();
-
-    if (typeof showToast === 'function') showToast("Tab and data deleted");
-}
-
-// Global Bridges
-// --- Window Bridge (Public API) ---
-// window.openActiveTabSettings = () => { if (window.activeTab) openTabSettings(window.activeTab); };
-window.openNewTabCreator = () => openTabSettings(null);
-window.deleteTab = () => {
-    const tabId = window.activeTab;
-    // if (CORE_DEFAULT_TABS.includes(tabId)) return alert("Default tabs cannot be deleted.");
-    const tab = getTabData(tabId);
-    if (confirm(`Delete "${tab.name}" and all its tasks?`)) finalizeTabDeletion(tabId);
-};
-
-
-
-// Start
-document.addEventListener("DOMContentLoaded", () => {
-    initTabs();
-    initEventListeners();
-});
-
 function openCommandbar() {
     const combar = $('#commandBar');
     combar.toggleClass('hidden');
 }
 
-// function openCommandsettings() {
-//     const comset = $('#commandsettings');
-//     comset.toggleClass('hidden');
-// }
-
+function refreshApplication() {
+    $("#universal_panel_wrapper").removeClass("open");
+    initTabs();
+    if (typeof displayData === "function")
+        displayData();
+    if (typeof renderTaskList === "function")
+        renderTaskList();
+    if (typeof renderPurgeList === "function")
+        renderPurgeList();
+    if (typeof pushFullSync === "function")
+        pushFullSync();
+}

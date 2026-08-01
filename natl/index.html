@@ -131,13 +131,6 @@
         </div>
         <div class="settings-panel" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
                 <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                    <span>Theme (Light/Dark)</span>
-                    <label class="switch">
-                        <input type="checkbox" id="themeToggle">
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-                <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
                     <span>Show healthbar</span>
                     <label class="switch">
                         <input type="checkbox" id="healthbarToggle" checked>
@@ -145,16 +138,23 @@
                     </label>
                 </div>
                 <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                    <span>Healthbar charge state/resource depletion</span>
+                    <span>Healthbar charge state / Resource depletion</span>
                     <label class="switch">
                         <input type="checkbox" id="healthbarToggle" checked>
                         <span class="slider round"></span>
                     </label>
                 </div>
                 <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                    <span>add predefined tabs</span>
+                    <span>Add predefined tabs and routines</span>
                     <label class="switch">
                         <input type="checkbox" id="healthbarToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <span>Theme (Light/Dark)</span>
+                    <label class="switch">
+                        <input type="checkbox" id="themeToggle">
                         <span class="slider round"></span>
                     </label>
                 </div>
@@ -189,21 +189,26 @@
         <div class="sheet-body">
             <input type="text" id="tab_name_input" placeholder="Tab name">
 
-
-            <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <span>Tab Mode Standard List/Check-in Grid</span>
-                <label class="switch">
-                    <input type="checkbox" id="healthbarToggle" checked>
-                    <span class="slider round"></span>
-                </label>
-            </div>
-
             <label>Tab Mode</label>
             <select id="tab_mode_select">
-                <option value="list"> / Standard List</option>
+                <option value="list"> Standard List</option>
                 <option value="checkin">Check-in Grid</option>
             </select>
 
+            <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <span>Tab Visualization Standard List/ Tile Grid</span>
+                <label class="switch">
+                    <input type="checkbox" id="displayStyleToggle" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <span>Tab Mode Singular/Recurring</span>
+                <label class="switch">
+                    <input type="checkbox" id="recurringToggle" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
             <input type="submit" id="save_tab_btn" value=" " class="icon save" title="Save Changes">
             <input type="submit" id="delete_tab_btn" value=" " class="icon delete" title="Delete Tab">
         </div>
