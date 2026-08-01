@@ -317,7 +317,7 @@ function renderListView(container, tabData) {
 // const editDisplayState = true;
         const taskBodyHtml = isRecurringMode ? `
             <div class="task-summary">
-                <span class="task-text">${linkify(task.text)}</span>
+                <span class="task-text"></span>
                 <p class="time">${displayDate}</p>
             </div>
             <div class="recurring-action-row">
@@ -327,7 +327,7 @@ function renderListView(container, tabData) {
         ` : `
             <span>
                 <input type="checkbox" class="task-checkbox" ${task.checked ? 'checked' : ''}>
-                <span class="task-text">${linkify(task.text)}</span>
+                <span class="task-text"></span>
                 <p class="time">${displayDate}</p>
             </span>
         `;
@@ -348,6 +348,8 @@ function renderListView(container, tabData) {
         `);
 
         container.append(newListItem);
+        const textContainer = newListItem.find(".task-text")[0];
+        renderTaskText(textContainer, task.text);
 
         const swiper = newListItem.find(".swipe-container")[0];
         requestAnimationFrame(() => {
@@ -609,15 +611,6 @@ function enterTask() {
     $('#enter_task').val('');
     updateHealthBar();
     window.renderTaskList();
-
-//     Since ISO timestamps are lexically sortable, you can sort tasks by ID directly:
-        // todoList.sort((a, b) => a.id.localeCompare(b.id)); // ascending
-        // todoList.sort((a, b) => b.id.localeCompare(a.id)); // descending
-        // Or if you ever switch to numeric timestamps:
-
-        // todoList.sort((a, b) => new Date(b.id) - new Date(a.id));
-
-
         
     // VERIFY THIS LINE IS HERE:
     if (typeof window.pushFullSync === 'function') window.pushFullSync();
@@ -1124,107 +1117,6 @@ function toggleTheme() {
     }
 }
 
-
-//Exports the contents of local storage to a file in JSON format
-//https://stackoverflow.com/questions/61586888/javascript-export-local-storage
-function exportHistory() {  
-    // console.log("System Export: Started"); 
-
-    // 1. Initialize the bundle with core settings and the tab manifest
-    const backupBundle = {
-        timestamp: new Date().toISOString(),
-        master_tabs: JSON.parse(localStorage.getItem('master_tabs') || '[]'),
-        tabData: {}
-    };
-
-    // 2. Iterate through all tabs to collect their specific lists
-    backupBundle.master_tabs.forEach(tab => {
-        const tabId = tab.id;
-        backupBundle.tabData[tabId] = {
-            activeList: JSON.parse(localStorage.getItem(`${tabId}List`) || '[]'),
-            purgeList: JSON.parse(localStorage.getItem(`${tabId}PurgeList`) || '[]')
-        };
-    });
-
-    // 3. Convert the whole bundle to a pretty-printed JSON string
-    const fullSnapshot = JSON.stringify(backupBundle, null, 2);
-    const filetime = new Date().toISOString().split('T')[0]; // Simple YYYY-MM-DD
-
-    // 4. Create the download link
-    const blob = new Blob([fullSnapshot], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    
-    a.href = url;
-    a.download = `FloWea_Full_Backup_${filetime}.json`;
-    document.body.appendChild(a);
-    a.click();
-    
-    // 5. Cleanup
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    // console.log("System Export: Finished. Snapshot saved.");    
-}
-
-//import to local storage**/
-// ✅ DELEGATED TRANSITION FIX: Listens globally for the change event
-$(document).on('change', '#jsonFileInput', function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const backup = JSON.parse(e.target.result);
-
-            // 1. Validation: Ensure it's a full backup file
-            if (!backup.master_tabs || !backup.tabData) {
-                throw new Error("Invalid file format. This is not a FloWea Full Backup.");
-            }
-            else if (confirm("This will delete all current tasks and tabs and replace them with the backup. Continue?")) {
-                localStorage.clear();
-                // ... rest of the logic
-            
-                // 2. The Destructive Wipe
-                // We clear everything to ensure a clean slate for the restoration
-                localStorage.clear();
-
-                // 3. Restore Global Settings
-                localStorage.setItem('master_tabs', JSON.stringify(backup.master_tabs));
-
-                // 4. Restore Individual Tab Content
-                Object.keys(backup.tabData).forEach(tabId => {
-                    const data = backup.tabData[tabId];
-                    localStorage.setItem(`${tabId}List`, JSON.stringify(data.activeList));
-                    localStorage.setItem(`${tabId}PurgeList`, JSON.stringify(data.purgeList));
-                });
-
-                // 5. Hard Reset Global State
-                window.allTabs = backup.master_tabs;
-                window.isManualOverride = false;
-                
-                // Set a default active tab if one isn't set
-                const firstTabId = window.allTabs.length > 0 ? window.allTabs[0].id : 'work';
-                window.activeTab = firstTabId;
-                localStorage.setItem("activeTab", firstTabId);
-
-                // Cleanly stows away your panel overlay since the workspace is resetting
-                $('#universal_panel_wrapper').removeClass('open');
-
-                if (typeof initTabs === 'function') initTabs();           // Redraw tab buttons
-                if (typeof window.displayData === 'function') window.displayData(); // Redraw the task lists
-
-                alert("Restoration Successful! Your workspace has been updated.");
-            }
-
-        } catch (error) {
-            console.error('Restoration Failed:', error);
-            alert("Error: " + error.message);
-        }
-    };
-    reader.readAsText(file);
-});
-
 // Sync specific functions
 window.updateDashboardUI = function() {
     const display = document.getElementById('userUidDisplay');
@@ -1330,3 +1222,192 @@ function linkify(text) {
         return `<a href="${url}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>`;
     });
 }
+
+// 
+// dom based text input render
+// 
+const titleCache = new Map();
+
+async function getYoutubeTitle(url) {
+    try {
+        const endpoint =
+            "https://www.youtube.com/oembed?format=json&url=" +
+            encodeURIComponent(url);
+        const response = await fetch(endpoint);        if (!response.ok) return null;        const data = await response.json();
+        return data.title || null;
+
+    } catch {
+        return null;
+    }
+}
+
+async function getLinkTitle(url) {
+    if (titleCache.has(url))        return titleCache.get(url);
+    let title = null;
+    try {
+        const host = new URL(url).hostname.replace(/^www\./, "");
+        switch (host) {
+            case "youtube.com":
+            case "youtu.be":
+            case "m.youtube.com":
+                title = await getYoutubeTitle(url);
+                break;
+            default:
+                title = host;
+        }
+        if (!title)
+            title = host;
+    } catch {
+        title = url;
+    }
+
+    titleCache.set(url, title);
+
+    return title;
+}
+
+function renderTaskText(container, text) {
+    const regex = /\bhttps?:\/\/[^\s<>"']+/g;
+    let lastIndex = 0;
+    for (const match of text.matchAll(regex)) {
+        const url = match[0];
+        // normal text before URL
+        if (match.index > lastIndex) {
+            container.appendChild(
+                document.createTextNode(
+                    text.slice(lastIndex, match.index)
+                )
+            );
+        }
+
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+
+        // Initial label
+        a.textContent = new URL(url).hostname.replace(/^www\./, "");
+
+        // Update title later
+        getLinkTitle(url).then(title => {
+            a.textContent = title;
+        });
+
+        container.appendChild(a);
+
+        lastIndex = match.index + url.length;
+    }
+
+    // Remaining text
+    if (lastIndex < text.length) {
+
+        container.appendChild(
+            document.createTextNode(
+                text.slice(lastIndex)
+            )
+        );
+    }
+}
+
+//Exports the contents of local storage to a file in JSON format
+//https://stackoverflow.com/questions/61586888/javascript-export-local-storage
+function exportHistory() {  
+    // console.log("System Export: Started"); 
+
+    // 1. Initialize the bundle with core settings and the tab manifest
+    const backupBundle = {
+        timestamp: new Date().toISOString(),
+        master_tabs: JSON.parse(localStorage.getItem('master_tabs') || '[]'),
+        tabData: {}
+    };
+
+    // 2. Iterate through all tabs to collect their specific lists
+    backupBundle.master_tabs.forEach(tab => {
+        const tabId = tab.id;
+        backupBundle.tabData[tabId] = {
+            activeList: JSON.parse(localStorage.getItem(`${tabId}List`) || '[]'),
+            purgeList: JSON.parse(localStorage.getItem(`${tabId}PurgeList`) || '[]')
+        };
+    });
+
+    // 3. Convert the whole bundle to a pretty-printed JSON string
+    const fullSnapshot = JSON.stringify(backupBundle, null, 2);
+    const filetime = new Date().toISOString().split('T')[0]; // Simple YYYY-MM-DD
+
+    // 4. Create the download link
+    const blob = new Blob([fullSnapshot], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    
+    a.href = url;
+    a.download = `FloWea_Full_Backup_${filetime}.json`;
+    document.body.appendChild(a);
+    a.click();
+    
+    // 5. Cleanup
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    // console.log("System Export: Finished. Snapshot saved.");    
+}
+
+//import to local storage**/
+// ✅ DELEGATED TRANSITION FIX: Listens globally for the change event
+
+
+$(document).on('change', '#jsonFileInput', function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const backup = JSON.parse(e.target.result);
+
+            // 1. Validation: Ensure it's a full backup file
+            if (!backup.master_tabs || !backup.tabData) {
+                throw new Error("Invalid file format. This is not a FloWea Full Backup.");
+            }
+            else if (confirm("This will delete all current tasks and tabs and replace them with the backup. Continue?")) {
+                localStorage.clear();
+                // ... rest of the logic
+            
+                // 2. The Destructive Wipe
+                // We clear everything to ensure a clean slate for the restoration
+                localStorage.clear();
+
+                // 3. Restore Global Settings
+                localStorage.setItem('master_tabs', JSON.stringify(backup.master_tabs));
+
+                // 4. Restore Individual Tab Content
+                Object.keys(backup.tabData).forEach(tabId => {
+                    const data = backup.tabData[tabId];
+                    localStorage.setItem(`${tabId}List`, JSON.stringify(data.activeList));
+                    localStorage.setItem(`${tabId}PurgeList`, JSON.stringify(data.purgeList));
+                });
+
+                // 5. Hard Reset Global State
+                window.allTabs = backup.master_tabs;
+                window.isManualOverride = false;
+                
+                // Set a default active tab if one isn't set
+                const firstTabId = window.allTabs.length > 0 ? window.allTabs[0].id : 'work';
+                window.activeTab = firstTabId;
+                localStorage.setItem("activeTab", firstTabId);
+
+                // Cleanly stows away your panel overlay since the workspace is resetting
+                $('#universal_panel_wrapper').removeClass('open');
+
+                if (typeof initTabs === 'function') initTabs();           // Redraw tab buttons
+                if (typeof window.displayData === 'function') window.displayData(); // Redraw the task lists
+
+                alert("Restoration Successful! Your workspace has been updated.");
+            }
+
+        } catch (error) {
+            console.error('Restoration Failed:', error);
+            alert("Error: " + error.message);
+        }
+    };
+    reader.readAsText(file);
+});

@@ -65,8 +65,23 @@ window.togglePanelDisplay = function(panelKey, ...injectionData) {
 };
 
 function renderSyncPanel() {
-    const shelfView = $('<div class="shelf-panel-view"></div>');
-    const tileGrid = $('<div id="shelf_tiles_container" class="">Locally storage in free version</div>');
+    const shelfView = $(`
+        <div class="shelf-panel-view">
+
+        </div>`);
+    const tileGrid = $(
+        `
+        <div id="shelf_tiles_container" class="">Locally storage in free version
+        <div style="border: 1px solid #ddd; border-radius: 10px;">
+            <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
+            <a id="exportHistoryLink" style="display: none;">Export</a>
+            <br>
+            <!-- <label for="FileInputLabel"><b>Import</b></label> -->
+            <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input>
+          </div>
+        </div>`
+    );
+    
     shelfView.append(tileGrid);
     
     // 3. CRITICAL: Return the completed fragment straight back to togglePanelDisplay
