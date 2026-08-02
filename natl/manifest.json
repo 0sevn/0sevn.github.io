@@ -1,4 +1,3 @@
-
 {
     "name": "natl",
     "short_name": "natl",
@@ -18,6 +17,30 @@
         "type": "image/png"
       }
     ],
-    "description": "Not Another Task List!"
+    "description": "Not Another Task List!",
+    "screenshots" : [
+      {
+        "src": "Screenshot_morning.jpg",
+        "sizes": "720x1130",
+        "type": "image/jpg",
+        "platform": "wide"
+      },
+      {
+        "src": "Screenshot_gym track.jpg",
+        "sizes": "720x1130",
+        "type": "image/jpg",
+        "platform": "wide"
+      },
+      {
+        "src": "Screenshot_gym complete.jpg",
+        "sizes": "720x1130",
+        "type": "image/jpg",
+        "platform": "wide"
+      }
+    ],
+    "orientation": "portrait-primary",
+        "launch_handler": {
+        "client_mode": ["focus-existing", "auto"] 
+    }
   }
   
