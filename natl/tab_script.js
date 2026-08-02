@@ -78,7 +78,6 @@ Local storage only in free version
                 <div style="display: flex; gap: 8px;">
                     <button onclick="exportHistory()" style="padding: 6px 12px; border-radius: 6px; border: none; background: #2196f3; color: #fff; font-size: 0.8rem; cursor: pointer;">Export</button>
                     <button onclick="triggerImport()" style="padding: 6px 12px; border-radius: 6px; border: none; background: #444; color: #fff; font-size: 0.8rem; cursor: pointer;">Import</button>
-                    <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import">
                 </div>
             </div>
             <br><br>
