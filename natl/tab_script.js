@@ -19,7 +19,7 @@ const UI_PANEL_CONFIG = {
     sync_panel: {
         title: "Cross device syncing ",
         shortcut: "d",
-        width: "50%", height: "30%",
+        width: "70%", height: "30%",
         position: "bottom-right",
         animateDirection: "w3-animate-bottom",
         renderSource: () => renderSyncPanel()
@@ -67,17 +67,26 @@ window.togglePanelDisplay = function(panelKey, ...injectionData) {
 function renderSyncPanel() {
     const shelfView = $(`
         <div class="shelf-panel-view">
-
+Local storage only in free version
         </div>`);
     const tileGrid = $(
         `
-        <div id="shelf_tiles_container" class="">Locally storage in free version
+        <div id="shelf_tiles_container" class="">
         <div style="border: 1px solid #ddd; border-radius: 10px;">
-            <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
-            <a id="exportHistoryLink" style="display: none;">Export</a>
-            <br>
-            <!-- <label for="FileInputLabel"><b>Import</b></label> -->
-            <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input>
+            <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; padding: 5px;">
+                <span>Backup & Restore</span>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="exportHistory()" style="padding: 6px 12px; border-radius: 6px; border: none; background: #2196f3; color: #fff; font-size: 0.8rem; cursor: pointer;">Export</button>
+                    <button onclick="triggerImport()" style="padding: 6px 12px; border-radius: 6px; border: none; background: #444; color: #fff; font-size: 0.8rem; cursor: pointer;">Import</button>
+                    <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import">
+                </div>
+            </div>
+            <br><br>
+                <!--button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
+                <a id="exportHistoryLink" style="display: none;">Export</a>
+                
+                < <label for="FileInputLabel"><b>Import</b></label> >
+                <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input-->
           </div>
         </div>`
     );
@@ -580,10 +589,6 @@ function refreshApplication() {
     initTabs();
     if (typeof displayData === "function")
         displayData();
-    if (typeof renderTaskList === "function")
-        renderTaskList();
-    if (typeof renderPurgeList === "function")
-        renderPurgeList();
     if (typeof pushFullSync === "function")
         pushFullSync();
 }

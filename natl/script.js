@@ -12,7 +12,7 @@ window.displayData = function() {
 };
 
 // Ensure activeTab is never null and matches current system data
-window.activeTab = localStorage.getItem('activeTab') || (window.allTabs && window.allTabs[0] ? window.allTabs[0].id : null);
+window.activeTab = localStorage.getItem('activeTab') || (window.masterTabs && window.masterTabs[0] ? window.masterTabs[0].id : null);
 window.tabData = typeof getTabData === 'function' ? getTabData(window.activeTab) : { id: window.activeTab, type: 'list' };
 
 //
@@ -27,12 +27,12 @@ document.querySelectorAll(".tab").forEach(tab => {
     }
 });
 
+
 /**
  * UNIFIED SMART COMPATIBILITY STORAGE ENGINE (The Bridge)
  * Solves duplicate key initializations by funnelling all 
  * raw and suffixed calls into a single standardized key layout structure.
  */
-
 function getTabStorageData(tabId, listType = "active") {
 
     const store = JSON.parse(
@@ -50,45 +50,28 @@ function getTabStorageData(tabId, listType = "active") {
         ? store[tabId].purgeList
         : store[tabId].activeList;
 }
-
-window.setTabStorageData = function(tabId, dataArray, typeOrList) {
+/**
+ * UNIFIED STORAGE ENGINE
+ * @param {string} tabId - Target tab ID
+ * @param {Array} dataArray - Array to store
+ * @param {string} [listType='active'] - 'active' for activeList, 'purge'/'purgeList' for purgeList
+ */
+window.setTabStorageData = function(tabId, dataArray, listType = 'active') {
     if (!tabId) return;
 
-    // Handle parameter misalignment adjustments out-of-order gracefully
-    let finalArray = dataArray;
-    let finalType = typeOrList;
-    if (typeof dataArray === 'string' && Array.isArray(typeOrList)) {
-        finalArray = typeOrList;
-        finalType = dataArray;
-    }
-
-    const safeArray = Array.isArray(finalArray) ? finalArray : [];
-    const isPurge = (finalType === 'purge' || finalType === 'purgeList');
+    const safeArray = Array.isArray(dataArray) ? dataArray : [];
+    const isPurge = (listType === 'purge' || listType === 'purgeList');
     const targetField = isPurge ? 'purgeList' : 'activeList';
-    
-    // Force the destination key to utilize the standard unified naming pattern
-    const standardKey = isPurge ? `${tabId}PurgeList` : `${tabId}List`;
 
     try {
-        // 1. Update the New Unified State Object
         const masterStore = JSON.parse(localStorage.getItem('flowea_tab_data') || '{}');
         if (!masterStore[tabId]) {
             masterStore[tabId] = { activeList: [], purgeList: [] };
         }
         masterStore[tabId][targetField] = safeArray;
         localStorage.setItem('flowea_tab_data', JSON.stringify(masterStore));
-
-        // 2. Commit to the single standard legacy string key
-        // localStorage.setItem(standardKey, JSON.stringify(safeArray));
-        
-        // 3. CLEAN UP & PREVENT DUPLICATES: 
-        // If an old unsuffixed duplicate key exists, clear it out so it stops taking up memory
-        if (!isPurge && localStorage.getItem(tabId) !== null) {
-            localStorage.removeItem(tabId);
-        }
-        
     } catch (e) {
-        console.error(`Bridge failed writing storage for Tab: ${tabId}`, e);
+        console.error(`Storage write failed for tab: ${tabId}`, e);
     }
 };
 
@@ -240,7 +223,7 @@ function renderGridView(container, tabData) {
                         tile.attr('data-clicks', Math.min(item.clicks, 3));
 
                         // FIX: Replaced storageKey with general purpose helper inside the click callback
-                        window.setTabStorageData(tabData.id, todoList, tabData.type);
+                        window.setTabStorageData(tabData.id, todoList);
 
                         updateHealthBar();
                         if (window.checkBoardCompletion) window.checkBoardCompletion();
@@ -273,7 +256,7 @@ function renderGridView(container, tabData) {
                     goalDisplay.text(`${newVal}/${bb}`);
                     item.text = `${displayName} ${newVal}/${bb}`;
                     // setTabStorageData(tabData.id, tabData.type, todoList);
-                    window.setTabStorageData(tabData.id, todoList, tabData.type);
+                    window.setTabStorageData(tabData.id, todoList);
                 });
 
                 slider.on('blur', () => {
@@ -411,7 +394,7 @@ function renderListView(container, tabData) {
                     window.setTabStorageData(tabData.id, currentTasks, tabData.type);
                     updateHealthBar();
                     togglePurgeButton();
-                    if (window.pushFullSync) window.pushFullSync();
+                    
                 }
             });
         }
@@ -604,7 +587,7 @@ function enterTask() {
     const todoList = window.getTabStorageData(tabData.id, tabData.type);
     todoList.push(newTask);
 
-    window.setTabStorageData(tabData.id, todoList, tabData.type);
+    window.setTabStorageData(tabData.id, todoList);
     localStorage.setItem("LastSync", isoTime); //set last sync as last created task time
     
 
@@ -650,14 +633,14 @@ window.deleteTaskById = function(taskId) {
     const undoDelete = () => {
         let currentTodo = window.getTabStorageData(activeTabId, tabData.type);
         currentTodo.push(deletedTask);
-        window.setTabStorageData(activeTabId, currentTodo, tabData.type);
+        window.setTabStorageData(activeTabId, currentTodo);
         window.renderTaskList();
         updateHealthBar();
-        if (window.pushFullSync) window.pushFullSync();
+        
     };
 
     showToast("Task deleted", undoDelete);
-    if (window.pushFullSync) window.pushFullSync();
+    
 }
 
 // Targeted task purging adapted for unified compatibility storage
@@ -695,7 +678,7 @@ function purgeSpecificTask(id) {
             purgeList.unshift(deletedTask);
         }
 
-        window.setTabStorageData(currentTabId, todoList, currentTabType);
+        window.setTabStorageData(currentTabId, todoList);
         window.setTabStorageData(currentTabId, purgeList, 'purge');
         
         updateHealthBar();
@@ -705,7 +688,7 @@ function purgeSpecificTask(id) {
         if (typeof purgeMessages !== 'undefined' && purgeMessages.length > 0) {
             showToast(purgeMessages[Math.floor(Math.random() * purgeMessages.length)]);
         }
-        if (window.pushFullSync) window.pushFullSync();
+        
     }
 };
 
@@ -720,11 +703,11 @@ function incrementTaskCount(taskId) {
         if (targetIdx === -1) return;
 
         todoList[targetIdx].clicks = (todoList[targetIdx].clicks || 0) + 1;
-        window.setTabStorageData(currentTabId, todoList, currentTabType);
+        window.setTabStorageData(currentTabId, todoList);
         updateHealthBar();
         togglePurgeButton();
         if (typeof window.renderTaskList === 'function') window.renderTaskList();
-        if (window.pushFullSync) window.pushFullSync();
+        
 }
 
 window.saveNewOrder = function() {
@@ -759,13 +742,13 @@ window.saveNewOrder = function() {
     });
 
     // 4. Save the cleanly sorted array through the bridge helper
-    window.setTabStorageData(currentTabId, reorderedTasks, currentTabType);
+    window.setTabStorageData(currentTabId, reorderedTasks);
     
     // console.log(`Reordering successfully committed for tab: ${currentTabId}`);
 
     // 5. Fire off updates to keep health balances and layout configurations unified
     if (typeof updateHealthBar === 'function') updateHealthBar();
-    if (window.pushFullSync) window.pushFullSync();
+    
 };
 
 
@@ -818,7 +801,7 @@ function purgeList() {
         });
 
         if (purgedAnything) {
-            window.setTabStorageData(currentTabId, updatedTodoList, currentTabType);
+            window.setTabStorageData(currentTabId, updatedTodoList);
             window.setTabStorageData(currentTabId, purgeHistory, 'purge');
 
             showToast("Progress archived & counters reset!", () => {
@@ -896,10 +879,9 @@ function purgeList() {
         if (typeof renderTaskList === 'function') renderTaskList();
         if (typeof renderPurgeList === 'function') renderPurgeList();
         if (typeof window.displayData === 'function') window.displayData();
-        if (window.pushFullSync) window.pushFullSync();
+        
     }
 }
-
 
 // ----------- UTILITIES --------------
 
@@ -908,7 +890,6 @@ function getWeekNumber(date) {
     const days = Math.floor((date - start) / 86400000);
     return Math.ceil((days + start.getDay() + 1) / 7);
 }
-
 
 function updateHealthBar() {
     const healthBar = document.getElementById('health_bar');
@@ -1081,7 +1062,6 @@ $(function () {
     updateHealthBar();
 });
 
-
     // ----------- OTHER -------------
     function showHistory() {
         // console.log('show history');
@@ -1213,21 +1193,20 @@ window.checkBoardCompletion = function() {
 }
 
 // make hyperlinks clickable
-function linkify(text) {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    return text.replace(urlRegex, url => {
-        const div = document.createElement('div');
-        div.textContent = url;
-        const safeUrl = div.innerHTML;
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>`;
-    });
-}
+// function linkify(text) {
+//     const urlRegex = /(https?:\/\/[^\s]+)/g;
+//     return text.replace(urlRegex, url => {
+//         const div = document.createElement('div');
+//         div.textContent = url;
+//         const safeUrl = div.innerHTML;
+//         return `<a href="${url}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>`;
+//     });
+// }
 
 // 
 // dom based text input render
 // 
 const titleCache = new Map();
-
 async function getYoutubeTitle(url) {
     try {
         const endpoint =
@@ -1310,99 +1289,120 @@ function renderTaskText(container, text) {
     }
 }
 
-//Exports the contents of local storage to a file in JSON format
-//https://stackoverflow.com/questions/61586888/javascript-export-local-storage
-function exportHistory() {  
-    // console.log("System Export: Started"); 
+// ==========================================
+// 💾 BACKUP & RESTORE ENGINE
+// ==========================================
+function exportHistory() {
+    const store = JSON.parse(localStorage.getItem('flowea_tab_data') || '{}');
+    const masterTabs = JSON.parse(localStorage.getItem('master_tabs') || '[]');
 
-    // 1. Initialize the bundle with core settings and the tab manifest
     const backupBundle = {
         timestamp: new Date().toISOString(),
-        master_tabs: JSON.parse(localStorage.getItem('master_tabs') || '[]'),
+        master_tabs: masterTabs,
         tabData: {}
     };
 
-    // 2. Iterate through all tabs to collect their specific lists
-    backupBundle.master_tabs.forEach(tab => {
+    // Pull live data from the unified store
+    masterTabs.forEach(tab => {
         const tabId = tab.id;
         backupBundle.tabData[tabId] = {
-            activeList: JSON.parse(localStorage.getItem(`${tabId}List`) || '[]'),
-            purgeList: JSON.parse(localStorage.getItem(`${tabId}PurgeList`) || '[]')
+            activeList: store[tabId]?.activeList || [],
+            purgeList: store[tabId]?.purgeList || []
         };
     });
 
-    // 3. Convert the whole bundle to a pretty-printed JSON string
     const fullSnapshot = JSON.stringify(backupBundle, null, 2);
-    const filetime = new Date().toISOString().split('T')[0]; // Simple YYYY-MM-DD
+    const filetime = new Date().toISOString().split('T')[0];
 
-    // 4. Create the download link
-    const blob = new Blob([fullSnapshot], {type: 'application/json'});
+    const blob = new Blob([fullSnapshot], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    
+
     a.href = url;
-    a.download = `FloWea_Full_Backup_${filetime}.json`;
+    a.download = `NATL_${filetime}.json`;
     document.body.appendChild(a);
     a.click();
-    
-    // 5. Cleanup
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    // console.log("System Export: Finished. Snapshot saved.");    
+
+    showToast("Backup exported successfully!");
 }
 
-//import to local storage**/
-// ✅ DELEGATED TRANSITION FIX: Listens globally for the change event
+// Helper to programmatically open the file picker
+function triggerImport() {
+    console.log('import')
+    const input = document.getElementById('jsonFileInput');
+    if (input) input.click();
+}
 
-
-$(document).on('change', '#jsonFileInput', function(event) {
+$(document).on('change', '#jsonFileInput', function (event) {
     const file = event.target.files[0];
     if (!file) return;
 
+    // Reset so the same file can be selected again later
+    event.target.value = '';
+
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         try {
             const backup = JSON.parse(e.target.result);
 
-            // 1. Validation: Ensure it's a full backup file
             if (!backup.master_tabs || !backup.tabData) {
-                throw new Error("Invalid file format. This is not a FloWea Full Backup.");
+                throw new Error("Invalid file format. This is not a Full Backup.");
             }
-            else if (confirm("This will delete all current tasks and tabs and replace them with the backup. Continue?")) {
-                localStorage.clear();
-                // ... rest of the logic
-            
-                // 2. The Destructive Wipe
-                // We clear everything to ensure a clean slate for the restoration
-                localStorage.clear();
 
-                // 3. Restore Global Settings
-                localStorage.setItem('master_tabs', JSON.stringify(backup.master_tabs));
-
-                // 4. Restore Individual Tab Content
-                Object.keys(backup.tabData).forEach(tabId => {
-                    const data = backup.tabData[tabId];
-                    localStorage.setItem(`${tabId}List`, JSON.stringify(data.activeList));
-                    localStorage.setItem(`${tabId}PurgeList`, JSON.stringify(data.purgeList));
-                });
-
-                // 5. Hard Reset Global State
-                window.allTabs = backup.master_tabs;
-                window.isManualOverride = false;
-                
-                // Set a default active tab if one isn't set
-                const firstTabId = window.allTabs.length > 0 ? window.allTabs[0].id : 'work';
-                window.activeTab = firstTabId;
-                localStorage.setItem("activeTab", firstTabId);
-
-                // Cleanly stows away your panel overlay since the workspace is resetting
-                $('#universal_panel_wrapper').removeClass('open');
-
-                if (typeof initTabs === 'function') initTabs();           // Redraw tab buttons
-                if (typeof window.displayData === 'function') window.displayData(); // Redraw the task lists
-
-                alert("Restoration Successful! Your workspace has been updated.");
+            if (!confirm("This will replace all current tabs and tasks with the backup. Continue?")) {
+                return;
             }
+
+            // 1. Preserve user settings (don't nuke theme/healthbar prefs)
+            const preserved = {
+                theme: localStorage.getItem('theme'),
+                showHealthbar: localStorage.getItem('showHealthbar')
+            };
+
+            // 2. Surgically remove old app data instead of localStorage.clear()
+            const keysToNuke = ['master_tabs', 'flowea_tab_data', 'activeTab'];
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const key = localStorage.key(i);
+                if (key && (key.endsWith('List') || key.endsWith('PurgeList') || key.startsWith('startTime_'))) {
+                    keysToNuke.push(key);
+                }
+            }
+            keysToNuke.forEach(key => localStorage.removeItem(key));
+
+            // 3. Restore preserved settings
+            if (preserved.theme) localStorage.setItem('theme', preserved.theme);
+            if (preserved.showHealthbar) localStorage.setItem('showHealthbar', preserved.showHealthbar);
+
+            // 4. Restore tab metadata
+            localStorage.setItem('master_tabs', JSON.stringify(backup.master_tabs));
+            window.masterTabs = backup.master_tabs;
+
+            // 5. Rebuild the unified data store
+            const unifiedStore = {};
+            Object.keys(backup.tabData).forEach(tabId => {
+                const data = backup.tabData[tabId];
+                unifiedStore[tabId] = {
+                    activeList: Array.isArray(data.activeList) ? data.activeList : [],
+                    purgeList: Array.isArray(data.purgeList) ? data.purgeList : []
+                };
+            });
+            localStorage.setItem('flowea_tab_data', JSON.stringify(unifiedStore));
+
+            // 6. Pick a sensible active tab
+            const firstTab = backup.master_tabs[0];
+            window.activeTab = firstTab ? firstTab.id : null;
+            if (window.activeTab) {
+                localStorage.setItem('activeTab', window.activeTab);
+            }
+
+            // 7. Reset UI and re-init
+            $('#universal_panel_wrapper').removeClass('open');
+            if (typeof initTabs === 'function') initTabs();
+            if (typeof window.displayData === 'function') window.displayData();
+
+            showToast("Backup restored successfully!");
 
         } catch (error) {
             console.error('Restoration Failed:', error);

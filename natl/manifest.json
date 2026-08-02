@@ -2,7 +2,7 @@
 {
     "name": "natl",
     "short_name": "natl",
-    "start_url": ".",
+    "start_url": "./index.html",
     "display": "standalone",
     "background_color": "#454545",
     "theme_color": "#454545",
@@ -17,6 +17,7 @@
         "sizes": "512x512",
         "type": "image/png"
       }
-    ]
+    ],
+    "description": "Not Another Task List!"
   }
   

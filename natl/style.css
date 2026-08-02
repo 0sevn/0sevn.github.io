@@ -718,7 +718,7 @@ a {
       background-size: contain;
       background-repeat: no-repeat;
       filter: invert(var(--invert-icon));
-      width: 35px;
+      width: 40px;
       margin: 1px;
       padding: 0px;
       border: none;
@@ -940,7 +940,7 @@ a {
     -webkit-user-select: text;*/
   
 }
-.purge_list_container.hidden { display: hidden; }
+.purge_list_container.hidden { display: none; }
 
 #purge_list li {
     pointer-events: auto;    /* Ensure clicks pass through to the text */
@@ -1266,7 +1266,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     backdrop-filter: blur(10px); /* Modern glass effect */
 }
 
-.command-bar.hidden { display: hidden; }
+.command-bar.hidden { display: none; }
 
 .context-icons-row {
     display: flex;
@@ -1284,7 +1284,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     background: #1a1a1a;
     border-radius: 8px;
 }
-.routine-dashboard.hidden { display: hidden;}
+.routine-dashboard.hidden { display: none;}
 
 .hidden {
     display: none !important;
