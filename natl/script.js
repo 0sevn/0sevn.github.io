@@ -1,6 +1,12 @@
 // ==========================================
 // 🧠 GLOBAL APP STATE & CORNERSTONE ENGINE
 // ==========================================
+
+const SCHEMA_VERSION = 1;
+if (parseInt(localStorage.getItem('flowea_schema_version')) !== SCHEMA_VERSION) {
+    localStorage.setItem('flowea_schema_version', String(SCHEMA_VERSION));
+}
+
 // UID
 let userId = null;
 
@@ -894,14 +900,17 @@ function getWeekNumber(date) {
 function updateHealthBar() {
     const healthBar = document.getElementById('health_bar');
     if (!healthBar) return;
-
     const currentTabId = window.activeTab;
     const tabData = typeof getTabData === 'function' ? getTabData(currentTabId) : window.tabData;
     const todoList = window.getTabStorageData(currentTabId, tabData.type);
-    
+
     let totalItems = todoList.length;
     let unfinishedTasks = 0;
     let calculatedWidth = 0;
+
+    // 0/null (default) = option 1: full+green -> depletes/red as load increases
+    // 1 = option 2: empty+green -> fills/red as load increases
+    const healthBarDirection = localStorage.getItem('healthbarDirection') === 'true' ? 1 : 0;
 
     if (tabData.type === 'checkin') {
         unfinishedTasks = todoList.filter(item => !((item.clicks || 0) > 0)).length;
@@ -912,7 +921,14 @@ function updateHealthBar() {
         calculatedWidth = (100) * (1 - Math.exp(-unfinishedTasks / 5.5));
     }
 
-    let healthPercent = totalItems === 0 ? 3 : Math.max(3, calculatedWidth);
+    // calculatedWidth is "load" (0-100, grows with unfinished tasks).
+    // Option 2 shows load directly; option 1 shows the inverse (remaining "health").
+    const displayWidth = healthBarDirection === 1 ? calculatedWidth : (100 - calculatedWidth);
+
+    let healthPercent = totalItems === 0
+        ? (healthBarDirection === 1 ? 3 : 100)
+        : Math.max(3, displayWidth);
+
     healthBar.style.width = `${healthPercent}%`;
 
     if (unfinishedTasks > 5) {
@@ -930,11 +946,33 @@ function updateHealthBar() {
     }
 }
 
+function setHealthbarDirection(direction) {
+    // direction: 0 (default, option 1) or 1 (option 2)
+    localStorage.setItem('healthbarDirection', direction === 1 ? 'true' : 'false');
+    updateHealthBar();
+}
+
 function setHealthbarVisibility(show) {
-    const healthBar = document.getElementById('health_bar');
+    const healthBar = document.getElementById('health_bar_container');
     if (!healthBar) return;
     healthBar.style.display = show ? '' : 'none';
     localStorage.setItem('showHealthbar', show ? 'true' : 'false');
+}
+
+
+function initBooleanToggle(elementId, storageKey, defaultValue, applyFn) {
+    const input = document.getElementById(elementId);
+    const saved = localStorage.getItem(storageKey);
+    const initialValue = saved === null ? defaultValue : saved === 'true';
+
+    applyFn(initialValue);
+
+    if (input) {
+        input.checked = initialValue;
+        input.addEventListener('change', function(e) {
+            applyFn(e.target.checked);
+        });
+    }
 }
 
 // ==========================================
@@ -1014,17 +1052,10 @@ $(function () {
         });
     }
 
-    const healthbarToggleInput = document.getElementById('healthbarToggle');
-    const savedHealthbarDisplay = localStorage.getItem('showHealthbar');
-    const defaultHealthbarVisible = savedHealthbarDisplay === null ? true : savedHealthbarDisplay === 'true';
-    setHealthbarVisibility(defaultHealthbarVisible);
-
-    if (healthbarToggleInput) {
-        healthbarToggleInput.checked = defaultHealthbarVisible;
-        healthbarToggleInput.addEventListener('change', function(e) {
-            setHealthbarVisibility(e.target.checked);
-        });
-    }
+initBooleanToggle('healthbarToggle', 'showHealthbar', true, setHealthbarVisibility);
+initBooleanToggle('healthbarDirectionToggle', 'healthbarDirection', false, function(checked) {
+    setHealthbarDirection(checked ? 1 : 0);
+});
 
 
 

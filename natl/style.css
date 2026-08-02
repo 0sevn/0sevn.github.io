@@ -623,6 +623,7 @@ width: 100%;
     list-style: none;
     margin-left: 20px;
     margin-right: 20px;
+    margin-top: 10px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
