@@ -67,12 +67,12 @@ window.togglePanelDisplay = function(panelKey, ...injectionData) {
 function renderSyncPanel() {
     const shelfView = $(`
         <div class="shelf-panel-view">
-Local storage only in free version
+
         </div>`);
     const tileGrid = $(
         `
         <div id="shelf_tiles_container" class="">
-        <div style="border: 1px solid #ddd; border-radius: 10px;">
+        <div style="border: 0px solid #ddd; border-radius: 10px;">
             <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; padding: 5px;">
                 <span>Backup & Restore</span>
                 <div style="display: flex; gap: 8px;">
@@ -86,8 +86,10 @@ Local storage only in free version
                 
                 < <label for="FileInputLabel"><b>Import</b></label> >
                 <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input-->
-          </div>
-        </div>`
+          </div>(Local storage only in free version)
+        </div>
+
+        `
     );
     
     shelfView.append(tileGrid);
@@ -197,27 +199,86 @@ window.masterTabs = JSON.parse(localStorage.getItem("master_tabs") || "[]");
 window.editingTabId = null;
 
 if (window.masterTabs.length === 0) {
-    const baseTime = Date.now();
-    const defaultTabs = [
-        { name: "Morning", category: "Morning", type: "list", displayStyle: "list", taskMode: "singular" },
-        { name: "Work", category: "Work", type: "list", displayStyle: "list", taskMode: "singular" },
-        { name: "Exercise", category: "Gym", type: "checkin", displayStyle: "tiles", taskMode: "recurring" },
-        { name: "Evening", category: "Evening", type: "list", displayStyle: "list", taskMode: "singular" },
-        { name: "Night", category: "Night", type: "list", displayStyle: "list", taskMode: "singular" }
-    ];
+            const baseTime = Date.now();
+            const defaultTabs = [
+                { name: "New Tab", category: "Morning", type: "list", displayStyle: "list", taskMode: "singular" },
+            ];
 
-    window.masterTabs = defaultTabs.map((tabBlueprint, index) => ({
-        id: `tab_${baseTime}_${index}`,
-        name: tabBlueprint.name,
-        category: tabBlueprint.category,
-        order: index,
-        type: tabBlueprint.type,
-        displayStyle: tabBlueprint.displayStyle,
-        taskMode: tabBlueprint.taskMode
-    }));
+            window.masterTabs = defaultTabs.map((tabBlueprint, index) => ({
+                id: `tab_${baseTime}_${index}`,
+                name: tabBlueprint.name,
+                category: tabBlueprint.category,
+                order: index,
+                type: tabBlueprint.type,
+                displayStyle: tabBlueprint.displayStyle,
+                taskMode: tabBlueprint.taskMode
+            }));
 
-    localStorage.setItem('master_tabs', JSON.stringify(masterTabs));
+            localStorage.setItem('master_tabs', JSON.stringify(masterTabs));
+        }
+/**
+ * Reusable core function to wipe the app's local storage.
+ */
+function clearStorageData() {
+    // If you want to clear specific keys instead of everything, specify them here.
+    // e.g., localStorage.removeItem('tasks'); localStorage.removeItem('tabs');
+    localStorage.clear();
 }
+
+function resetToDefaults() {
+    const confirmed = window.confirm("This will overwrite your current workspace with the default tabs and routines. Do you want to continue?");
+    
+    if (confirmed) {
+        clearStorageData();
+    
+        const baseTime = Date.now();
+        const defaultTabs = [
+            { name: "Morning", category: "Morning", type: "list", displayStyle: "list", taskMode: "singular" },
+            { name: "Work", category: "Work", type: "list", displayStyle: "list", taskMode: "singular" },
+            { name: "Exercise", category: "Gym", type: "checkin", displayStyle: "tiles", taskMode: "recurring" },
+            { name: "Evening", category: "Evening", type: "list", displayStyle: "list", taskMode: "singular" },
+            { name: "Night", category: "Night", type: "list", displayStyle: "list", taskMode: "singular" }
+        ];
+
+        window.masterTabs = defaultTabs.map((tabBlueprint, index) => ({
+            id: `tab_${baseTime}_${index}`,
+            name: tabBlueprint.name,
+            category: tabBlueprint.category,
+            order: index,
+            type: tabBlueprint.type,
+            displayStyle: tabBlueprint.displayStyle,
+            taskMode: tabBlueprint.taskMode
+        }));
+
+        localStorage.setItem('master_tabs', JSON.stringify(masterTabs));
+
+        
+        showToast("Default tabs and routines loaded successfully!");
+        
+        // Optional: reload app state or refresh UI
+        setTimeout(() => {
+            window.location.reload(); 
+        }, 1000);
+    }
+}
+
+/**
+ * Wipes storage entirely without restoring defaults.
+ */
+function clearStorageOnly() {
+    const confirmed = window.confirm("Warning: This will permanently delete all your tasks, history, and settings. Are you sure?");
+    
+    if (confirmed) {
+        clearStorageData();
+        showToast("All data cleared successfully.");
+        
+        // Refresh UI state
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    }
+}
+
 function getMasterTabs() {
     return window.masterTabs;
 }
@@ -475,6 +536,20 @@ function executeUnifiedDeletion(id, mode) {
 document.addEventListener("DOMContentLoaded", () => {
     initTabs();
     initEventListeners();
+    
+});
+// Bind event listeners when the DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    const resetBtn = document.getElementById('btn-reset-defaults');
+    const clearBtn = document.getElementById('btn-clear-storage');
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetToDefaults);
+    }
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearStorageOnly);
+    }
 });
 //  * Initializes the Tab UI from the master data.
 function initTabs() {

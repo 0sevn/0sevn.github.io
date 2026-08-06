@@ -1059,7 +1059,8 @@ initBooleanToggle('healthbarDirectionToggle', 'healthbarDirection', false, funct
 
 
 
-    // Cloud sync features removed for local-only app.
+
+
 
     // text edit on dbl clk
     $('#todo_list').on('dblclick', '.task-text', function () {
@@ -1222,17 +1223,6 @@ window.checkBoardCompletion = function() {
         container.removeClass("board-complete");
     }
 }
-
-// make hyperlinks clickable
-// function linkify(text) {
-//     const urlRegex = /(https?:\/\/[^\s]+)/g;
-//     return text.replace(urlRegex, url => {
-//         const div = document.createElement('div');
-//         div.textContent = url;
-//         const safeUrl = div.innerHTML;
-//         return `<a href="${url}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>`;
-//     });
-// }
 
 // 
 // dom based text input render
