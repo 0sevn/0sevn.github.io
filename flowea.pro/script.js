@@ -1,28 +1,14 @@
 // task operation 
-// 
-function linkify(text) {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    return text.replace(urlRegex, url => {
-        const div = document.createElement('div');
-        div.textContent = url;
-        const safeUrl = div.innerHTML;
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>`;
-    });
-}
-
 let userId = null;
 
+// Initialize UI
 window.displayData = function() {
-    renderTaskList();
+    window.renderTaskList();
     renderPurgeList();
     updateHealthBar();
 }
-
-// 
-// Ensure activeTab is never null
-window.activeTab = localStorage.getItem('activeTab') || (window.allTabs[0] ? window.allTabs[0].id : null);
-window.activeTabList = window.activeTab + "List";
-// ----------- RENDERING --------------
+// ----------- RENDERING -------------- of what? tabs?
+// Update DOM elements on initial load if tab names are customized
 document.querySelectorAll(".tab").forEach(tab => {
   const tabId = tab.getAttribute("data-tab-id");
   const storedName = localStorage.getItem(`tabName_${tabId}`);
@@ -32,25 +18,89 @@ document.querySelectorAll(".tab").forEach(tab => {
   }
 });
 
-function renderTaskList() {
+// // functions for constants, variables
+// Ensure activeTab is never null
+window.activeTab = localStorage.getItem('activeTab') || (window.allTabs[0] ? window.allTabs[0].id : null);
+window.tabData = getTabData(activeTab);
+/**
+ * General purpose helper to retrieve parsed LocalStorage arrays based on Tab context
+ * @param {string} tabId - The ID of the target tab
+ * @param {string} type - The type property ('list', 'checkin', etc.)
+ * @return {Array} Parsed data array or empty array fallback
+ */
+function getTabStorageData(tabId, type) {
+    if (!tabId) return [];
+    // const key = type === 'list' ? `${tabId}List` : tabId;
+    const key = `${tabId}List`;
+    try {
+        return JSON.parse(localStorage.getItem(key) || '[]');
+    } catch (e) {
+        console.error(`Error parsing storage for key ${key}:`, e);
+        return [];
+    }
+}
+
+/**
+ * General purpose helper to save arrays to LocalStorage based on Tab context
+ * @param {string} tabId - The ID of the target tab
+ * @param {string} type - The type property ('list', 'checkin', etc.)
+ * @param {Array} data - The array of data to serialize and save
+ */
+function setTabStorageData(tabId, type, data) {
+    if (!tabId) return;
+    // moved away from individual names
+    // const key = type === 'list' ? `${tabId}List` : tabId;
+    const key = `${tabId}List`;
+    localStorage.setItem(key, JSON.stringify(data || []));
+    localStorage.setItem("LastSync", new Date().toISOString());
+}
+
+// window.tabData = getTabData(window.activeTab);
+// window.todoList = JSON.parse(localStorage.getItem(window.activeTab) || '[]');
+// console.log("tabData BEFORE", tabData)
+// render based on tab type
+// type list or checkinmode
+// router function
+window.renderTaskList = function() {
     const weekHeader = $("#week_header").empty();
     weekHeader.append('Wk '+getWeekNumber(new Date()));
 
-    const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
-    const listElement = $("#todo_list").empty();
+    const activeTabId = window.activeTab; //current tabID from master_tabs
+    const tabData = getTabData(activeTabId); // Helper, get tabData from tabID from master_tabs - make one for set data next
+    const container = $("#todo_list").empty();
+    if (!container.length || !tabData) return;
 
-    // 2. Determine if the current activeTab is named 'x'
     // tab_script.js defines activeTab as the ID (e.g. "work" or "173931...")
-    const currentTabName = localStorage.getItem(`tabName_${activeTab}`) || activeTab;
-    
-    if (currentTabName === 'x') {
-        // --- CHECK-IN MODE ---
-        console.log("check/in mode")
-        listElement.addClass('checkin-grid');
+    // const currentTabName = localStorage.getItem(`tabName_000000${activeTab}`) || activeTab;
+    // console.log("check/in mode currentTabName", currentTabName);
+
+    // Remove legacy classes to clean canvas state
+    container.removeClass('checkin-grid');
+
+    switch (tabData.type) {          
+        case 'checkin':
+            renderGridView(container, tabData);
+            console.log("current tab is checkin", activeTab)
+            break;
+
+        case 'list':
+        default:
+            renderListView(container, tabData);
+            console.log("current tab is standard list", activeTab)
+            break;
+    }
+    togglePurgeButton();
+}
+// --- CHECK-IN MODE ---
+function renderGridView(container, tabData) {
+    // const storageKey = getTabStorageData(tabData.id, tabData.type);
+    // const todoList = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    // const todoList = JSON.parse(localStorage.getItem(activeTab) || '[]');
+    let todoList = getTabStorageData(tabData.id, tabData.type);
+        container.addClass('checkin-grid');
         
         // Seed defaults if empty
-        if (todoList.length === 0) {
-            // const defaults = ["Water", "Gym", "Read", "Meditation"];"Stretch flexors 45/97"
+                    // const defaults = ["Water", "Gym", "Read", "Meditation"];"Stretch flexors 45/97"
             // Choose program, begin, rehab, stretch, gain
             // morning stretch 30min
             // sun salutation 10min
@@ -58,20 +108,57 @@ function renderTaskList() {
             // generate workout, random upper/lower body, push/pull, strength/explosivity/endurance, conditioning
             // daily block planner, stretch 30min, breakfast 30min, work 45minx8, eat, workout, sleep8h
             // const defaults = ["Back Low row/Lats Pull 89/97","Zercher 45/97", "Smith Squat 100/100", "Dead Lift 90/120", "Bench Press 50/80", "Shoulder Press 60/97", "Triceps/Biceps 45/97", "Toe raise, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Leg raise/Crunches 45/97" ];
-            const defaults = ["Lat Pull 40/97", "Row 45/97", "Chest Press 45/97", "Shoulder Press 45/97", "Leg Extension 45/97", "Leg Curl 45/97", "Hip Add, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Zercher 45/97", "Leg raise/Crunches 45/97" ];
-            //monthly house keeping
-            const house = ["BRF JxB 4280 kr", "Nordea Lån 5800kr", "Fortum el 800??", "Mat"];
-            const studio = ["L;n", "Abbonemang telefon", "bankgiro", ""];
-            // presets
-            // 
             
+            //monthly house keeping
+            // defaults = ["Back Low row/Lats Pull 89/97","Zercher 45/97", "Smith Squat 100/100", "Dead Lift 90/120", "Bench Press 50/80", "Shoulder Press 60/97", "Triceps/Biceps 45/97", "Toe raise, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Leg raise/Crunches 45/97" ];
+            
+            // ["Lat Pull 40/97", "Row 45/97", "Chest Press 45/97", "Shoulder Press 45/97", "Leg Extension 45/97", "Leg Curl 45/97", "Hip Add, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Zercher 45/97", "Leg raise/Crunches 45/97" ];
+            
+            // console.log("tabData.name", tabData.name)
+            // presets
+        if (todoList.length === 0) {
+            let defaults = [""];
+            
+            // const currentTabName = localStorage.getItem(`${activeTab}`) || activeTab;
+            // Route based on TYPE
+            switch (tabData.name) {
+                case 'Gym1 - machines':
+                    console.log("tabData.name", tabData.name)
+                    defaults = ["Lat Pull 40/97", "Row 45/97", "Chest Press 45/97", "Shoulder Press 45/97", "Leg Extension 45/97", "Leg Curl 45/97", "Hip Add, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Zercher 45/97", "Leg raise/Crunches 45/97" ];
+                    break;
+
+                case 'Gym2 - weights':
+                    console.log("tabData.name", tabData.name)
+                    defaults = ["Back Low row/Lats Pull 89/97","Zercher 45/97", "Smith Squat 100/100", "Dead Lift 90/120", "Bench Press 50/80", "Shoulder Press 60/97", "Triceps/Biceps 45/97", "Toe raise, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Leg raise/Crunches 45/97" ];
+                    break;
+                    
+                case 'House':
+                    console.log("tabData.nam", tabData.name)
+                    defaults = ["JB 48 kr", "Nordea Lån 580kr", "For el 80", "Mat"];
+                    break;
+
+                case 'Studio Tam':
+                default:
+                    console.log("tabData.nam", tabData.name)
+                    defaults = ["L'o'n", "Abonemang telefon", "bankgiro", "fakturering","bokf;ring"];
+                    break;
+            }
             const seeded = defaults.map(name => ({
                 id: new Date().toISOString() + Math.random(),
                 text: name,
                 clicks: 0
             }));
-            localStorage.setItem(activeTabList, JSON.stringify(seeded));
-            return renderTaskList(); // Re-run once with data
+            // Use general purpose setter helper to save initial seeds
+            setTabStorageData(tabData.id, tabData.type, seeded);
+            // return window.renderTaskList();
+            // FIX: Assign the seeded data to our local variable so the loop below can render it immediately.
+            // DO NOT call window.renderTaskList() here anymore.
+            todoList = seeded;
+            // FIX 1: Run completion check immediately for newly seeded boards 
+        // to handle cases where 0/0 conditions satisfy completion criteria.
+        if (typeof window.checkBoardCompletion === 'function') {
+            window.checkBoardCompletion();
+        }
         }
 
         todoList.forEach((item) => {
@@ -114,10 +201,11 @@ function renderTaskList() {
                             tile.find('.checkin-count').text(item.clicks);
                             tile.attr('data-clicks', Math.min(item.clicks, 3));
 
-                            localStorage.setItem(activeTabList, JSON.stringify(todoList));
+                            // FIX: Replaced storageKey with general purpose helper inside the click callback
+                            setTabStorageData(tabData.id, tabData.type, todoList);
                             updateHealthBar();
-                            checkBoardCompletion(); // Run the check live
-                            togglePurgeButton()
+                            if (window.checkBoardCompletion) window.checkBoardCompletion();
+                            togglePurgeButton();
                             clickTimer = null;
                         }, 250); // 250ms is the standard gap
                     }
@@ -145,7 +233,9 @@ function renderTaskList() {
                         aa = newVal;
                         goalDisplay.text(`${newVal}/${bb}`);
                         item.text = `${displayName} ${newVal}/${bb}`;
-                        localStorage.setItem(activeTabList, JSON.stringify(todoList));
+                        // setTabStorageData(tabData.id, tabData.type, todoList);
+                        // FIX: Replaced storageKey with general purpose helper inside the input callback
+                        setTabStorageData(tabData.id, tabData.type, todoList);
                     });
 
                     slider.on('blur', () => {
@@ -158,118 +248,149 @@ function renderTaskList() {
                     });
                 }
 
-                listElement.append(tile);
+                container.append(tile);
             });
             
-            checkBoardCompletion(); // Run the check live
-    } else {
-        // --- STANDARD MODE ---
-        listElement.removeClass('checkin-grid');
-        
-        if (todoList.length === 0) {
-            // listElement.append('<p class="empty-msg" style="margin:20px;">No tasks for this week yet.</p>');
-        } else {
-                // todoList.sort((a, b) => b.id.localeCompare(a.id)); // sort newest first
-                todoList.forEach((item) => {
-                    // Format id timestamp to just day and month (e.g., "31 May")
-                    const displayDate = new Date(item.id).toLocaleDateString('en-GB', {
-                        day: 'numeric',
-                        month: 'short'
-                    });
-
-                    const newListItem = $(`
-                        <li data-id="${item.id}" class="sortable-item" draggable="true">
-                            
-                        <div class="swipe-container" id="swipe">
-                        <button style="background: rgba(48, 151, 48, 0.69); width: 100px; border: none">✅</button>
-                            <div class="task-content">
-                                <span>
-                                    <input type="checkbox" class="task-checkbox" ${item.checked ? 'checked' : ''}>
-                                    <span class="task-text">${linkify(item.text)}</span>
-                                    <p class="time">${displayDate}</p>
-                                </span>
-                                <div class="edit_tasks" id="edit_tasks" style="display:${editButtonsVisible ? 'inline-block' : 'none'};">
-                                    <!--input type="submit" class="icon edit" value="" title="Edit task"-->
-                                    <input type="submit" class="icon delete" value=" " title="Delete task" style="padding-right:0%;">
-                                </div>
-                            </div>
-                            
-                        <button style="background: rgb(199, 74, 74); width: 100px; border: none">❌</button>
-                        </div>
-                            
-                        </li>
-                    `);
-                    listElement.append(newListItem);
-                    
-                        // const swiper = document.getElementById("swipe");
-                        // FIX 2: Attach listener to the specific container of THIS item
-                        const swiper = newListItem.find(".swipe-container")[0];
-                        // Force the swiper to start in the middle (hiding the buttons)
-                        // 99px to hide gap gap on mobile
-                        requestAnimationFrame(() => {
-                            swiper.scrollLeft = 99; 
-                    });
-
-                    swiper.addEventListener("scroll", function(e) {
-                        const li = e.target.closest('.sortable-item');
-                        if (!li) return; // Exit if we didn't scroll a task
-
-                        const taskId = li.getAttribute('data-id');
-                        const scroll_div = e.currentTarget;
-                        const scroll_center = scroll_div.scrollWidth / 2;
-                        const viewport_center = scroll_div.clientWidth / 2;
-                        const current = scroll_div.scrollLeft + viewport_center;
-                        const dx = current - scroll_center;
-                        console.log(dx);
-
-                        // Threshold logic
-                        if (dx > 99) {                
-                            scroll_div.style.backgroundColor = "red";
-                            // console.log("red");
-                                setTimeout(() => {
-                                    li.style.transform = "translateX(-90%)";
-                                    li.style.opacity = "0";
-                                    setTimeout(() => {
-                                        // Your existing delete logic here
-                                        deleteTaskById(taskId);
-                                        // deleteTask();
-                                        // saveData();
-                                    }, 100); // 1 second delay
-                                }, 600); // 1 second delay
-                                
-
-                        } else if (dx < -99) {
-                            scroll_div.style.backgroundColor = "green";
-                            // console.log("green");
-                            // purgeList();
-                            // togglePurgeButton();
-                            setTimeout(() => {
-                                const cb = li.querySelector('input[type="checkbox"]');
-                                if (cb) cb.checked = true; // Mark as done so purge picks it up
-                                li.style.transform = "translateX(90%)";
-                                li.style.opacity = "10";
-                                // Call your existing purge function
-                                setTimeout(() => {
-                                    // Your existing delete logic here
-                                    // purgeList();
-                                    // togglePurgeButton(); 
-                                    scroll_div.scrollTo({ left: 99, behavior: 'instant' });
-                                    purgeSpecificTask(taskId);
-                                    // saveData();
-                                }, 100); // 1 second delay
-                            }, 300); // Shorter delay for purge to feel "snappy"
-
-                        } else {
-                            scroll_div.style.backgroundColor = ""; // reset when in middle
-                            // console.log("middle");
-                        }
-                    });
-                });
-
-    
-        }
+            // FIX 2: Ensure fallback safe checking at the very end of the rendering pass
+    if (typeof window.checkBoardCompletion === 'function') {
+        window.checkBoardCompletion();
+    } else if (typeof checkBoardCompletion === 'function') {
+        checkBoardCompletion(); // Local scope fallback execution
     }
-    togglePurgeButton();
+}
+
+// call string with variable, add List
+//   const tasks = JSON.parse(localStorage.getItem(`${tabData.id}List`) || '[]');
+function renderListView(container, tabData) {
+    // 1. Fetch using the general-purpose storage helper
+    const tasks = getTabStorageData(tabData.id, tabData.type);
+    
+    // Clear out the element wrapper
+    container.empty();
+    
+    if (tasks.length === 0) {
+        // container.html(`<div class="empty-state">No tasks in ${tabData.name}</div>`);
+        return;
+    }
+
+    // 2. Loop through task records and construct interactive DOM nodes
+    tasks.forEach((task) => {
+        // Format the id timestamp safely into just day and month (e.g., "31 May")
+        const displayDate = new Date(task.id).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short'
+        });
+
+        // Determine fallback display state for contextual editing tool controls
+        const editDisplayState = (typeof editButtonsVisible !== 'undefined' && editButtonsVisible) ? 'inline-block' : 'none';
+
+        // Construct the item layout template structure
+        const newListItem = $(`
+            <li data-id="${task.id}" class="sortable-item" draggable="true">
+                <div class="swipe-container">
+                    <button style="background: rgba(48, 151, 48, 0.69); width: 100px; border: none">✅</button>
+                    <div class="task-content">
+                        <span>
+                            <input type="checkbox" class="task-checkbox" ${task.checked ? 'checked' : ''}>
+                            <span class="task-text">${linkify(task.text)}</span>
+                            <p class="time">${displayDate}</p>
+                        </span>
+                        <div class="edit_tasks" style="display: ${editDisplayState};">
+                            <input type="submit" class="icon delete" value=" " title="Delete task" style="padding-right:0%;">
+                        </div>
+                    </div>
+                    <button style="background: rgb(199, 74, 74); width: 100px; border: none">❌</button>
+                </div>
+            </li>
+        `);
+
+        // Append the item right into the wrapper list
+        container.append(newListItem);
+
+        // 3. Setup Swipe Gestures Logic
+        const swiper = newListItem.find(".swipe-container")[0];
+        
+        // Hide standard mobile side gutters using optimized display ticks
+        requestAnimationFrame(() => {
+            if (swiper) swiper.scrollLeft = 99; 
+        });
+
+        // Attach Swipe Event Listener
+        if (swiper) {
+            swiper.addEventListener("scroll", function(e) {
+                const li = e.target.closest('.sortable-item');
+                if (!li) return;
+
+                const taskId = li.getAttribute('data-id');
+                const scroll_div = e.currentTarget;
+                const scroll_center = scroll_div.scrollWidth / 2;
+                const viewport_center = scroll_div.clientWidth / 2;
+                const current = scroll_div.scrollLeft + viewport_center;
+                const dx = current - scroll_center;
+
+                // Threshold tracking action checks
+                if (dx > 99) {                
+                    scroll_div.style.backgroundColor = "red";
+                    setTimeout(() => {
+                        li.style.transform = "translateX(-90%)";
+                        li.style.opacity = "0";
+                        setTimeout(() => {
+                            // Unified delete execution
+                            if (window.deleteTaskById) {
+                                window.deleteTaskById(taskId);
+                            } else {
+                                // Fallback to standard delete callback action if by-id is missing
+                                deleteTask.call($(li).find('.delete')[0]);
+                            }
+                        }, 100);
+                    }, 600);
+
+                } else if (dx < -99) {
+                    scroll_div.style.backgroundColor = "green";
+                    setTimeout(() => {
+                        const cb = li.querySelector('input[type="checkbox"]');
+                        if (cb) cb.checked = true; 
+                        
+                        li.style.transform = "translateX(90%)";
+                        li.style.opacity = "1"; // Keep visible during transformation window
+                        
+                        setTimeout(() => {
+                            scroll_div.scrollTo({ left: 99, behavior: 'instant' });
+                            if (window.purgeSpecificTask) {
+                                window.purgeSpecificTask(taskId);
+                            } else if (window.purgeList) {
+                                window.purgeList(); // Fallback cascade anchor
+                            }
+                        }, 100);
+                    }, 300);
+
+                } else {
+                    scroll_div.style.backgroundColor = ""; // Clear background state color at midpoint
+                }
+            });
+        }
+
+        // 4. Manual Event Click Actions (Checkbox Toggles + Inline Deletions)
+        newListItem.find('.task-checkbox').on('change', function() {
+            const isChecked = $(this).is(':checked');
+            // Locate local layout tracking index references
+            const currentTasks = getTabStorageData(tabData.id, tabData.type);
+            const targetIdx = currentTasks.findIndex(t => t.id === task.id);
+            
+            if (targetIdx !== -1) {
+                currentTasks[targetIdx].checked = isChecked;
+                setTabStorageData(tabData.id, tabData.type, currentTasks);
+                updateHealthBar();
+                togglePurgeButton();
+                if (window.pushFullSync) window.pushFullSync();
+            }
+        });
+
+        newListItem.find('.delete').on('click', function(e) {
+            e.stopPropagation();
+            deleteTask.call(this); // Calls standard execution mapping to filter out task keys
+        });
+    });
 }
 
 function renderPurgeList() {
@@ -292,7 +413,7 @@ function renderPurgeList() {
 
         const newPurgeItem = $(`
             <li><span style="font-size:13px; color:light-grey;">
-                ${item.text} <p class="time">${item.timestamp}</p>
+                ${item.text} <p class="time">${item.createdAt}</p>
             </span></li>
         `);
         $(`.week-${purgedWeek}`).after(newPurgeItem);
@@ -302,14 +423,24 @@ function renderPurgeList() {
 
 // ----------- TASK FUNCTIONS -------------
 function togglePurgeButton() {
-    const currentTabName = localStorage.getItem(`tabName_${activeTab}`) || activeTab;
-
-    if (currentTabName === 'x') {
-        console.log("togglePurgeButton in x Tab")
+    // on/off
+    // const currentTabName = localStorage.getItem(`tabName_${activeTab}`) || activeTab;
+    // window.activeTab = localStorage.getItem('activeTab') || (window.allTabs[0] ? window.allTabs[0].id : null);
+    const activeTab = window.activeTab;
+    // console.log("activeTab", activeTab)
+    // const tabData = getTabData(activeTab); 
+    const tabData = typeof getTabData === 'function' ? getTabData(activeTab) : { id: activeTab, type: 'checkin' };
+    // const tabData = window.tabData; // Helper we built earlier
+    // console.log("tabData type", tabData.type)
+    
+    if (tabData.type === 'checkin') {
+        // console.log("togglePurgeButton in x Tab")
         // For 'x' tab: Enable if any tile has clicks > 0
-        const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+        // const todoList = JSON.parse(localStorage.getItem(activeTab) || '[]');
+        const todoList = getTabStorageData(tabData.id, tabData.type);
         const hasClicks = todoList.some(task => (task.clicks || 0) > 0);
-        console.log("togglePurgeButton in x Tab", hasClicks)
+        // todoList[3].clicks
+        console.log("togglePurgeButton in checkin tab", hasClicks)
         $('#purge').prop('disabled', !hasClicks);
     } else {
         // Standard mode: Enable if any checkbox is checked
@@ -319,9 +450,14 @@ function togglePurgeButton() {
     }
 }
 
+
+
 function enterTask() {
     const text = $('#enter_task').val().trim();
     if (!text) return;
+
+    const activeTabId = window.activeTab;
+    const tabData = getTabData(activeTabId);
 
     const isoTime = new Date().toISOString(); // simple unique id based on createdAT timestamp
 
@@ -331,17 +467,28 @@ function enterTask() {
         hour: '2-digit', minute: '2-digit'
     });
 
-    
+            // Create a new master_tab object
+            const newTask = {
+                id: isoTime,
+                text: text,
+                checked: false,
+                createdBy: window.userId, // <--- Add this line
+                createdAt: new Date().toISOString()
+            };
 
-    const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
-    todoList.push({ id: isoTime, text, timestamp, checked: false });
+    // const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
+    // Pull, push, and save effortlessly
+    const todoList = getTabStorageData(tabData.id, tabData.type);
+    todoList.push(newTask);
 
-    localStorage.setItem(activeTabList, JSON.stringify(todoList));
+    setTabStorageData(tabData.id, tabData.type, todoList);
     localStorage.setItem("LastSync", isoTime); //set last sync as last created task time
+    
 
     $('#enter_task').val('');
     updateHealthBar();
-    renderTaskList();
+    // renderTaskList();
+    window.renderTaskList();
 
 //     Since ISO timestamps are lexically sortable, you can sort tasks by ID directly:
         // todoList.sort((a, b) => a.id.localeCompare(b.id)); // ascending
@@ -401,6 +548,8 @@ function deleteTask() {
 
 // purge button click
 function purgeList() {
+    const tabData = window.tabData; // Helper we built earlier
+
     // Clear the timer for the 'x' tab specifically
     localStorage.removeItem(`startTime_${activeTab}`);
     checkBoardCompletion();
@@ -413,7 +562,7 @@ function purgeList() {
     const now = new Date().toISOString();
     let purgedAnything = false;
 
-if (currentTabName === 'x') {
+if (tabData.type === 'checkin') {
     // FIX: Ensure purgeList is actually an array
         let rawPurgeData = localStorage.getItem(activeTabPurgeList);
         let purgeList = [];
@@ -527,14 +676,14 @@ function updateHealthBar() {
 
     const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
     const currentTabName = localStorage.getItem(`tabName_${activeTab}`) || activeTab;
-
+const tabData = window.tabData;
     const count = todoList.length;
     
     let totalItems = todoList.length;
     let activeItems;
     let calculatedWidth;
 
-    if (currentTabName === 'x') {
+    if (tabData.type === 'checkin') {
         // --- Health Logic for Check-in Tab ---
         // A task "depletes" health if it has 1 or more clicks (it's active/started)
         // find tasks, filter those with clicks or 0, get length of if there are more than 0
@@ -680,6 +829,27 @@ window.addEventListener('keydown', (e) => {
         if (!dash.classList.contains("hidden")) updateDashboardUI();
     }
 });
+
+// FAVORITES BAR (Key 'w')
+window.addEventListener('keydown', (e) => {
+if (e.key.toLowerCase() === 'w' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+    const dash = document.getElementById('favBar');
+    dash.classList.toggle('hidden');
+    if (dash.classList.contains('hidden')) {
+        window.updateDashboardUI();
+    }
+}
+});
+// 1. FOCUS MATRIX Toggle (Key 'q')
+window.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'q' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        const dash = document.getElementById("routineMatrix");
+        renderDiagnostics();
+        dash.classList.toggle("hidden");
+        if (!dash.classList.contains("hidden")) updateDashboardUI();
+    }
+});
+// 1. HISTORY CARD Toggle (Key 'f')
 window.addEventListener('keydown', (e) => {
     if (e.key.toLowerCase() === 'f' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
         const dash = document.getElementById("historyCard");
@@ -687,7 +857,7 @@ window.addEventListener('keydown', (e) => {
         if (!dash.classList.contains("hidden")) updateDashboardUI();
     }
 });
-
+// 1. STATISTICS DASHBOARD Toggle (Key 's')
 window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
@@ -697,6 +867,7 @@ window.addEventListener('keydown', (e) => {
         if (!statsDash.classList.contains("hidden")) renderStats();
     }
 });
+// 1. COMMAND BAR Toggle (Key 'x')
 window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
@@ -706,6 +877,16 @@ window.addEventListener('keydown', (e) => {
         if (!combar.classList.contains("hidden")) updateDashboardUI();
     }
 });
+
+// 1. SHELF CARD Toggle (Key 'x')
+window.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    if (e.key.toLowerCase() === 'e') {
+        showShelf();        
+    }
+});
+
 // 2. Sync Toggle Listener
 // 1. Locate the checkbox in the Dashboard
 const syncToggle = document.getElementById('cloudSyncToggle');
@@ -808,17 +989,6 @@ window.handleManualSync = function() {
             // }
 };
 
-// Example toggle logic for the 'F' key
-window.addEventListener('keydown', (e) => {
-if (e.key.toLowerCase() === 'w' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-    const dash = document.getElementById('favBar');
-    dash.classList.toggle('hidden');
-    if (dash.classList.contains('hidden')) {
-        window.updateDashboardUI();
-    }
-}
-});
-
     $('#todo_list').on('change', '.task-checkbox', function () {
         const index = $(this).closest('li').index();
         updateTaskInStorage(index, $(this).siblings('.task-text').text(), this.checked);
@@ -830,12 +1000,12 @@ if (e.key.toLowerCase() === 'w' && e.target.tagName !== 'INPUT' && e.target.tagN
     $('#todo_list').on('click', '.delete', deleteTask);
 
     $('#todo_list').on('dblclick', '.task-text', function () {
-    const taskSpan = $(this);
-    const currentText = taskSpan.text();
-    const input = $('<input type="text" class="task-edit-input">').val(currentText);
+        const taskSpan = $(this);
+        const currentText = taskSpan.text();
+        const input = $('<input type="text" class="task-edit-input">').val(currentText);
 
-    taskSpan.replaceWith(input);
-    input.focus().select();
+        taskSpan.replaceWith(input);
+        input.focus().select();
 
         input.on('blur', function () {
         const newText = input.val().trim() || currentText;
@@ -855,44 +1025,6 @@ if (e.key.toLowerCase() === 'w' && e.target.tagName !== 'INPUT' && e.target.tagN
         }
         });
     });
-    // $('#todo_list').on('click', '.edit', function () {
-    //     const taskText = $(this).siblings('span').find('.task-text');
-    //     taskText.attr('contenteditable', 'true').focus();
-
-    //     taskText.on('keydown', function (e) {
-    //         if (e.key === 'Enter') {
-    //             e.preventDefault();
-    //             taskText.attr('contenteditable', 'false');
-    //             const index = $(this).closest('li').index();
-    //             updateTaskInStorage(index, taskText.text());
-    //         }
-    //     });
-
-    //     taskText.on('blur', function () {
-    //         taskText.attr('contenteditable', 'false');
-    //         const index = $(this).closest('li').index();
-    //         updateTaskInStorage(index, taskText.text());
-    //     });
-    // });
-
-    // $("#sort_list").sortable({
-    //     axis: "y",
-    //     cursor: "move",
-    //     opacity: 0.5,
-    //     update: function () {
-    //         const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
-    //         const newOrder = $('#todo_list li').map(function () {
-    //             return $(this).attr('id');
-    //         }).get();
-
-    //         newOrder.forEach((id, i) => {
-    //             const idx = parseInt(id.split('-')[1], 10);
-    //             if (todoList[idx]) todoList[idx].id = i + 1;
-    //         });
-
-    //         localStorage.setItem(activeTabList, JSON.stringify(todoList));
-    //     }
-    // });
 
     displayData();
     updateHealthBar();
@@ -916,28 +1048,14 @@ function showTaskEdit() {
         taskDiv.style.display = editButtonsVisible ? 'inline-block' : 'none';
     });
 }
-// function showTaskEdit() {
-//     const showTask = document.getElementById("edit_tasks").style.display;
-//     document.querySelectorAll(".edit_tasks").forEach(taskDiv => {
-//     if (showTask === 'none') {
-//       document.getElementById("edit_tasks").style.display = "inline-block";
-//       console.log("showTask")
-//     } else if (showTask === 'inline-block') {
-//       document.getElementById("edit_tasks").style.display = "none";
-//     }
-//     });
-// }
 
 // REPLACE WITH HTML POP UP & OVERS
 function showHelp() {
     document.getElementById("helpCard").style.display = "block";
-    // console.log('activetablist', activeTabList);
-    // displayData();
 }
 
 function closeHelp() {
     document.getElementById("helpCard").style.display = "none";
-    // document.getElementById("favBar").style.display = "none";
 }
 
 function showHistory() {
@@ -947,6 +1065,23 @@ function showHistory() {
     const dash = document.getElementById("historyCard");
         dash.classList.toggle("hidden");
         if (!dash.classList.contains("hidden")) updateDashboardUI();
+} 
+function showShelf() {
+    // const visibleHist = document.getElementById("shelfCard").style.display;
+    // console.log('show history');
+    // displayData();
+    
+    let context = window.getAutoContext().category;
+    window.applyContext(context, true);
+    const shelfPanel = document.getElementById("shelfCard");
+    shelfPanel.classList.toggle("hidden");
+    // if (!shelfPanel.classList.contains("hidden")) updateDashboardUI();
+    if (!shelfPanel.classList.contains("hidden")) {
+            window.applyContext("Shelf", true);
+            renderShelfPanel();
+            updateDashboardUI();
+    }
+    
 } 
 
 function showSync() {
@@ -973,110 +1108,6 @@ function toggleTheme() {
     }
 }
 
-
-//Exports the contents of local storage to a file in JSON format
-//https://stackoverflow.com/questions/61586888/javascript-export-local-storage
-function exportHistory() {  
-    console.log("System Export: Started"); 
-
-    // 1. Initialize the bundle with core settings and the tab manifest
-    const backupBundle = {
-        timestamp: new Date().toISOString(),
-        routine_config: JSON.parse(localStorage.getItem('routine_config')),
-        master_tabs: JSON.parse(localStorage.getItem('master_tabs') || '[]'),
-        tabData: {}
-    };
-
-    // 2. Iterate through all tabs to collect their specific lists
-    backupBundle.master_tabs.forEach(tab => {
-        const tabId = tab.id;
-        backupBundle.tabData[tabId] = {
-            activeList: JSON.parse(localStorage.getItem(`${tabId}List`) || '[]'),
-            purgeList: JSON.parse(localStorage.getItem(`${tabId}PurgeList`) || '[]')
-        };
-    });
-
-    // 3. Convert the whole bundle to a pretty-printed JSON string
-    const fullSnapshot = JSON.stringify(backupBundle, null, 2);
-    const filetime = new Date().toISOString().split('T')[0]; // Simple YYYY-MM-DD
-
-    // 4. Create the download link
-    const blob = new Blob([fullSnapshot], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    
-    a.href = url;
-    a.download = `FloWea_Full_Backup_${filetime}.json`;
-    document.body.appendChild(a);
-    a.click();
-    
-    // 5. Cleanup
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    console.log("System Export: Finished. Snapshot saved.");    
-}
-
-//import to local storage**/
-document.getElementById('jsonFileInput').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const backup = JSON.parse(e.target.result);
-
-            // 1. Validation: Ensure it's a full backup file
-            if (!backup.master_tabs || !backup.tabData) {
-                throw new Error("Invalid file format. This is not a FloWea Full Backup.");
-            }
-            else if (confirm("This will delete all current tasks and tabs and replace them with the backup. Continue?")) {
-                localStorage.clear();
-                // ... rest of the logic
-            
-                // 2. The Destructive Wipe
-                // We clear everything to ensure a clean slate for the restoration
-                localStorage.clear();
-
-                // 3. Restore Global Settings
-                localStorage.setItem('master_tabs', JSON.stringify(backup.master_tabs));
-                if (backup.routine_config) {
-                    localStorage.setItem('routine_config', JSON.stringify(backup.routine_config));
-                    window.routineConfig = backup.routine_config;
-                }
-
-                // 4. Restore Individual Tab Content
-                Object.keys(backup.tabData).forEach(tabId => {
-                    const data = backup.tabData[tabId];
-                    localStorage.setItem(`${tabId}List`, JSON.stringify(data.activeList));
-                    localStorage.setItem(`${tabId}PurgeList`, JSON.stringify(data.purgeList));
-                });
-
-                // 5. Hard Reset Global State
-                window.allTabs = backup.master_tabs;
-                window.isManualOverride = false;
-                
-                // Set a default active tab if one isn't set
-                const firstTabId = window.allTabs.length > 0 ? window.allTabs[0].id : 'work';
-                window.activeTab = firstTabId;
-                localStorage.setItem("activeTab", firstTabId);
-
-                // 6. Final UI Sync
-                initTabs();           // Redraw tab buttons
-                renderRoutineBar();   // Redraw routine segments/handles
-                window.displayData(); // Redraw the task lists
-
-                alert("Restoration Successful! Your workspace has been updated.");
-            }
-
-        } catch (error) {
-            console.error('Restoration Failed:', error);
-            alert("Error: " + error.message);
-        }
-    };
-    reader.readAsText(file);
-});
-
 // --- MOVE THIS TO THE BOTTOM OF script.js (Outside the $(function) block) ---
 window.updateStatusHUD = function(text, color) {
     const dot = document.getElementById('syncStatusDot');
@@ -1087,6 +1118,7 @@ window.updateStatusHUD = function(text, color) {
     }
 }
 
+// Sync specific functions
 window.updateDashboardUI = function() {
     const display = document.getElementById('userUidDisplay');
     if (window.userId && display) {
@@ -1106,6 +1138,9 @@ window.updateDashboardUI = function() {
     }
 };
 
+
+// Not used anywhere??
+// lost function in cloud sync??
 window.toggleTabLock = function(tabId) {
     const key = `tabLocked_${tabId}`;
     const isLocked = localStorage.getItem(key) === 'true';
@@ -1119,46 +1154,95 @@ window.toggleTabLock = function(tabId) {
 };
 
 window.renderTabSyncSettings = function() {
-    const tabList = JSON.parse(localStorage.getItem("tabList") || '["work", "personal"]');
+    // master_tabs is an array of objects: [{id: '123', name: 'Work', ...}, ...]
+    const tabList = JSON.parse(localStorage.getItem("master_tabs") || '[]');
     const container = document.getElementById('tabSyncList');
     if (!container) return;
     
-    container.innerHTML = tabList.map(id => {
-        const name = localStorage.getItem(`tabName_${id}`) || id;
+    container.innerHTML = tabList.map(tab => {
+        const id = tab.id;
+        const name = localStorage.getItem(`tabName_${id}`) || tab.name || id;
         const isLocked = localStorage.getItem(`tabLocked_${id}`) === 'true';
+        const isRemote = !!tab.remoteOwnerId;
+
+        // If it's a remote tab, we show who owns it instead of a sync toggle
+        const syncControl = isRemote 
+            ? `<span class="remote-badge">Shared by: ${tab.remoteOwnerId.substring(0,5)}...</span>`
+            : `<button onclick="toggleTabLock('${id}')" class="sync-toggle-btn ${isLocked ? 'locked' : 'synced'}">
+                ${isLocked ? '🏠 Local Only' : '☁️ Cloud Sync'}
+               </button>`;
+
         return `
-            <div class="tab-sync-item">
-                <span>${name}</span>
-                <button onclick="toggleTabLock('${id}')" class="${isLocked ? 'locked' : 'synced'}">
-                    ${isLocked ? '🏠 Local Only' : '☁️ Cloud Sync'}
+            <div class="tab-sync-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 10px;">
+                <span style="flex-grow: 1;">${name}</span>
+                
+                ${syncControl}
+
+                <button onclick="copyTabShareCode('${id}')" class="copy-btn" title="Copy Share Code">
+                    🔗 Copy Link
                 </button>
             </div>
         `;
     }).join('');
 };
 
-window.refreshUIFromSync = function() {
-    console.log("Real-time update received!");
+// Duplicate function
+// Toggle whether a tab is pushed to the cloud
+window.toggleTabLock = function(id) {
+    const current = localStorage.getItem(`tabLocked_${id}`) === 'true';
+    localStorage.setItem(`tabLocked_${id}`, !current);
     
-    // 1. Refresh global pointers
-    activeTab = localStorage.getItem("activeTab") || 'work';
-    activeTabList = activeTab + "List";
-    activeTabPurgeList = activeTab + "PurgeList";
-
-    // 2. Redraw UI components
-    // createTabs(); 
-    initTabs()
-    window.displayData();
-    renderRoutineBar();
-    updateHealthBar();
-    
-    // 3. Visual confirmation
-    const dot = document.getElementById('syncStatusDot');
-    if (dot) {
-        dot.style.transform = 'scale(1.5)';
-        setTimeout(() => dot.style.transform = 'scale(1)', 4000);
-    }
+    // Refresh UI and trigger a sync to update cloud state
+    window.renderTabSyncSettings();
+    if (window.pushFullSync) window.pushFullSync();
 };
+
+// Generate and copy the USERID|TABID string
+window.copyTabShareCode = function(tabId) {
+    if (!window.userId) {
+        alert("Please enable Cloud Sync first to get a User ID.");
+        return;
+    }
+    const shareCode = `${window.userId}|${tabId}`;
+    
+    navigator.clipboard.writeText(shareCode).then(() => {
+        // Visual feedback
+        const toast = document.getElementById('toast');
+        if (toast) {
+            toast.textContent = "Share Code Copied!";
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        } else {
+            alert("Copied: " + shareCode);
+        }
+    });
+};
+
+// //
+// This function is not used anywhere...
+// //
+// window.refreshUIFromSync = function() {
+//     console.log("Real-time update received!");
+    
+//     // 1. Refresh global pointers
+//     activeTab = localStorage.getItem("activeTab") || 'work';
+//     activeTabList = activeTab + "List";
+//     activeTabPurgeList = activeTab + "PurgeList";
+
+//     // 2. Redraw UI components
+//     // createTabs(); 
+//     initTabs()
+//     window.displayData();
+//     renderRoutineBar();
+//     updateHealthBar();
+    
+//     // 3. Visual confirmation
+//     const dot = document.getElementById('syncStatusDot');
+//     if (dot) {
+//         dot.style.transform = 'scale(1.5)';
+//         setTimeout(() => dot.style.transform = 'scale(1)', 4000);
+//     }
+// };
 
 // Minimal change: One listener on the parent container
 document.getElementById('todo_list').addEventListener('click', function(e) {
@@ -1264,7 +1348,7 @@ function renderStats() {
 
     let created, done, left;
 
-    if (currentTabName === 'x') {
+    if (tabData.type === 'checkin') {
         // --- Stats for Check-in Tab ---
         // 'Created' is the sum of current clicks + all historical clicks this week
         const historicalClicks = purgedTasks
@@ -1323,7 +1407,9 @@ function isInInterval(dateStr) {
     return false;
 }
 
-function checkBoardCompletion() {
+window.checkBoardCompletion = function() {
+    // Your calculation code to check if all tasks are completed/clicked...
+    console.log("Board status evaluated!");
     const todoList = JSON.parse(localStorage.getItem(activeTabList) || '[]');
     const container = $("#todo_list");
 
@@ -1376,11 +1462,13 @@ function checkBoardCompletion() {
 function renderDiagnostics() {
     const configContainer = document.getElementById('display_config');
     const dataContainer = document.getElementById('display_data');
+    const dets = document.createElement('details');
     
     if (!configContainer || !dataContainer) return;
 
     // 1. Define the System Keys we want to track
     const systemKeys = [
+        'LastSync',
         'routine_config', 
         'activeTab', 
         'lastLocalPushTime', 
@@ -1391,8 +1479,34 @@ function renderDiagnostics() {
 
     configContainer.innerHTML = '<h4>System Config</h4>';
     systemKeys.forEach(key => {
-        const value = localStorage.getItem(key) || (window[key] ? JSON.stringify(window[key]) : 'null');
-        configContainer.appendChild(createCollapsibleItem(key, value));
+    // 1. Create a NEW element for EVERY key inside the loop
+    const row = document.createElement('div'); 
+    row.className = "diag-row"; // For easier styling
+    
+    const value = localStorage.getItem(key) || (window[key] ? JSON.stringify(window[key]) : 'null');
+    
+    // 2. Set the content for this specific new row
+    row.innerHTML = `
+        <div class="diag-row" style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px;">
+            <span style="font-weight: bold; min-width: 120px;">${key}:</span>
+            <pre style="
+            background: #222; 
+            color: #eee;
+            padding: 5px; 
+            font-size: 11px; 
+            white-space: pre-wrap;       /* Allows text wrapping */
+            word-break: break-all;      /* Prevents long strings from breaking layout */
+            max-height: 200px;
+            margin: 0; 
+            overflow-x: auto;
+            ">${value}</pre>
+        </div>
+    `;
+    
+    // 3. Append the brand new element to the container
+    configContainer.appendChild(row);
+        // configContainer.appendChild(createCollapsibleItem(key, value));
+        
     });
 
     // 2. Iterate through allTabs to show Tab Data
@@ -1400,9 +1514,12 @@ function renderDiagnostics() {
     const masterTabs = JSON.parse(localStorage.getItem('master_tabs') || '[]');
     
     masterTabs.forEach(tab => {
+        const isShared = !!tab.remoteOwnerId;
+        const shareTag = isShared ? `<span style="color:#ffa500;"> [SHARED from ${tab.remoteOwnerId.slice(0,5)}...]</span>` : '';
+
         const tabFolder = document.createElement('details');
         tabFolder.className = 'diag-tab-folder';
-        tabFolder.innerHTML = `<summary><strong>Tab: ${tab.name || tab.id}</strong> (${tab.id})</summary>`;
+        tabFolder.innerHTML = `<summary><strong>Tab: ${tab.name || tab.id}</strong> ${shareTag}(${tab.id})</summary>`;
         
         const tabContent = document.createElement('div');
         tabContent.style.paddingLeft = "15px";
@@ -1419,6 +1536,7 @@ function renderDiagnostics() {
         dataContainer.appendChild(tabFolder);
     });
 }
+
 
 // Helper to create the collapsible UI
 function createCollapsibleItem(key, rawValue) {
@@ -1438,3 +1556,164 @@ function createCollapsibleItem(key, rawValue) {
     `;
     return details;
 }
+
+window.importSharedTab = async function() {
+    const code = prompt("Paste the Share Code (ID|TabID):");
+    if (!code || !code.includes('|')) return;
+
+    const [ownerId, tabId] = code.split('|');
+
+    // 1. Check if we already have this tab
+    if (window.allTabs.some(t => t.id === tabId)) {
+        return alert("You already have this tab in your list.");
+    }
+
+    // 2. Create the Pointer Tab
+    const newTab = {
+        id: tabId,
+        name: "Syncing...", // Will be updated by the watcher
+        icon: "🔗",
+        mode: "Work",
+        remoteOwnerId: ownerId, // This is the magic key
+        order: window.allTabs.length
+    };
+
+    window.allTabs.push(newTab);
+    localStorage.setItem('master_tabs', JSON.stringify(window.allTabs));
+    
+    alert("Tab added! The app will now sync this specific tab from the owner.");
+    location.reload();
+};
+
+window.generateTabShareCode = function() {
+    if (!window.userId || !window.editingTabId) {
+        alert("Please enable Cloud Sync first.");
+        return;
+    }
+    
+    // Format: USER_ID|TAB_ID
+    const code = `${window.userId}|${window.editingTabId}`;
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(code).then(() => {
+        const display = document.getElementById('share_code_display');
+        display.textContent = "Code copied to clipboard!";
+        setTimeout(() => { display.textContent = code; }, 2000);
+    });
+};
+
+
+// make hyperlinks clickable
+function linkify(text) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, url => {
+        const div = document.createElement('div');
+        div.textContent = url;
+        const safeUrl = div.innerHTML;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>`;
+    });
+}
+
+
+//Exports the contents of local storage to a file in JSON format
+//https://stackoverflow.com/questions/61586888/javascript-export-local-storage
+function exportHistory() {  
+    console.log("System Export: Started"); 
+
+    // 1. Initialize the bundle with core settings and the tab manifest
+    const backupBundle = {
+        timestamp: new Date().toISOString(),
+        routine_config: JSON.parse(localStorage.getItem('routine_config')),
+        master_tabs: JSON.parse(localStorage.getItem('master_tabs') || '[]'),
+        tabData: {}
+    };
+
+    // 2. Iterate through all tabs to collect their specific lists
+    backupBundle.master_tabs.forEach(tab => {
+        const tabId = tab.id;
+        backupBundle.tabData[tabId] = {
+            activeList: JSON.parse(localStorage.getItem(`${tabId}List`) || '[]'),
+            purgeList: JSON.parse(localStorage.getItem(`${tabId}PurgeList`) || '[]')
+        };
+    });
+
+    // 3. Convert the whole bundle to a pretty-printed JSON string
+    const fullSnapshot = JSON.stringify(backupBundle, null, 2);
+    const filetime = new Date().toISOString().split('T')[0]; // Simple YYYY-MM-DD
+
+    // 4. Create the download link
+    const blob = new Blob([fullSnapshot], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    
+    a.href = url;
+    a.download = `FloWea_Full_Backup_${filetime}.json`;
+    document.body.appendChild(a);
+    a.click();
+    
+    // 5. Cleanup
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    console.log("System Export: Finished. Snapshot saved.");    
+}
+
+//import to local storage**/
+document.getElementById('jsonFileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const backup = JSON.parse(e.target.result);
+
+            // 1. Validation: Ensure it's a full backup file
+            if (!backup.master_tabs || !backup.tabData) {
+                throw new Error("Invalid file format. This is not a FloWea Full Backup.");
+            }
+            else if (confirm("This will delete all current tasks and tabs and replace them with the backup. Continue?")) {
+                localStorage.clear();
+                // ... rest of the logic
+            
+                // 2. The Destructive Wipe
+                // We clear everything to ensure a clean slate for the restoration
+                localStorage.clear();
+
+                // 3. Restore Global Settings
+                localStorage.setItem('master_tabs', JSON.stringify(backup.master_tabs));
+                if (backup.routine_config) {
+                    localStorage.setItem('routine_config', JSON.stringify(backup.routine_config));
+                    window.routineConfig = backup.routine_config;
+                }
+
+                // 4. Restore Individual Tab Content
+                Object.keys(backup.tabData).forEach(tabId => {
+                    const data = backup.tabData[tabId];
+                    localStorage.setItem(`${tabId}List`, JSON.stringify(data.activeList));
+                    localStorage.setItem(`${tabId}PurgeList`, JSON.stringify(data.purgeList));
+                });
+
+                // 5. Hard Reset Global State
+                window.allTabs = backup.master_tabs;
+                window.isManualOverride = false;
+                
+                // Set a default active tab if one isn't set
+                const firstTabId = window.allTabs.length > 0 ? window.allTabs[0].id : 'work';
+                window.activeTab = firstTabId;
+                localStorage.setItem("activeTab", firstTabId);
+
+                // 6. Final UI Sync
+                initTabs();           // Redraw tab buttons
+                renderRoutineBar();   // Redraw routine segments/handles
+                window.displayData(); // Redraw the task lists
+
+                alert("Restoration Successful! Your workspace has been updated.");
+            }
+
+        } catch (error) {
+            console.error('Restoration Failed:', error);
+            alert("Error: " + error.message);
+        }
+    };
+    reader.readAsText(file);
+});

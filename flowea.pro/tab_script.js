@@ -4,7 +4,7 @@
 // what is current mode, display relevant tabs
 // 
 // --- Constants ---
-const CORE_DEFAULT_TABS = ["work", "personal"];
+// const CORE_DEFAULT_TABS = ["work", "personal"];
 
 // ------------------- CONTEXTS -----------------------
 const ROUTINE_CONTEXTS = {
@@ -12,47 +12,167 @@ const ROUTINE_CONTEXTS = {
     "Work":    { start: 9,  end: 17, icon: "💻", theme: "#54a0ff" },
     "Gym":    { start: 17,  end: 18, icon: "🏋️", theme: "#80450e" },
     "Evening": { start: 18, end: 22, icon: "🌆", theme: "#5f27cd" },
-    "Night":   { start: 22, end: 5,  icon: "🌙", theme: "#222f3e" }
+    "Night":   { start: 22, end: 5,  icon: "🌙", theme: "#222f3e" },
+    "Shelf": {icon: "📥", color: "#e67e22"}
 };
 
+//     const DefaultTabs = {
+//     "Morning": { start: 5,  end: 9,  icon: "🌅", theme: "#ff9f43" },
+//     "Work":    { start: 9,  end: 17, icon: "💻", theme: "#54a0ff" },
+//     "Gym":    { start: 17,  end: 18, icon: "🏋️", theme: "#80450e" },
+//     "Evening": { start: 18, end: 22, icon: "🌆", theme: "#5f27cd" },
+//     "Night":   { start: 22, end: 5,  icon: "🌙", theme: "#222f3e" }
+// };
 
+const days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const cats = ["morning", "work", "gym", "evening", "night"];
+
+window.initRoutineMatrix = function() {    
+    let matrix = JSON.parse(localStorage.getItem("routine_matrix"));
+    
+    if (!matrix) {
+        matrix = {};
+        days.forEach(d => {
+            matrix[d] = {};
+            cats.forEach(c => matrix[d][c] = null); // Start empty
+        });
+        localStorage.setItem("routine_matrix", JSON.stringify(matrix));
+    } else {
+        // MAINTENANCE: If you added a new category/day, make sure it's in the object
+        days.forEach(d => {
+            if (!matrix[d]) matrix[d] = {};
+            cats.forEach(c => {
+                if (matrix[d][c] === undefined) matrix[d][c] = null;
+            });
+        });
+    }
+    window.routineMatrix = matrix;
+    console.log('Matrix Initialized:', window.routineMatrix);
+};
+
+window.renderRoutineGrid = function() {
+    const container = document.getElementById('routineGridContainer');
+    console.log('container', container);
+    if (!container) return;
+    
+    const now = new Date();
+    // JS getDay() is 0 for Sunday. Adjust to match your ["mon", "tue"...] array.
+    const dayIndex = now.getDay() === 0 ? 6 : now.getDay() - 1;
+    const currentDay = days[dayIndex];
+// Get current category from your existing logic
+    // Safer version for your grid renderer
+    const auto = getAutoContext();
+    const currentCatName = (auto.category || "Work").toLowerCase();
+    
+    let html = `<div class="routine-grid">`;
+    console.log('container2', container);
+    // Header Row (Days)
+    html += `<div class="grid-label"></div>`; // Corner
+    days.forEach(d => html += `<div class="grid-header">${d.toUpperCase()}</div>`);
+
+    // Data Rows
+    cats.forEach(cat => {
+        html += `<div class="grid-label cat-label">${cat}</div>`;
+        days.forEach(day => {
+            const selectedTabId = window.routineMatrix[day][cat];
+            const tab = (window.allTabs || []).find(t => t.id === selectedTabId);
+            const label = tab ? tab.name.substring(0, 35) : '---';
+            // const isActive = tab ? 'active-cell' : '';
+            // Highlight the cell if it matches the current focused tab
+    const cellClass = tab ? 'assigned-cell' : 'empty-cell';
+    const isCurrentlyViewed = (selectedTabId === window.activeTab) ? 'active-focus' : '';
+// Then use: class="grid-cell ${cellClass} ${isCurrentlyViewed}"
+            html += `
+                <div class="grid-cell ${cellClass} ${isCurrentlyViewed}" onclick="cycleGridCell('${day}', '${cat}')">
+                    ${label}
+                </div>`;
+        });
+    });
+
+    html += `</div>`;
+    container.innerHTML = html;
+};
+
+window.cycleGridCell = function(day, cat) {
+    // 1. Find all tabs belonging to this category
+    const candidates = (window.allTabs || []).filter(t => t.category && t.category.toLowerCase() === cat.toLowerCase());
+
+    if (candidates.length === 0) {
+        console.warn(`No tabs found for category: ${cat}`);
+        return alert(`No tabs found in category: ${cat}`);
+    }
+    const currentId = window.routineMatrix[day][cat];
+    const currentIndex = candidates.findIndex(t => t.id === currentId);
+    
+    // 2. Select next tab (or back to null/empty)
+    let nextTab;
+    if (currentIndex === candidates.length - 1) {
+        nextTab = null; // Reset to empty after last tab
+    } else {
+        nextTab = candidates[currentIndex + 1];
+    }
+
+    // 3. Update Matrix & LocalStorage
+    window.routineMatrix[day][cat] = nextTab ? nextTab.id : null;
+    localStorage.setItem("routine_matrix", JSON.stringify(window.routineMatrix));
+
+    // 4. Update Tab Order (Visual Priority)
+    if (nextTab) {
+        // Increment order so it floats to the top of its category
+        nextTab.order = (nextTab.order || 0) + 1;
+        localStorage.setItem("master_tabs", JSON.stringify(window.allTabs));
+    }
+
+    renderRoutineGrid();
+    if (window.pushFullSync) window.pushFullSync();
+};
 
 // Global config sourced from Storage or Defaults
 window.routineConfig = JSON.parse(localStorage.getItem('routine_config')) || ROUTINE_CONTEXTS;
 
 // --- Global State ---
-// --- Global State ---
 // 1. Try to get existing tabs
-let storedTabs = JSON.parse(localStorage.getItem('master_tabs') || '[]');
+let masterTabs = JSON.parse(localStorage.getItem('master_tabs') || '[]');
 
-// 2. If no tabs exist (New User / Cleared Data), create the Default Tab
-if (storedTabs.length === 0) {
-    const defaultTab = {
-        id: "tab_" + Date.now(), // Unique ID
-        name: "TabName",
-        icon: "📝",
-        mode: "Work", // Default category
-        order: 0
-    };
-    storedTabs = [defaultTab];
-    localStorage.setItem('master_tabs', JSON.stringify(storedTabs));
-    localStorage.setItem(`tabName_${defaultTab.id}`, defaultTab.name);
-    // Set as active so the first task has a destination
-    localStorage.setItem('activeTab', defaultTab.id);
+// 2. If no tabs exist (New User / Cleared Data), seed the structural timeline categories 
+if (masterTabs.length === 0) {
+    const baseTime = Date.now();
+    
+    // Define the blueprint for your standard daily tracking structure
+    const defaultCategories = [
+        { name: "Morning Routine", category: "Morning", type: "list" },
+        { name: "Studio Tasks",    category: "Work",    type: "list" },
+        { name: "Gym2 - weights",  category: "Gym",     type: "checkin" }, // Auto-boots with your checkin layout matrices!
+        { name: "Evening Routine", category: "Evening", type: "list" },
+        { name: "Night Review",    category: "Night",   type: "list" }
+    ];
+
+    // Map blueprints into fully qualified master_tab object schemas
+    masterTabs = defaultCategories.map((tabBlueprint, index) => {
+        return {
+            id: `tab_${baseTime}_${index}`, // Buffered unique timestamp string keys
+            name: tabBlueprint.name,
+            category: tabBlueprint.category,
+            order: index,
+            type: tabBlueprint.type
+        };
+    });
+
+    // Save newly initialized arrays down to LocalStorage
+    localStorage.setItem('master_tabs', JSON.stringify(masterTabs));
+    
+    // Set the very first item ("Morning Routine") as active so the UI loads cleanly
+    localStorage.setItem('activeTab', masterTabs[0].id);
+    window.activeTab = masterTabs[0].id;
+} else {
+    // Standard initialization anchor if tabs already live in memory
+    window.activeTab = localStorage.getItem('activeTab') || masterTabs[0].id;
 }
 
-window.allTabs = storedTabs;
+// 
+window.allTabs = masterTabs;
 window.editingTabId = null;
 window.isManualOverride = false; // Prevents auto-switching if the user manually picks a tab
-
-// Initialize Context: Start with the clock
-window.currentContext = getAutoContext();
-
-// Initialize global variables used by script.js
-window.activeTab = localStorage.getItem("activeTab") || 'work';
-window.activeTabList = `${window.activeTab}List`;
-window.activeTabPurgeList = `${window.activeTab}PurgeList`;
-
 
 
 
@@ -60,30 +180,92 @@ window.activeTabPurgeList = `${window.activeTab}PurgeList`;
  * 1. GET THE AUTO CONTEXT
  * Logic to handle the 24-hour wrap-around for 'Night'
  */
-function getAutoContext() {
-    const hour = new Date().getHours();
-    for (const [name, limits] of Object.entries(ROUTINE_CONTEXTS)) {
-        if (limits.start < limits.end) {
-            if (hour >= limits.start && hour < limits.end) return name;
-        } else {
-            // Handles wrap-around (e.g., 22:00 to 05:00)
-            if (hour >= limits.start || hour < limits.end) return name;
+
+window.getAutoContext = function (overrideContext = null) {
+    const now = new Date();
+    const hour = now.getHours();
+    const dayIndex = now.getDay() === 0 ? 6 : now.getDay() - 1;
+    const currentDay = days[dayIndex];
+
+    // JS getDay(): 0 is Sunday, 1 is Monday...
+    // Adjust to match your ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+
+    // Ensure we start with a String
+    let activeCatName = "Night"; 
+
+    if (overrideContext && typeof overrideContext === 'string') {
+        activeCatName = overrideContext;
+    } else if (overrideContext && typeof overrideContext === 'object') {
+        // Defensive: if the whole object was passed, extract the category
+        activeCatName = overrideContext.category || "Night";
+    } else {
+        // Normal clock-based logic
+        for (const [name, limits] of Object.entries(ROUTINE_CONTEXTS)) {
+            if (limits.start < limits.end) {
+                if (hour >= limits.start && hour < limits.end) activeCatName = name;
+            } else {
+                if (hour >= limits.start || hour < limits.end) activeCatName = name;
+            }
         }
     }
-    return "Work"; // Fallback
+
+
+
+console.log('getautocontext');
+    // Matrix check: Use the tab assigned in the grid, fallback to the category name
+// Now we know activeCatName is a string, so .toLowerCase() is safe
+    const catKey = activeCatName.toLowerCase();
+    const matrixTabId = window.routineMatrix?.[currentDay]?.[catKey];
+
+    // 3. Return the Tab ID if assigned, otherwise the Category name
+    return {
+        category: activeCatName, // e.g., "Work"
+        tabId: matrixTabId
+        // matrixTabId || activeCatName.charAt(0).toUpperCase() + activeCatName.slice(1);
+    }
 }
+// Initialize Context: Start with the clock
+window.currentContext = window.getAutoContext();
+
+// Initialize global variables used by script.js
+window.activeTab = localStorage.getItem("activeTab") || 'work';
+window.activeTabList = `${window.activeTab}List`; //ta bort
+window.activeTabPurgeList = `${window.activeTab}PurgeList`;
+
 
 /**
  * 2. MASTER APPLY FUNCTION
  * Handles Header, Command Bar, and Tab Visibility
+ * @return {Array|void} Returns data array if context is an isolated data panel
  */
 window.applyContext = function(contextName, manual = false) {
+    // DEFENSIVE: If an object was passed, extract the category string
+    if (typeof contextName === 'object' && contextName.category) {
+        contextName = contextName.category;
+    }
+
+    // Now it's safe to check .startsWith
+    if (typeof contextName === 'string' && contextName.startsWith('tab_')) {
+        const tab = getTabData(contextName);
+        contextName = tab.category;
+    }
+
+    // 2. DEFINE TARGET: This fixes the ReferenceError
+    // We pass contextName to get the priority tab for the selected mode
+    const target = getAutoContext(contextName);
+    
   // 1. Update the State
     window.currentContext = contextName;
     if (manual) window.isManualOverride = true;
     
-    const contextData = ROUTINE_CONTEXTS[contextName] || { icon: "❓" };
-    
+    const contextData = ROUTINE_CONTEXTS[contextName];
+    // If it's still not found, fallback to Work to avoid the ❓
+    if (!contextData) {
+        console.warn("Invalid context requested:", contextName);
+        if (contextName !== "Work") window.applyContext("Work", manual);
+        return;
+    }
+
     // Update Header Label
     const label = $('#active_context_label');
     label.html(`${contextData.icon} ${contextName}`);
@@ -93,7 +275,20 @@ window.applyContext = function(contextName, manual = false) {
     $('.context-btn').removeClass('active');
     $(`.context-btn[data-context="${contextName}"]`).addClass('active');
 
-    // Filter Tabs
+    // ----------------------------------------------------
+    // BRANCHING ARCHITECTURE MATRIX
+    // ----------------------------------------------------
+    const masterTabs = JSON.parse(localStorage.getItem('master_tabs') || '[]');
+
+    if (contextName === 'Shelf') {
+        // Hide ALL tabs on the main top navigation bar since we are in shelf view
+        $('.tab').toggle(false);
+        
+        // Return ONLY the shelved tabs back to the caller (renderShelfPanel)
+        return masterTabs.filter(tab => !!tab.shelved);
+    }
+
+    // NORMAL CATEGORY ROUTINES (Morning, Work, Gym, etc.)
     let firstVisibleTabId = null;
     let currentTabVisible = false;
 
@@ -101,12 +296,21 @@ window.applyContext = function(contextName, manual = false) {
         const tabId = $(this).attr('data-tab-id');
         const tabData = getTabData(tabId);
         
-        // Show if category matches OR if it's a new/uncategorized tab
-        const isVisible = !tabData.category || 
-                          tabData.category === contextName || 
-                          tabData.category === "undefined";
-
+        // Hide if the tab is shelved. If not shelved, check the category.
+        const isVisible = !tabData.shelved && (
+            !tabData.category || 
+            tabData.category === contextName || 
+            tabData.category === "undefined"
+        );
+        // -----------------------------------------------
         $(this).toggle(isVisible);
+
+        // 2. Priority Highlight Logic
+        // This ensures the "Matrix Priority" glow moves when you switch categories
+        $(this).toggleClass('matrix-priority', tabId === target.tabId);
+        
+        // 3. Active Tab Logic
+        $(this).toggleClass('active', tabId === window.activeTab);
 
         if (isVisible) {
             if (!firstVisibleTabId) firstVisibleTabId = tabId;
@@ -198,14 +402,21 @@ function initTabs() {
     switchTab(window.activeTab);
 }
 
+
 function startRoutineHeartbeat() {
     setInterval(() => {
         if (!window.isManualOverride) {
-            const freshAutoContext = getAutoContext();
+            const target = getAutoContext();
             
-            // Only trigger a re-filter if the hour actually shifted the context
-            if (window.currentContext !== freshAutoContext) {
-                window.applyContext(freshAutoContext);
+            // 1. Handle Category Sync (Filtering)
+            if (window.currentContext !== target.category) {
+                window.applyContext(target.category);
+            }
+
+            // 2. Handle Specific Tab Sync (Focusing)
+            if (target.tabId && window.activeTab !== target.tabId) {
+                console.log("Matrix focusing tab:", target.tabId);
+                switchTab(target.tabId);
             }
         }
     }, 30000); 
@@ -217,12 +428,32 @@ function startRoutineHeartbeat() {
  */
 function createTabElement(tab) {
     const tabEl = document.createElement("div");
-    tabEl.className = "tab";
+    
+    // Check if the tab is subscribed/remote
+    const isRemote = !!tab.remoteOwnerId; //
+    
+    
+    // Add the standard "tab" class, and conditionally add "is-remote"
+    // tabEl.className = `tab ${isRemote ? 'is-remote' : ''}`; //
+    // Check if this tab is the one assigned in the matrix RIGHT NOW
+    // Look for priority based on whatever context is currently being viewed
+    const viewTarget = getAutoContext(window.currentContext);
+    const isMatrixPriority = (tab.id === viewTarget.tabId);
+
+    tabEl.className = `tab ${isRemote ? 'is-remote' : ''} ${isMatrixPriority ? 'matrix-priority' : ''}`;
+    
+    // Add active class if it's the current global active tab
+    if (tab.id === window.activeTab) {
+        tabEl.classList.add("active");
+    }
+
     tabEl.setAttribute("data-tab-id", tab.id);
     tabEl.setAttribute("data-category", tab.category);
 
     const span = document.createElement("span");
     span.className = "tab-label";
+    
+    // Optional: Keep the label as is, or prepend a small indicator if desired
     span.textContent = tab.name;
 
     // Double-tap/click to open settings
@@ -262,7 +493,7 @@ function switchTab(tabId) {
 
     const enterTaskInput = document.getElementById("enter_task");
     if (enterTaskInput) {
-        enterTaskInput.placeholder = `Enter task for ${tabData.name}`;
+        enterTaskInput.placeholder = ` Enter task for ${tabData.name}`;
     }
 
     // 4. Data Refresh: Trigger main list update in script.js
@@ -272,30 +503,55 @@ function switchTab(tabId) {
 /**
  * Helper to get a tab object from memory.
  */
+// current category or active tab category, latter probably..
 function getTabData(tabId) {
+    // allTabs= look in master_tabs for tabId, then get tablist entry for that tabId
+    return window.allTabs.find(t => t.id === tabId) || 
+           { id: tabId, name: "New Tab", category: 'Work', type: 'list' };
+}
+/**
+ * Helper to set a tab object from memory.
+ * replace all localstorage calls, simplify
+ */
+function setTabData(tabId) {
+    // allTabs= look in master_tabs for tabId, then get tablist for that tabId
     return window.allTabs.find(t => t.id === tabId) || 
            { id: tabId, name: "New Tab", category: 'Work', type: 'list' };
 }
 
 // --- Tab Settings Card Logic ---
 function openTabSettings(tabId = null) {
+    console.log('tab edit', tabId);
     window.editingTabId = tabId;
+
+    const tab = getTabData(tabId);
+    const isRemote = tab && !!tab.remoteOwnerId;
     const card = $('#tab_settings_card');
     
-    if (tabId) {
-        const tab = getTabData(tabId);
-        $('#sheet_title').text('Edit Tab');
+    // if (tabId) {
+        // Disable inputs if the tab is remote
+        $('#tab_name_input').prop('disabled', isRemote);
+        $('#tab_mode_select').prop('disabled', isRemote);
+        $('.category-icon-picker').css('pointer-events', isRemote ? 'none' : 'auto');
         $('#tab_name_input').val(tab.name);
         $('#tab_mode_select').val(tab.type || 'list');
+        // existing tab read category
         selectCategoryIcon(tab.category);
-        $('#delete_tab_btn').toggle(!CORE_DEFAULT_TABS.includes(tabId));
-    } else {
-        $('#sheet_title').text('New Tab');
-        $('#tab_name_input').val('');
-        $('#tab_mode_select').val('list');
-        selectCategoryIcon(window.currentContext || 'Work');
-        $('#delete_tab_btn').hide();
-    }
+        // new tab, suggest current context category
+        //     selectCategoryIcon(window.currentContext || 'Work');
+        
+        if (isRemote) {
+            console.log(' edit', tabId);
+            $('#sheet_title').text('Tab is remote, Guest Settings (ReadOnly)');
+            $('#save_tab_btn').hide(); // Hide save button for subscribers
+            // $('#delete_tab_btn').hide();
+        } else {
+            console.log('local tab edit', tabId);
+            $('#sheet_title').text(tabId ? 'Edit Tab (local)' : 'New Tab');
+            $('#save_tab_btn').show();
+
+        }
+
     card.addClass('active');
 }
 
@@ -358,7 +614,7 @@ function finalizeTabDeletion(tabId) {
 window.openNewTabCreator = () => openTabSettings(null);
 window.deleteTab = () => {
     const tabId = window.activeTab;
-    if (CORE_DEFAULT_TABS.includes(tabId)) return alert("Default tabs cannot be deleted.");
+    // if (CORE_DEFAULT_TABS.includes(tabId)) return alert("Default tabs cannot be deleted.");
     const tab = getTabData(tabId);
     if (confirm(`Delete "${tab.name}" and all its tasks?`)) finalizeTabDeletion(tabId);
 };
@@ -371,9 +627,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (localStorage.getItem('tabList')) {
         migrateLegacyTabs();
     }
+    initRoutineMatrix();
     initTabs();
+
+    // Fix: Handle the object return
+    const initialTarget = getAutoContext();
+    window.currentContext = initialTarget.category;
+    
+    // If matrix has a specific tab for right now, use it; otherwise use last active
+    if (initialTarget.tabId) {
+        window.activeTab = initialTarget.tabId;
+    }
+
+    renderRoutineGrid();
     initEventListeners();
     startRoutineHeartbeat();
+
+    // Final check: Apply the current string context
+    window.applyContext(window.currentContext);
 });
 
 function migrateLegacyTabs() {
@@ -542,6 +813,12 @@ function openCommandbar() {
         }
     }
 }
+function openFocusmatrix() {
+    const syncDash = $('#routineMatrix'); // Using jQuery for consistency
+    syncDash.toggleClass('hidden');
+    
+    if (!syncDash.hasClass('hidden')) updateDashboardUI();
+}
 
 function openCommandsettings() {
     const comset = $('#commandsettings');
@@ -585,7 +862,7 @@ function setupDraggable(handle, modeKey) {
             // 3. Sync Engine: Switch context immediately if the shift affects "now"
             if (!window.isManualOverride) {
                 const fresh = getAutoContext();
-                if (window.currentContext !== fresh) window.applyContext(fresh);
+                if (window.currentContext !== fresh.category) window.applyContext(fresh.category);
             }
         });
 
@@ -594,4 +871,80 @@ function setupDraggable(handle, modeKey) {
             if (typeof showToast === 'function') showToast(`Routine updated: ${modeKey} starts at ${window.routineConfig[modeKey].start}:00`);
         });
     });
+}
+
+/**
+ * Global single function to handle shelving and unshelving tabs
+ * @param {string} tabId - Target tab identifier
+ */
+window.toggleShelveStatus = function(tabId) {
+    const targetTabId = tabId || window.activeTab;
+    if (!targetTabId) return;
+
+    console.log("toggleshelvestatus", targetTabId)
+    let masterTabs = JSON.parse(localStorage.getItem('master_tabs') || '[]');
+    const targetIdx = masterTabs.findIndex(t => t.id === targetTabId);
+
+    if (targetIdx !== -1) {
+        // 1. Flip flag status
+        const isNowShelved = !masterTabs[targetIdx].shelved;
+        masterTabs[targetIdx].shelved = isNowShelved;
+        localStorage.setItem('master_tabs', JSON.stringify(masterTabs));
+
+        // 2. Force evaluate active context viewport layout
+        // If we just shelved the active tab, applyContext will automatically pivot tab focus safely.
+        window.applyContext(window.currentContext);
+        
+        if (typeof window.renderTaskList === 'function') window.renderTaskList();
+        if (typeof window.pushFullSync === 'function') window.pushFullSync();
+    }
+    displayData();
+};
+
+function renderShelfPanel() {
+    const shelfContainer = $('#shelf_tiles_container');
+    shelfContainer.empty();
+
+    // Reuses the MASTER context pipeline to pull only shelved tabs!
+    const shelvedTabs = window.applyContext('Shelf') || [];
+
+    if (shelvedTabs.length === 0) {
+        shelfContainer.html(`<div class="shelf-empty">The shelf is empty. Pack away tabs to return to in the future here.</div>`);
+        return;
+    }
+
+    shelvedTabs.forEach(tab => {
+        // Use your general purpose data helper with strict 'List' suffix support
+        const items = getTabStorageData(tab.id, tab.type);
+        const totalCount = items.length;
+        
+        // Calculate completions based on view layout properties
+        const completedCount = tab.type === 'checkin' 
+            ? items.filter(i => (i.clicks || 0) > 0).length 
+            : items.filter(i => i.checked === true).length;
+
+        const tile = $(`
+            <div class="checkin-tile" data-id="${tab.id}">
+            
+                <div class="checkin-text">${tab.name}</div>                
+                
+                <div class="checkin-subline">
+                    <div class="goal-container">
+                        <span class="goal-display">${completedCount}/${totalCount}</span>
+                    </div>
+                        <span class="checkin-count">${ROUTINE_CONTEXTS[tab.category].icon}/${tab.type === 'checkin' ? '📊' : '✅'}</span>
+                </div>
+            </div>
+        `);
+
+
+
+        // Click a tile to toggle its status back to active visibility
+        tile.on('click', function() { 
+            window.toggleShelveStatus(tab.id); 
+        });
+        
+        shelfContainer.append(tile);
+    });
+    updateDashboardUI();
 }

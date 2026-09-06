@@ -1,4 +1,5 @@
 // PANEL CONTROLLER// [key]:{title,shortcut,size,position}// vertical alignment first, horizontal alignment second
+// Finite state machine..
 const UI_PANEL_CONFIG = {
     edit_panel: {
         title: "Edit Panel",
@@ -67,7 +68,7 @@ window.togglePanelDisplay = function(panelKey, ...injectionData) {
 function renderSyncPanel() {
     const shelfView = $(`
         <div class="shelf-panel-view">
-
+(Local storage only)
         </div>`);
     const tileGrid = $(
         `
@@ -80,13 +81,13 @@ function renderSyncPanel() {
                     <button onclick="triggerImport()" style="padding: 6px 12px; border-radius: 6px; border: none; background: #444; color: #fff; font-size: 0.8rem; cursor: pointer;">Import</button>
                 </div>
             </div>
-            <br><br>
+            
                 <!--button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
                 <a id="exportHistoryLink" style="display: none;">Export</a>
                 
                 < <label for="FileInputLabel"><b>Import</b></label> >
                 <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input-->
-          </div>(Local storage only in free version)
+          </div>
         </div>
 
         `
@@ -194,10 +195,10 @@ $(document).on('dblclick', '.sortable-item, .checkin-tile, .todo-item', function
 });
 
 // =====================================================================
-// MASTER TAB STORAGE API// --- Global State ---// Default tabs
+// MASTER TAB STORAGE API// --- Global State ---
 window.masterTabs = JSON.parse(localStorage.getItem("master_tabs") || "[]");
 window.editingTabId = null;
-
+// Default tabs
 if (window.masterTabs.length === 0) {
             const baseTime = Date.now();
             const defaultTabs = [
@@ -312,20 +313,45 @@ window.openNewTabCreator = () => openTabSettings(null);
 function openTabSettings(tabId = null) {
     window.editingTabId = tabId;
     const tab = getTabData(tabId);
-    // const isRemote = tab && !!tab.remoteOwnerId;
     const card = $('#tab_settings_card');
-    
-        // $('#tab_name_input').prop('disabled', isRemote);
-        // $('#tab_mode_select').prop('disabled', isRemote);
-        // $('.category-icon-picker').css('pointer-events', isRemote ? 'none' : 'auto');
+
+    const presetSelect = $('#tab_preset_select');
+    presetSelect.html('<option value="">None / Custom</option>' +
+        Object.entries(PRESET_LIBRARY).map(([id, preset]) =>
+            `<option value="${id}">${preset.label}</option>`
+        ).join('')
+    );
+
     if (tabId) {
         $('#tab_name_input').val(tab.name);
-        $('#tab_mode_select').val(tab.type || 'list');
+        // $('#tab_mode_select').val(tab.type || 'list');
+        $('#tabModeSelect').prop('checked', (tab.type || 'list') === 'checkin');
         $('#displayStyleToggle').prop('checked', (tab.displayStyle || 'list') === 'tiles');
         $('#recurringToggle').prop('checked', (tab.taskMode || 'singular') === 'recurring');
+        presetSelect.val(resolvePresetId(tab) || '');
+    } else {
+        presetSelect.val('');
+        $('#tab_name_input').val('');
     }
-            $('#sheet_title').text(tabId ? 'Edit Tab' : 'New Tab');
-            $('#save_tab_btn').show();        
+
+    // Re-bind fresh each open to avoid stacking duplicate handlers
+    presetSelect.off('change').on('change', function() {
+        const selectedId = $(this).val();
+        const nameInput = $('#tab_name_input');
+        const currentName = nameInput.val().trim();
+
+        // Only auto-fill if the field is empty, or still holds a previous preset's label
+        // (i.e. the user hasn't typed a custom name over it)
+        const isUntouchedOrPresetName = currentName === '' ||
+            Object.values(PRESET_LIBRARY).some(p => p.label === currentName);
+
+        if (selectedId) {
+            nameInput.val(PRESET_LIBRARY[selectedId].label);
+        }
+    });
+
+    $('#sheet_title').text(tabId ? 'Edit Tab' : 'New Tab');
+    $('#save_tab_btn').show();
     card.addClass('active');
 }
 function closeTabSettings() {
@@ -334,33 +360,58 @@ function closeTabSettings() {
 }
 function handleSaveTab() {
     const name = $('#tab_name_input').val().trim();
-    const type = $('#tab_mode_select').val();
+    // const type = $('#tab_mode_select').val();
+    const type = $('#tabModeSelect').is(':checked') ? 'checkin' : 'list';
     const displayStyle = $('#displayStyleToggle').is(':checked') ? 'tiles' : 'list';
     const taskMode = $('#recurringToggle').is(':checked') ? 'recurring' : 'singular';
+    const presetId = $('#tab_preset_select').val() || null;
 
     if (!name) return alert("Please provide a name");
 
     // Refresh memory from storage to be safe
     window.masterTabs = JSON.parse(localStorage.getItem('master_tabs') || '[]');
 
+    let targetTabId;
+    let previousPresetId = null;
+    let isNewTab = false;
+
     if (window.editingTabId) {
-        const index = window.masterTabs.findIndex(t => t.id === window.editingTabId);
+        targetTabId = window.editingTabId;
+        const index = window.masterTabs.findIndex(t => t.id === targetTabId);
         if (index !== -1) {
-            window.masterTabs[index] = { ...window.masterTabs[index], name, type, displayStyle, taskMode };
+            previousPresetId = resolvePresetId(window.masterTabs[index]);
+            window.masterTabs[index] = { ...window.masterTabs[index], name, type, displayStyle, taskMode, presetId };
         }
     } else {
-        const newId = "tab_" + Date.now();
-        window.masterTabs.push({ id: newId, name, type, displayStyle, taskMode });
-        window.activeTab = newId; 
+        isNewTab = true;
+        targetTabId = "tab_" + Date.now();
+        window.masterTabs.push({ id: targetTabId, name, type, displayStyle, taskMode, presetId });
+        window.activeTab = targetTabId;
+    }
+
+    // Apply preset tasks if: new tab with a preset, or an existing tab where the preset selection changed
+    const presetChanged = presetId !== previousPresetId;
+    if (presetId && presetChanged) {
+        const existingTasks = isNewTab ? [] : (window.getTabStorageData(targetTabId, type) || []);
+        const applyPreset = () => {
+            window.setTabStorageData(targetTabId, buildTasksFromPreset(presetId), type);
+        };
+
+        if (isNewTab || existingTasks.length === 0) {
+            applyPreset();
+        } else if (confirm(`Replace the ${existingTasks.length} existing task(s) with the "${PRESET_LIBRARY[presetId].label}" preset?`)) {
+            applyPreset();
+        }
     }
 
     // Update Memory and Storage
     localStorage.setItem('master_tabs', JSON.stringify(window.masterTabs));
-    
+
     // Update UI
     closeTabSettings();
     initTabs();
-    
+
+    if (typeof window.pushFullSync === 'function') window.pushFullSync();
     if (typeof showToast === 'function') showToast("Tab Saved!");
 }
 function finalizeTabDeletion() {
@@ -384,6 +435,143 @@ function finalizeTabDeletion() {
     if (typeof showToast === 'function') showToast("Tab and data deleted");
 }
 
+
+/**
+ * Horizontal "ruler" slider — drag the strip left/right under a fixed center
+ * pointer to scrub a value. Works with mouse, touch, and trackpad via Pointer Events.
+ */
+function createRulerSlider({
+    min = 0,
+    max = 100,
+    step = 1,
+    value = 0,
+    pxPerStep = 12,
+    majorTickEvery = 5,
+    label = '',
+    onChange = () => {}
+} = {}) {
+    let currentMin = min;
+    let currentMax = max;
+    let currentValue = clampToStep(value);
+
+    function clampToStep(v) {
+        const stepped = Math.round(v / step) * step;
+        return Math.min(currentMax, Math.max(currentMin, stepped));
+    }
+
+    const wrap = document.createElement('div');
+    wrap.className = 'ruler-slider';
+    wrap.innerHTML = `
+        <div class="ruler-slider-label">
+            <span class="ruler-slider-name">${label}</span>
+            <span class="ruler-slider-value">${currentValue}</span>
+        </div>
+        <div class="ruler-slider-viewport">
+            <div class="ruler-slider-track"></div>
+            <div class="ruler-slider-pointer"></div>
+        </div>
+    `;
+
+    const viewport = wrap.querySelector('.ruler-slider-viewport');
+    const track = wrap.querySelector('.ruler-slider-track');
+    const valueLabel = wrap.querySelector('.ruler-slider-value');
+
+    function renderTicks() {
+        const totalSteps = Math.round((currentMax - currentMin) / step);
+        track.innerHTML = '';
+        track.style.width = `${totalSteps * pxPerStep}px`;
+        for (let i = 0; i <= totalSteps; i++) {
+            const isMajor = i % majorTickEvery === 0;
+            const tick = document.createElement('div');
+            tick.className = `ruler-tick${isMajor ? ' ruler-tick-major' : ''}`;
+            tick.style.left = `${i * pxPerStep}px`;
+            if (isMajor) {
+                const num = document.createElement('span');
+                num.className = 'ruler-tick-num';
+                num.textContent = currentMin + i * step;
+                tick.appendChild(num);
+            }
+            track.appendChild(tick);
+        }
+    }
+
+    function valueToOffset(v) {
+        return ((v - currentMin) / step) * pxPerStep;
+    }
+
+    function positionTrack(animate) {
+        const centerPx = viewport.clientWidth / 2;
+        const offset = centerPx - valueToOffset(currentValue);
+        track.style.transition = animate ? 'transform 0.15s ease-out' : 'none';
+        track.style.transform = `translateX(${offset}px)`;
+    }
+
+    function setValue(v, { silent = false, animate = true } = {}) {
+        currentValue = clampToStep(v);
+        valueLabel.textContent = currentValue;
+        positionTrack(animate);
+        if (!silent) onChange(currentValue);
+    }
+
+    function setMax(newMax) {
+        currentMax = newMax;
+        renderTicks();
+        if (currentValue > currentMax) {
+            setValue(currentMax);
+        } else {
+            positionTrack(false);
+        }
+    }
+
+    // --- Drag handling ---
+    let dragging = false;
+    let startX = 0;
+    let startValue = 0;
+
+    viewport.addEventListener('pointerdown', (e) => {
+        dragging = true;
+        startX = e.clientX;
+        startValue = currentValue;
+        viewport.setPointerCapture(e.pointerId);
+        track.style.transition = 'none';
+    });
+
+    viewport.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const deltaPx = e.clientX - startX;
+        // dragging left brings higher values under the pointer (direct-manipulation feel)
+        const deltaValue = -(deltaPx / pxPerStep) * step;
+        setValue(startValue + deltaValue, { animate: false });
+    });
+
+    function endDrag() {
+        if (!dragging) return;
+        dragging = false;
+        setValue(currentValue, { animate: true }); // snaps to nearest step
+    }
+    viewport.addEventListener('pointerup', endDrag);
+    viewport.addEventListener('pointercancel', endDrag);
+
+    // Desktop convenience: mouse wheel nudges by one step
+    viewport.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const dir = (e.deltaY || e.deltaX) > 0 ? 1 : -1;
+        setValue(currentValue + dir * step);
+    }, { passive: false });
+
+    window.addEventListener('resize', () => positionTrack(false));
+
+    renderTicks();
+    requestAnimationFrame(() => positionTrack(false));
+
+    return {
+        element: wrap,
+        getValue: () => currentValue,
+        setValue: (v) => setValue(v, { silent: true }),
+        setMax
+    };
+}
+
 /** * Global single function to handle shelving and unshelving tabs
  * @param {string} tabId - Target tab identifier */
 function renderUnifiedForm(itemData, mode) {
@@ -394,18 +582,20 @@ function renderUnifiedForm(itemData, mode) {
                 <label>Name</label>
                 <input type="text" id="edit_field_name" class="form-control">
             </div>
-            <div class="form-group">
-                <label>Description</label>
-                <textarea id="edit_field_desc" class="form-control"></textarea>
-            </div>
+            
             <div class="slider-group" style="display: none;">
-                <label>Progress Matrix (Current Value)</label>
-                <input type="range" id="edit_field_slider" class="form-slider">
-                <div class="metric-display"><span id="lbl_current">0</span> / <span id="lbl_goal">0</span></div>
+                <div class="metric-display">Current / Goal: <span id="lbl_current">0</span> / <span id="lbl_goal">0</span></div>
+                <div id="ruler_current_mount"></div>
+                <div id="ruler_goal_mount"></div>
+            </div>
             </div>
             <div class="meta-group" style="margin-top: 15px; font-size: 0.75rem; color: #666;">
                 <div id="edit_meta_created"></div>
                 <div id="edit_meta_updated"></div>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="edit_field_desc" class="form-control"></textarea>
             </div>
             <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px;">
                 <button id="btn_save_edit" class="btn btn-primary">Save Changes</button>
@@ -418,6 +608,9 @@ function renderUnifiedForm(itemData, mode) {
     const isTab = (mode === 'tab');
     formFragment.find('#edit_field_name').val(isTab ? itemData.name : itemData.text);
     formFragment.find('#edit_field_desc').val(itemData.description || '');
+    
+    let rulerCurrent = null;
+    let rulerGoal = null;
 
     if (!isTab) {
         formFragment.find('#edit_meta_created').text(`Created: ${itemData.createdAt || 'N/A'}`);
@@ -431,17 +624,45 @@ function renderUnifiedForm(itemData, mode) {
             
             // Strip metrics from raw text input display for cleaner formatting
             formFragment.find('#edit_field_name').val(itemData.text.replace(/\d+\/\d+/, "").trim());
-            
+                        
             // Set slider properties
-            formFragment.find('#edit_field_slider').attr({ 'max': goalVal, 'value': currentVal });
+            // formFragment.find('#edit_field_slider').attr({ 'max': goalVal, 'value': currentVal });
             formFragment.find('#lbl_current').text(currentVal);
             formFragment.find('#lbl_goal').text(goalVal);
+
             formFragment.find('.slider-group').show();
+                        // formFragment.find('.slider-group').show();
+
+                        // Goal ruler: generous headroom above the current goal so users can raise it
+                        rulerGoal = createRulerSlider({
+                            min: 0,
+                            max: Math.max(goalVal * 2, 100),
+                            step: 1,
+                            value: goalVal,
+                            label: 'Goal',
+                            onChange: (newGoal) => {
+                                if (rulerCurrent) rulerCurrent.setMax(newGoal);
+                            }
+                        });
+
+                        // Current value ruler: bounded by the goal
+                        rulerCurrent = createRulerSlider({
+                            min: 0,
+                            max: goalVal,
+                            step: 1,
+                            value: currentVal,
+                            label: 'Current',
+                            onChange: () => {} // live label already updates itself
+                        });
+
+                        formFragment.find('#ruler_goal_mount').append(rulerGoal.element);
+                        formFragment.find('#ruler_current_mount').append(rulerCurrent.element);
+            
 
             // Sync text label with slider adjustments in real time
-            formFragment.find('#edit_field_slider').on('input', function() {
-                formFragment.find('#lbl_current').text($(this).val());
-            });
+            // formFragment.find('#edit_field_slider').on('input', function() {
+            //     formFragment.find('#lbl_current').text($(this).val());
+            // });
         }
     } else {
         formFragment.find('.meta-group').hide();
@@ -449,7 +670,7 @@ function renderUnifiedForm(itemData, mode) {
 
     // 3. Bind Actions
     formFragment.find('#btn_save_edit').on('click', function() {
-        saveUnifiedDataModifications(itemData.id, mode, formFragment);
+        saveUnifiedDataModifications(itemData.id, mode, formFragment, { rulerCurrent, rulerGoal });
     });
 
     formFragment.find('#btn_delete_edit').on('click', function() {
@@ -459,7 +680,7 @@ function renderUnifiedForm(itemData, mode) {
     return formFragment;
 }
 
-function saveUnifiedDataModifications(id, mode, fragment) {
+function saveUnifiedDataModifications(id, mode, fragment, rulers = {}) {
     const newName = fragment.find('#edit_field_name').val().trim();
     const newDesc = fragment.find('#edit_field_desc').val().trim();
 
@@ -467,15 +688,13 @@ function saveUnifiedDataModifications(id, mode, fragment) {
         alert("The item name field cannot be empty.");
         return;
     }
-
     if (mode === 'tab') {
-        
-         const updates = {
+        const updates = {
             name: newName,
             description: newDesc,
-            type: $("#tab_mode_select").val() || "list"
+            // type: $("#tab_mode_select").val() || "list"
+            type: $('#tabMmodeSelect').is(':checked') ? 'checkin' : 'list'
         };
-
         setTabData(id, updates);
     } else {
         const tab = getTabData(window.activeTab);
@@ -486,21 +705,19 @@ function saveUnifiedDataModifications(id, mode, fragment) {
         tasks[index].description = newDesc;
         tasks[index].updatedAt = new Date().toLocaleString();
 
-        // Handle slider evaluations if metrics are active
-        if (fragment.find('.slider-group').is(':visible')) {
-            const currentSliderVal = fragment.find('#edit_field_slider').val();
-            const goalMetricValue = fragment.find('#lbl_goal').text();
-            
-            tasks[index].text =`${newName} ${currentSliderVal}/${goalMetricValue}`;
-            tasks[index].clicks = Number(currentSliderVal);
+        if (rulers.rulerCurrent && rulers.rulerGoal) {
+            const currentVal = rulers.rulerCurrent.getValue();
+            const goalVal = rulers.rulerGoal.getValue();
+            tasks[index].text = `${newName} ${currentVal}/${goalVal}`;
+  
         } else {
             tasks[index].text = newName;
+            // console.log(currentVal);
         }
 
         setTabStorageData(tab.id, tasks);
     }
 
-    // // --- REFRESH DISPLAY VIEWPORTS ---
     refreshApplication();
 }
 

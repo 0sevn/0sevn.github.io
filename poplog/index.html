@@ -175,8 +175,11 @@ LIST MODE
 .post-details { padding: 1rem 0 0.5rem; } 
 .post-meta { display: flex; gap: 1rem; margin-top: 15px; font-size: 0.9rem; opacity: 0.7; }
 .rating { margin-top: 0.75rem; font-size: 1.2rem; letter-spacing: 2px;} 
-.star { color: #ccc; } 
+.star { color: #555; } 
 .star.filled { color: #f5b301; } 
+.star.half { color: transparent; 
+  background: linear-gradient( 90deg, #f5b301 45%, #555 30% ); 
+  background-clip: text; -webkit-background-clip: text; }
 /* Optional styling for inactive posts */ 
 .list-item2.inactive { opacity: 0.65; } 
 .visibility-toggle { display: inline-flex; align-items: center; gap: 0.5rem; margin-left: 10px; cursor: pointer; }
@@ -192,7 +195,7 @@ LIST MODE
     <!-- <button onclick="switchList('misc')">Misc</button> -->
     <button id="toggleBtn" onclick="toggleLayout()">Switch to Spiral View</button>
     <label class="visibility-toggle"> 
-      <input type="checkbox" id="visibilityToggle"> Show inactive posts </label> 
+      <!-- <input type="checkbox" id="visibilityToggle"> Show inactive posts </label>  -->
 
 </header>
 <!-- Spiral view -->
@@ -228,7 +231,7 @@ const dataSets = {
           status: "active",
           category: "Capitol",
           date: "2026-08-19",
-          rating: 3.5
+          rating: 4
         },
         {
           id: 0,
@@ -276,7 +279,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "Capitol",
           date: "2026-07-18",
-          rating: 3.5
+          rating: 4
         },
         {
           id: 0,
@@ -290,7 +293,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "Capitol",
           date: "2026-06-23",
-          rating: 3.5
+          rating: 3
         },
         {
           id: 0,
@@ -301,7 +304,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "Capitol",
           date: "2026-06-12",
-          rating: 3.5
+          rating: 4
         },
         {
           id: 0,
@@ -351,7 +354,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "Capitol",
           date: "2026-04-28",
-          rating: 3.5
+          rating: 4
         },
         {
           id: 21,
@@ -377,7 +380,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "Capitol",
           date: "2026-04-12",
-          rating: 3.5
+          rating: 4
         },
         {
           id: 18,
@@ -387,7 +390,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "Capitol",
           date: "2026-04-09",
-          rating: 3.5
+          rating: 2.5
         },
         {
           id: 17,
@@ -400,7 +403,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "Capitol",
           date: "2026-03-22",
-          rating: 3.5
+          rating: 4
         },
         {
           id: 16,
@@ -433,7 +436,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "Roy",
           date: "2026-02-22",
-          rating: 3.5
+          rating: 4.5
         },
         {
           id: 13,
@@ -461,7 +464,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "Roy",
           date: "10-02-2026",
-          rating: 3.5
+          rating: 5
         },
         {
           id: 10,
@@ -476,7 +479,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "Capitol",
           date: "08-02-2026",
-          rating: 3.5
+          rating: 4
         },
         {
           id: 9,
@@ -492,7 +495,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "Roy",
           date: "07-02-2026",
-          rating: 3.5
+          rating: 4
         },
         {
           id: 8,
@@ -507,7 +510,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "Capitol",
           date: "04-02-2026",
-          rating: 3.5
+          rating: 4
         },
         {
           id: 7,
@@ -519,7 +522,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "Roy",
           date: "03-02-2026",
-          rating: 3.5
+          rating: 2.5
         },
         {
           id: 6,
@@ -533,7 +536,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "Draken",
           date: "27-01-2026",
-          rating: 3.5
+          rating: 4
         },
         {
           id: 5,
@@ -559,7 +562,8 @@ Not only would home not be the same, but would his loved ones still accept him a
           description: " ",
           status: "active",
           category: "Roy",
-          date: "2025-10-24"},
+          date: "2025-10-24",
+          rating: 4},
         {
           id: 2,
           title: "The brutalist",
@@ -585,7 +589,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           status: "active",
           category: "M harms / bio?",
           date: "25-01-2026",
-          rating: 3.5
+          rating: 4
         },
         {
           id: 0,
@@ -596,9 +600,9 @@ Not only would home not be the same, but would his loved ones still accept him a
           <br>When the dream and romantic expectations turn out to be a 'corrupt' reality. Non-linear storyline is momentarily jumpy and disjointed but the effect lingers and still holds up 25 years later `,
           status: "active",
           category: "Roy",
-          date: "2026-02-23"},
-
-        
+          date: "2026-02-23",
+          rating: 4
+        },      
         {
           id: 0,
           title: "Miami connection",
@@ -619,8 +623,8 @@ Not only would home not be the same, but would his loved ones still accept him a
         },
         {
           id: 0,
-          title: "Riki-Oh",
-          description: "Some bad movies are actually entertaining,  ",
+          title: "placeholder",
+          description: "spiral fix.. ",
           status: "active",
           category: "Capitol",
           date: "2026-04-28",
@@ -628,7 +632,7 @@ Not only would home not be the same, but would his loved ones still accept him a
         },
         {
           id: 0,
-          title: "Gymkata",
+          title: "placeholder",
           description: "",
           status: "active",
           category: "Capitol",
@@ -637,7 +641,7 @@ Not only would home not be the same, but would his loved ones still accept him a
         },
         {
           id: 0,
-          title: "Riki-Oh",
+          title: "placeholder",
           description: "",
           status: "active",
           category: "Capitol",
@@ -646,7 +650,7 @@ Not only would home not be the same, but would his loved ones still accept him a
         },
         {
           id: 0,
-          title: "Riki-Oh",
+          title: "placeholder",
           description: "",
           status: "active",
           category: "Capitol",
@@ -1117,7 +1121,10 @@ function createStars(rating) {
   let stars = ""; 
   for (let i = 1; i <= maxRating; i++) { 
     if (rating >= i) { stars += `<span class="star filled">★</span>`; } 
-    else if (rating >= i - 0.5) { stars += `<span class="star half">★</span>`; } 
+    else if (rating >= i - 0.5) {
+      // half star
+       stars += `<span class="star half">★</span>`; 
+      } 
     else { stars += `<span class="star">★</span>`; } 
   } 
 return stars; 
@@ -1155,12 +1162,12 @@ function renderSpiral(items) {
 }
 
 // Show/hide inactive posts 
-visibilityToggle.addEventListener("change", () => { 
-  showInactive = visibilityToggle.checked; 
-    if (currentLayout === "list") {
-      renderList(dataSets[currentData] || []);
-    }
-}); 
+// visibilityToggle.addEventListener("change", () => { 
+//   showInactive = visibilityToggle.checked; 
+//     if (currentLayout === "list") {
+//       renderList(dataSets[currentData] || []);
+//     }
+// });
 
 
 

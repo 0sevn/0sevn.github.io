@@ -18,8 +18,9 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
+    
     const firebaseConfig = {
         apiKey: "AIzaSyC5IM5dasyavKCHczWIUlqoFThxLUtTZps",
           authDomain: "flowea-d43ef.firebaseapp.com",
@@ -34,9 +35,18 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // Expose Firebase functions to the global scope
+    window.updateDoc = updateDoc;
+    window.setDoc = setDoc;
+    window.doc = doc;
+    window.db = db; // Useful for debugging
+
     // Attach the function to the window object so script.js can see it
-window.initializeFirebaseSync = async function() {
-    updateStatusHUD('Connecting...', 'orange');
+    window.initializeFirebaseSync = async function() {
+    
+
+
+    window.updateStatusHUD('Connecting...', 'orange');
     try {
         const cred = await signInAnonymously(auth);
         
@@ -71,33 +81,96 @@ window.initializeFirebaseSync = async function() {
 
 let syncTimeout = null;
 
-window.pushFullSync = function() {
-    if (!window.userId || localStorage.getItem('cloudSyncEnabled') !== 'true') return;
+window.pushFullSync = async function() {
+    // if (!window.userId || localStorage.getItem('cloudSyncEnabled') !== 'true') return;
+    if (!window.userId) return;
 
-    window.updateStatusHUD('Saving in 2s...', '#f39c12');
+    // console.log("SUBSCRIBER PUSH", activeTabId, now);
+
+    const activeTabId = localStorage.getItem("activeTab");
+    const allTabs = JSON.parse(localStorage.getItem('master_tabs') || "[]");
+    const currentTab = allTabs.find(t => t.id === activeTabId);
+
+    if (!currentTab) return;
+
+    // Prepare data
+    const listKey = `${activeTabId}List`;
+    const purgeKey = `${activeTabId}PurgeList`;
+    const nameKey = `tabName_${activeTabId}`;
+
+    // --- CASE A: YOU ARE EDITING A SHARED TAB ---
+        // Identify if we are on a remote tab
+        // UPDATING OWNER'S CLOUD: Only update the data lists
+        if (currentTab.remoteOwnerId) {
+            const ownerId = currentTab.remoteOwnerId;
+            const updateData = {};
+            const now = Date.now();
+
+            // Push tasks and history back to owner
+            updateData[`allData.data.${listKey}`] = JSON.parse(localStorage.getItem(listKey) || "[]");
+            updateData[`allData.data.${purgeKey}`] = JSON.parse(localStorage.getItem(purgeKey) || "[]");
+            updateData[`allData.data.${activeTabId}LastUpdated`] = now;
+            updateData[`allData.data.${activeTabId}UpdatedBy`] = window.userId;
+
+            updateData["lastUpdated"] = serverTimestamp();
+            localStorage.setItem(`${activeTabId}LastUpdated`, now.toString());
+
+            try {
+                
+                await updateDoc(doc(db, "users", ownerId), updateData);
+                window.updateStatusHUD('Remote Sync OK', 'cyan');
+            } catch (e) {
+                console.error("Remote push failed:", e);
+                window.updateStatusHUD('Remote Fail', 'red');
+            }
+            return; // EXIT HERE so we don't run the local sync logic
+        }
+    
+    // --- CASE B: OWNER UPDATING THEIR OWN DATA ---
+    // 2. Guard against missing Tab Data
+    if (!window.allTabs || !Array.isArray(window.allTabs)) {
+        console.warn("Push postponed: allTabs not initialized.");
+        return;
+    }
+
     if (syncTimeout) clearTimeout(syncTimeout);
-
+    window.updateStatusHUD('Saving in 2s...', '#f39c12')
+    
     syncTimeout = setTimeout(async () => {
         console.log("Pushing to cloud...");
         window.updateStatusHUD('Syncing...', 'orange');
-
+// 
         try {
-            // Get the modern tab list
-            const masterTabs = JSON.parse(localStorage.getItem("master_tabs") || '[]');
-            const syncedTabs = masterTabs.filter(tab => localStorage.getItem(`tabLocked_${tab.id}`) !== 'true');
+            // Filter: Only push your OWN tabs (ones without a remoteOwnerId)
+            const tabsToPush = allTabs.filter(tab => {
+                const isLocked = localStorage.getItem(`tabLocked_${tab.id}`) === 'true';
+                return !isLocked && !tab.remoteOwnerId;
+            });
 
             const state = {
-                master_tabs: syncedTabs, 
+                master_tabs: tabsToPush, 
                 routine_config: window.routineConfig,
-                activeTab: localStorage.getItem("activeTab"),
+                activeTab: activeTabId,
                 data: {}
             };
 
-            syncedTabs.forEach(tab => {
+            // Collect data for your own tabs
+            tabsToPush.forEach(tab => {
                 const id = tab.id;
-                state.data[`tabName_${id}`] = localStorage.getItem(`tabName_${id}`);
+                // state.data[`tabName_${id}`] = localStorage.getItem(`tabName_${id}`);
+                // replace
+                state.data[`tabName_${id}`] = localStorage.getItem(`tabName_${id}`) || tab.name || "Untitled";
+
+
                 state.data[`${id}List`] = JSON.parse(localStorage.getItem(`${id}List`) || '[]');
                 state.data[`${id}PurgeList`] = JSON.parse(localStorage.getItem(`${id}PurgeList`) || '[]');
+                const now = Date.now();
+
+                state.data[`${id}LastUpdated`] = now;
+                state.data[`${id}UpdatedBy`] = window.userId;
+
+                localStorage.setItem(`${id}LastUpdated`, now.toString());
+                // Note: Category is stored inside the 'tab' object in master_tabs
             });
 
             await setDoc(doc(db, "users", window.userId), {
@@ -105,13 +178,30 @@ window.pushFullSync = function() {
                 lastUpdated: serverTimestamp()
             }, { merge: true });
 
+            // const updates = {
+            //     lastUpdated: serverTimestamp()
+            // };
+
+            // tabsToPush.forEach(tab => {
+            //     const id = tab.id;
+
+            //     updates[`allData.data.${id}`] = {
+            //         name: localStorage.getItem(`tabName_${id}`),
+            //         list: JSON.parse(localStorage.getItem(`${id}List`) || '[]'),
+            //         purge: JSON.parse(localStorage.getItem(`${id}PurgeList`) || '[]'),
+            //         updatedAt: Date.now(),
+            //         updatedBy: window.userId
+            //     };
+            // });
+
+            // await updateDoc(doc(db, "users", window.userId), updates);
+
             localStorage.setItem('lastLocalPushTime', (Date.now() + 1000).toString());
+            window.updateStatusHUD('Cloud Active', '#4CAF50');
             
             // --- SAFE UI UPDATE ---
             // const pullBtn = document.getElementById('cloudPullBtn');
             // if (pullBtn) pullBtn.classList.add('hidden');
-            
-            window.updateStatusHUD('Cloud Active', '#4CAF50');
             
         } catch (e) {
             console.error("Sync Error:", e);
@@ -119,6 +209,63 @@ window.pushFullSync = function() {
         }
     }, 2000);
 };
+
+window.importSharedTab = async function(targetUserId, targetTabId) {
+    // If called without arguments (from the button), ask for the Share Code
+    if (!targetUserId) {
+        const code = prompt("Paste the Share Code (ID|TabID):");
+        if (!code || !code.includes('|')) return;
+        [targetUserId, targetTabId] = code.split('|');
+    }
+
+    try {
+        updateStatusHUD('Fetching Tab...', 'orange');
+        const docSnap = await getDoc(doc(db, "users", targetUserId));
+        
+        if (!docSnap.exists()) return alert("Source SyncID not found.");
+
+        const remoteData = docSnap.data().allData;
+        const remoteTabs = remoteData.master_tabs || [];
+        const targetTab = remoteTabs.find(t => t.id === targetTabId);
+
+        // Inside window.importSharedTab in index.html
+        if (targetTab) {
+            const id = targetTabId;
+            
+            // 1. Set the individual name key immediately so the UI doesn't revert
+            localStorage.setItem(`tabName_${id}`, targetTab.name);
+
+            // 2. Create the Pointer Tab object
+            const sharedTab = { 
+                ...targetTab, 
+                remoteOwnerId: targetUserId, 
+                // icon: "🔗" 
+            };
+
+            // 3. Add to master list
+            window.allTabs.push(sharedTab);
+            localStorage.setItem('master_tabs', JSON.stringify(window.allTabs));
+            
+            // 4. Initial data pull for BOTH live list and history (PurgeList)
+            if (remoteData.data) {
+                const listData = remoteData.data[`${id}List`] || [];
+                const purgeData = remoteData.data[`${id}PurgeList`] || [];
+                
+                localStorage.setItem(`${id}List`, JSON.stringify(listData));
+                localStorage.setItem(`${id}PurgeList`, JSON.stringify(purgeData));
+            }
+
+            alert(`Subscribed to ${targetTab.name}!`);
+            location.reload();
+        } else {
+            alert("Tab ID not found in that user's cloud data.");
+        }
+    } catch (e) {
+        console.error("Shared Tab Import Failed:", e);
+        updateStatusHUD('Import Fail', 'red');
+    }
+};
+
 
 window.pullFullSync = async function(remoteUid) {
     window.updateStatusHUD('Pulling...', 'orange');
@@ -184,7 +331,103 @@ let isInitialLoad = true;
 
 window.startCloudWatcher = function() {
     if (!window.userId) return;
-    
+
+    // console.log("REMOTE RECEIVED", id, remoteTimestamp, localTimestamp);
+// 2. Listen to SHARED tabs from other users
+    // Inside your shared tabs loop in startCloudWatcher
+    window.allTabs.forEach(tab => {
+        console.log("WATCHING SHARED TAB", tab.id);
+        if (tab.remoteOwnerId) {
+            // Inside startCloudWatcher loop for remoteOwnerId
+            onSnapshot(doc(db, "users", tab.remoteOwnerId), (docSnap) => {
+                if (docSnap.exists()) {
+                    const remoteData = docSnap.data().allData;
+                    const id = tab.id;
+
+                    if (remoteData.data) {
+                        // SYNC NAME: Prevents reverting to "TabName"
+                        // Find latest owner version of the tab
+const remoteTabs = remoteData.master_tabs || [];
+
+const ownerTab = remoteTabs.find(t => t.id === id);
+
+if (ownerTab) {
+
+    // Preserve subscriber-only properties
+    const localTab =
+        window.allTabs.find(t => t.id === id);
+        // Preserve subscriber-only fields
+        // const existing = window.allTabs[localIndex];
+
+    const updatedTab = {
+        ...ownerTab,
+
+        // KEEP subscriber linkage
+        remoteOwnerId: tab.remoteOwnerId,
+        // remoteOwnerId: existing.remoteOwnerId,
+        // KEEP subscriber icon override if desired
+        // icon: localTab?.icon || "🔗"
+    };
+
+    // Update memory
+    const tabIndex =
+        window.allTabs.findIndex(t => t.id === id);
+
+    if (tabIndex !== -1) {
+        window.allTabs[tabIndex] = updatedTab;
+    }
+
+    // Persist master_tabs
+    localStorage.setItem(
+        'master_tabs',
+        JSON.stringify(window.allTabs)
+    );
+
+    // Persist tab name cache
+    localStorage.setItem(
+        `tabName_${id}`,
+        ownerTab.name || "Untitled"
+    );
+
+    console.log(
+            "SYNCED TAB NAME:",
+            ownerTab.name
+        );
+
+    // Re-render tabs immediately
+    if (typeof initTabs === 'function') {
+        initTabs();
+    }
+}
+
+                        // SYNC LIVE LIST
+                        // 
+                        const remoteTimestamp = remoteData.data[`${id}LastUpdated`] || 0;
+                        const localTimestamp = parseInt(localStorage.getItem(`${id}LastUpdated`) || '0');
+                        // Ignore older cloud data
+                        if (remoteTimestamp >= localTimestamp) {
+                            // Ignore our own echoed updates
+                            const updatedBy = remoteData.data[`${id}UpdatedBy`];
+                            if (updatedBy !== window.userId) {
+                                if (remoteData.data[`${id}List`]) {
+                                    localStorage.setItem(`${id}List`, JSON.stringify(remoteData.data[`${id}List`]));
+                                }
+                                if (remoteData.data[`${id}PurgeList`]) {
+                                    localStorage.setItem(`${id}PurgeList`, JSON.stringify(remoteData.data[`${id}PurgeList`]));
+                                }
+                                localStorage.setItem(`${id}LastUpdated`, remoteTimestamp.toString());
+                                console.log(`Applied remote update for ${id}`);
+                            }
+                        }
+                    }
+                    
+                    // Refresh UI if we are looking at this tab
+                    if (window.activeTab === id && window.displayData) window.displayData();
+                }
+            });
+        }
+    });
+
     onSnapshot(doc(db, "users", window.userId), (docSnap) => {
         if (docSnap.exists()) {
             const remoteData = docSnap.data().allData;
@@ -380,7 +623,7 @@ https://m.co/se/sv-SE/stationer/
 <!-- Mid navigation -->
 <div class="wrap-container">
     <div class="week-header">
-        <div id="week_header" class="status-text"></div>
+        <div id="week_header" class="status-text" onclick="openFocusmatrix()" style="cursor: pointer;"></div>
         <span id="active_context_label" class="context-label" onclick="openCommandbar()" style="cursor: pointer;">Loading current mode</span>
         <div id="active_sync" class="flex space-x-2 status-hud" onclick="openSyncDashboard()" style="cursor: pointer;">
             <div id="syncStatusDot" class="status-dot"></div>
@@ -408,9 +651,15 @@ https://m.co/se/sv-SE/stationer/
     <div class="tab-wrap">   
         <div class="tabs">
             <div class="tabs" id="tabsContainer"></div>
-                <input type="submit" id="delete_tab" value=" " class="icon delete" onclick="deleteTab()" title="Delete tab">
+                <!-- <input type="submit" id="delete_tab" value=" " class="icon delete" onclick="deleteTab()" title="Delete tab"> -->
+                 <input type="submit" id="add_tab" value=" " class="icon add_tab w3-animate-left" title="Add tab" onclick="openNewTabCreator()">
+                <input type="submit" value=" " class="icon shelf w3-animate-left" title="Book shelf" onclick="toggleShelveStatus()" ondblclick="showShelf()">
+                <!-- <button onclick="showShelf()" class="copy-btn" title="Shelve current tab">
+                    Show shelf
+                </button> -->
+                
+                <!-- <input type="submit" id="delete_tab" value=" " class="icon delete" onclick="deleteTab()" title="Delete tab"> -->
                 <!-- <input type="submit" id="add_tab" value=" " class="icon add_tab" onclick="addNewTab()" title="Add tab"> -->
-                 <input type="submit" id="add_tab" value=" " class="icon add_tab" onclick="openNewTabCreator()" title="Add tab">
         </div>   
     </div> 
 </div>
@@ -425,6 +674,9 @@ https://m.co/se/sv-SE/stationer/
             <!-- <br> -->
             
             <input type="submit" value=" " class="icon history w3-animate-right" title="History" onclick="showHistory()">
+            
+            <!-- <input type="submit" value=" " class="icon matrix w3-animate-right" title="Shelf" onclick="showShelf()"> -->
+            <input type="submit" value=" " class="icon darklight_mode w3-animate-bottom" title="Toggle light/dark mode" onclick="toggleTheme()">
         
     </div>
 
@@ -447,49 +699,26 @@ https://m.co/se/sv-SE/stationer/
 <!-- Purged list -->
 <nav id="historyCard" class="purge_list_container hidden w3-animate-bottom" style="height: 220px;">
     <!-- sync controls card -->
-    <div style="position:fixed; right:0;text-align:right;">
+    <div style="position:fixed; right:10px;text-align:right;">
         <input type="submit" value=" " class="icon rss" title="Sync controls" onclick="showSync()">
     </div>   
     <label>Purged tasks</label>
             <div id="tabSyncList1" class="tab-sync-list" style="margin: 10px; height: 400px; display: block;">
 
-                    <!-- Purged list -->
-                    <!-- <nav id="historyCard" class="purge_list_container"> -->
-                    <!-- sync controls card -->
                     <!-- Purge history list -->
                     <div style="color: var(--text-color);">
                         <ul id="purge_list" style="list-style: none;padding-left: 5%;">
                         </ul>
                     </div>
-
-        <!-- <div id="root"></div> -->
-        <!-- </nav> -->
             </div>
-    <!-- Purge history list -->
-    <!-- <div style="color: var(--text-color);">
-        <ul id="purge_list" style="list-style: none;padding-left: 5%;">
-        </ul>
-    </div> -->
-    <!-- Import/export buttons -->
-    <div class="fileops" id="syncControls" style="display: none;">
-        <div id="manualSyncUI"></div>
-        <div id="qr-reader" style="width: 300px;"></div>
-        <div style="border: 1px solid #ddd; border-radius: 10px;">
-            <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
-            <a id="exportHistoryLink" style="display: none;">Export</a>
-            <br>
-            <!-- <label for="FileInputLabel"><b>Import</b></label> -->
-            <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input>
-          </div>
-    </div>
-    <!-- <div id="root"></div> -->
-</nav>
 
+    
+</nav>
 
 <!-- JS vanilla script -->
 <script src="tab_script.js"></script>
 <script src="script.js"></script>
-
+<!-- SORTABLE SCRIPT -->
 <script>
     // sortable list
         const list = document.querySelector('.sortable-list');
@@ -533,26 +762,51 @@ https://m.co/se/sv-SE/stationer/
         }
     </script>
     <script>
-        
+        window.initRoutineMatrix();
 // console.log("asdf");
     </script>
 <div id="toast" class="toast"></div>
 
+<!-- Shelf list -->
+<div id="shelfCard" class="left-dashboard hidden w3-animate-top" style="width: 95%; height: 40%;">
+    <!-- sync controls card -->
+    <div class="dashboard-content">
+        <div class="dashboard-header">
+            <h4>On the Shelf (Tap to Restore)</h4>
+            <!-- <span class="close-hint">Press 'A' to close</span> -->
+        </div>
+        <!-- <div id="display_config" class="tab-sync-settings"> -->
+<div  class="tab-sync-list" style="margin: 10px; height: 500px; display: block; color: var(--text-color);">
+            <div id="shelf_tiles_container" class="checkin-grid">
+                Too many tabs breaks 5+-2 buffer
+                <br><br>Store some tabs on shelf, to be picked up at later time
+            </div>
+        <!-- </div> -->
+        <!-- <div id="display_data" class="tab-sync-settings"> -->
 
+        </div>
+<input type="submit" id="delete_tab" value=" " class="icon delete" onclick="deleteTab()" title="Delete tab">
+    </div>
+</div>
 
 <div id="syncDashboard" class="sync-dashboard hidden w3-animate-right">
     <div class="dashboard-content">
         <div class="dashboard-header">
-            <h3>Sync Dashboard</h3>
-            <span class="close-hint">Press 'D' to close</span>
+            <h3>Sync Dashboard</h3>asdf
+            <!-- Import/export buttons -->
+    <div class="fileops" id="syncControls" style="display: none;">
+        <div id="manualSyncUI"></div>
+        <div id="qr-reader" style="width: 300px;"></div>
+        <div style="border: 1px solid #ddd; border-radius: 10px;">
+            <button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
+            <a id="exportHistoryLink" style="display: none;">Export</a>
+            <br>
+            <!-- <label for="FileInputLabel"><b>Import</b></label> -->
+            <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input>
+          </div>
+    </div>
         </div>
-        <small id="lastSyncTimeDisplay"></small>
-        <div class="tab-sync-settings">
-            <label>Tab Syncing Permissions</label>
-            <div id="tabSyncList" class="tab-sync-list">
-                </div>
-        </div>
-        
+        <!-- Import shared tab button -->
         <div class="sync-toggle-container">
             <span>Cloud Sync</span>
             <label class="switch">
@@ -560,8 +814,19 @@ https://m.co/se/sv-SE/stationer/
                 <span class="slider"></span>
             </label>
         </div>
+        
+        <small id="lastSyncTimeDisplay"></small>
+        <div class="tab-sync-settings">
+            <label>Tab Syncing Permissions</label>
+            <div style="right:0;text-align:right;">
+            <input type="submit" value=" " class="icon rss" title="subscribe" onclick="importSharedTab()">
+        </div> 
+            <div id="tabSyncList" class="tab-sync-list">
+                </div>
+        </div>
 
         <div id="syncDetails" class="hidden">
+            
             <div class="uid-section">
                 <label>Your Sync ID</label>
                 <div class="uid-display">
@@ -569,20 +834,23 @@ https://m.co/se/sv-SE/stationer/
                     <button onclick="copyUid()">Copy</button>
                 </div>
             </div>
-
-            <div class="manual-sync-section">
-                <hr style="border: 0; border-top: 1px solid #444; margin: 15px 0;">
-                <label>Link Secondary Device</label>
-                <div class="input-group">
-                    <input type="text" id="manualSyncInput" placeholder="Paste Remote ID here...">
-                    <button onclick="handleManualSync()">Link</button>
-                </div>
-            </div>
-
+            <details>
+            <summary style="cursor: pointer;">Link other device
+            </summary>
             <div class="qr-section">
-                <p>Or scan to Sync</p>
+                <p>Scan QR to Sync</p>
                 <div id="syncQrCode"></div>
             </div>
+            
+                <div class="manual-sync-section">
+                    <hr style="border: 0; border-top: 1px solid #444; margin: 15px 0;">
+                    <label>Link Secondary Device</label>
+                    <div class="input-group">
+                        <input type="text" id="manualSyncInput" placeholder="Paste Remote ID here...">
+                        <button onclick="handleManualSync()">Link</button>
+                    </div>
+                </div>
+            </details>
         </div>
     </div>
 </div>
@@ -590,27 +858,34 @@ https://m.co/se/sv-SE/stationer/
     <div class="dashboard-content">
         <div class="dashboard-header">
             <h3>Diagnostics dashboard</h3>
-            <span class="close-hint">Press 'A' to close</span>
+            <!-- <span class="close-hint">Press 'A' to close</span> -->
         </div>
         <div id="display_config" class="tab-sync-settings">
-            Show all current configuration keys from Local storage here, for example:
-            routine_config: parameters
-            active_tab: current 
-            last_Sync: time
-            lastLocalPushTime: time
-            cloudSyncEnabled: state
-            SyncID: Current ID
-            master_tabs: parameters
+            <!-- routine_config: parameters :::: updates when saving new times
+             and mastertabs update
+             -->
         </div>
         <div id="display_data" class="tab-sync-settings">
-            Tab1 >
-                Tasklist
-            Tab2 >
-                Tasklist
-            ...
-            TabX >
-                Tasklist
+
         </div>
+
+    </div>
+</div>
+
+<div id="routineMatrix" class="left-dashboard hidden w3-animate-left" style="width: 90%;" >
+    <div class="dashboard-content">
+        <div class="dashboard-header">
+            <h3>Focus matrix</h3>
+            <!-- <span class="close-hint">Press 'A' to close</span> -->
+        </div>
+        <div id="routineGridContainer" class="tab-sync-settings">
+            <!-- routine_config: parameters :::: updates when saving new times
+             and mastertabs update
+             -->
+        </div>
+        <!-- <div id="display_data" class="tab-sync-settings">
+
+        </div> -->
 
     </div>
 </div>
@@ -636,18 +911,6 @@ https://m.co/se/sv-SE/stationer/
     </div>
 </div>
 
-<!-- <div id="commandBar" class="command-bar w3-animate-bottom">
-    <div class="context-btn" data-context="Morning" title="Morning">🌅</div>
-    <div class="context-btn" data-context="Work" title="Work">💻</div>
-    <div class="context-btn" data-context="Gym" title="Gym">🏋️</div>
-    <div class="context-btn" data-context="Evening" title="Evening">🌆</div>
-    <div class="context-btn" data-context="Night" title="Night">🌙</div>
-
-    <div id="routine_container" class="hidden">
-        <div id="segment_display"></div>
-        <div id="handle_container"></div>
-    </div>
-</div> -->
 <!-- Command bar -->
 <div id="commandBar" class="command-bar hidden w3-animate-bottom">
     <div class="context-icons-row">
@@ -673,36 +936,22 @@ https://m.co/se/sv-SE/stationer/
     </div>
 </div>
 
-
-<!-- <div id="pref_dashboard" class="settings-card">
-    <h3>Routine Boundaries</h3>
-    <div id="routine_bar_container">
-    <div class="routine-bar">
-        <div class="segment morning" style="flex: 4;">🌅</div>
-        <div class="segment work" style="flex: 8;">💻</div>
-        <div class="segment gym" style="flex: 1;">🏋️</div>
-        </div>
-    <div class="boundary-handle" data-boundary="Morning"></div>
-</div> -->
-<!-- <div class="slider-group">
-    <label>Morning Starts: <span id="val_morning">05:00</span></label>
-    <input type="range" min="0" max="23" value="5" class="time-slider" data-mode="Morning">
-    
-    <label>Work Starts: <span id="val_work">09:00</span></label>
-    <input type="range" min="0" max="23" value="9" class="time-slider" data-mode="Work">
-    
-    </div>
-<button onclick="saveRoutinePrefs()">Save Routine</button>
-</div> -->
-<!-- Tab edit basic -->
-
 <!-- context settings -->
 <div id="tab_settings_card" class="bottom-sheet">
     
     <div class="sheet-header" style="display: flex; justify-content: space-around; margin-left: 10px;">
-        Edit Tab
+        <!-- Edit Tab -->
+         <div id="sheet_title">woiebvwvbw;o</div>
+        <div style="margin-top: 0px; padding-top: 1px; border-top: 1px solid #444;">
+        <label>Collaboration</label>
+        <button onclick="generateTabShareCode()" class="w3-button w3-blue w3-round w3-small" style="width:100%;">
+            🔗 Generate Share Code
+        </button>
+        <p id="share_code_display" style="font-size: 10px; color: #adff2f; word-break: break-all; margin-top: 5px;"></p>
+    </div>
         <button onclick="closeTabSettings()" >✕</button>
     </div>
+    
     <div class="sheet-body">
         <input type="text" id="tab_name_input" placeholder="Tab name">
         <div class="category-selector">
@@ -719,8 +968,9 @@ https://m.co/se/sv-SE/stationer/
             <option value="checkin">Check-in Grid</option>
         </select>
 
-        <button id="save_tab_btn" class="primary-btn">Save Changes</button>
-        <button id="delete_tab_btn" class="danger-btn">Delete Tab</button>
+        <!-- <button id="save_tab_btn" class="icon save">Save Changes</button> -->
+        <input type="submit" id="save_tab_btn" value=" " class="icon save" title="Save Changes">
+        <!-- <input type="submit" id="delete_tab_btn" value=" " class="icon delete" title="Delete Tab"> -->
     </div>
 </div>
 

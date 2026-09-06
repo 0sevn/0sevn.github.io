@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Zero-Config Text Sharer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body { font-family: Inter, sans-serif; background:#f9fafb; }
+</style>
+</head>
+
+<body class="p-6">
+
+<!-- Modal -->
+<div id="customModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-xl max-w-sm w-full">
+    <h3 id="modalTitle" class="font-bold text-lg mb-2"></h3>
+    <p id="modalMessage" class="text-gray-600 mb-4"></p>
+    <button id="modalCloseButton" class="w-full bg-indigo-600 text-white py-2 rounded-lg">OK</button>
+  </div>
+</div>
+
+<div class="max-w-4xl mx-auto space-y-10">
+
+<header class="text-center">
+<h1 class="text-3xl font-bold">Zero-Config Text Sharer</h1>
+<p class="text-gray-500 mt-2">One box. Create, read, and edit in real-time.</p>
+<p class="text-sm mt-2">User ID: <span id="userIdDisplay">loading…</span></p>
+</header>
+
+<!-- MAIN TEXT BOX -->
+<textarea
+  id="mainTextarea"
+  class="w-full h-64 p-4 border rounded-xl font-mono text-sm shadow-inner"
+  placeholder="Paste or type text here…"
+></textarea>
+
+<!-- Viewer controls -->
+<div id="viewerControls" class="hidden flex justify-between items-center text-sm text-gray-500">
+  <span id="lastUpdatedDisplay">Last updated: —</span>
+  <button id="editToggleButton" class="text-indigo-600 font-medium">✏️ Edit</button>
+</div>
+
+<!-- Edit controls -->
+<div id="editControls" class="hidden flex space-x-2">
+  <button id="saveEditButton" class="bg-indigo-600 text-white px-4 py-2 rounded-lg">Save</button>
+  <button id="cancelEditButton" class="bg-gray-400 text-white px-4 py-2 rounded-lg">Cancel</button>
+</div>
+
+<!-- Create -->
+<button id="saveButton" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold">
+Save & Get Share ID
+</button>
+
+<!-- Share -->
+<div id="shareContainer" class="hidden p-4 bg-indigo-50 rounded-xl space-y-2">
+  <div>
+    Share ID:
+    <code id="shareIdDisplay" class="font-mono font-bold"></code>
+  </div>
+  <button id="copyButton" class="bg-white border px-3 py-2 rounded-lg">Copy ID</button>
+    <div
+    id="qrCodeContainer"
+    class="mt-3 p-3 bg-white rounded-lg border shadow flex justify-center"
+    ></div>
+</div>
+
+<!-- Reader -->
+<div class="flex space-x-2">
+  <input id="readInput" class="flex-grow p-3 border rounded-xl font-mono" placeholder="Enter Share ID" />
+  <button id="readButton" class="bg-green-600 text-white px-4 rounded-xl">Read</button>
+  <button id="clearButton" class="bg-red-500 text-white px-4 rounded-xl">Clear</button>
+</div>
+
+</div>
+<script src="qrcode.min.js"></script>
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, doc, onSnapshot,
+  updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+/* 🔥 YOUR FIREBASE CONFIG (unchanged) */
+const firebaseConfig = {
+  apiKey: "AIzaSyC1-ZWhRAhOh4JzzmLpqxnHPEXmcRgRDms",
+  authDomain: "binpaste-8fd73.firebaseapp.com",
+  projectId: "binpaste-8fd73",
+  storageBucket: "binpaste-8fd73.firebasestorage.app",
+  messagingSenderId: "14978874051",
+  appId: "1:14978874051:web:a7dbba61595e0a6c2e8076"
+};
+
+const COLLECTION = "shared_texts_external";
+
+/* DOM */
+const $ = id => document.getElementById(id);
+const mainTextarea = $("mainTextarea");
+const viewerControls = $("viewerControls");
+const editControls = $("editControls");
+const lastUpdated = $("lastUpdatedDisplay");
+
+const params = new URLSearchParams(window.location.search);
+const readId = params.get("readId");
+if (readId) {
+    $("readInput").value = readId;
+    subscribe(readId);
+}
+
+
+let db, auth, userId;
+let currentDocId = null;
+let unsubscribe = null;
+let mode = "create"; // create | view | edit
+
+/* Modal */
+function openModal(t,m){
+  $("modalTitle").textContent=t;
+  $("modalMessage").textContent=m;
+  $("customModal").classList.remove("hidden");
+}
+$("modalCloseButton").onclick=()=>$("customModal").classList.add("hidden");
+
+/* Mode handler */
+function setMode(m){
+  mode=m;
+  if(m==="create"){
+    mainTextarea.readOnly=false;
+    viewerControls.classList.add("hidden");
+    editControls.classList.add("hidden");
+  }
+  if(m==="view"){
+    mainTextarea.readOnly=true;
+    viewerControls.classList.remove("hidden");
+    editControls.classList.add("hidden");
+  }
+  if(m==="edit"){
+    mainTextarea.readOnly=false;
+    viewerControls.classList.add("hidden");
+    editControls.classList.remove("hidden");
+    mainTextarea.focus();
+  }
+}
+
+/* Init */
+const app = initializeApp(firebaseConfig);
+db = getFirestore(app);
+auth = getAuth(app);
+const cred = await signInAnonymously(auth);
+userId = cred.user.uid;
+$("userIdDisplay").textContent=userId;
+
+// QR generator
+function generateQrCode(shareId) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("readId", shareId);
+
+    const container = document.getElementById("qrCodeContainer");
+    container.innerHTML = ""; // Clear previous QR
+
+    new QRCode(container, {
+        text: url.toString(),
+        width: 150,
+        height: 150,
+        colorDark: "#111827",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+    });
+}
+
+/* Save new */
+$("saveButton").onclick = async () => {
+    const text = mainTextarea.value.trim();
+    if (!text) return openModal("Error", "Text required");
+
+    const ref = await addDoc(collection(db, COLLECTION), {
+        content: text,
+        ownerId: userId,
+        createdAt: serverTimestamp()
+    });
+
+    currentDocId = ref.id;
+
+    $("shareIdDisplay").textContent = ref.id;
+    $("shareContainer").classList.remove("hidden");
+
+    generateQrCode(ref.id);   // ✅ ADD THIS
+
+    setMode("view");
+};
+
+
+/* Read */
+function subscribe(id){
+  unsubscribe?.();
+  currentDocId=id;
+  unsubscribe=onSnapshot(doc(db,COLLECTION,id),(snap)=>{
+    if(!snap.exists()) return mainTextarea.value="Not found";
+    const d=snap.data();
+    mainTextarea.value=d.content||"";
+    const ts=d.updatedAt||d.createdAt;
+    lastUpdated.textContent=ts?.toDate?`Last updated: ${ts.toDate().toLocaleString()}`:"";
+    setMode(d.ownerId===userId?"view":"view");
+  });
+}
+
+$("readButton").onclick=()=>subscribe($("readInput").value.trim());
+
+$("clearButton").onclick = () => {
+    unsubscribe?.();
+    mainTextarea.value = "";
+    $("qrCodeContainer").innerHTML = "";
+    $("shareContainer").classList.add("hidden");
+    setMode("create");
+};
+
+
+/* Edit */
+$("editToggleButton").onclick=()=>setMode("edit");
+$("saveEditButton").onclick=async()=>{
+  await updateDoc(doc(db,COLLECTION,currentDocId),{
+    content:mainTextarea.value,
+    updatedAt:serverTimestamp()
+  });
+  setMode("view");
+};
+$("cancelEditButton").onclick=()=>setMode("view");
+
+/* Copy */
+$("copyButton").onclick=()=>{
+  navigator.clipboard.writeText($("shareIdDisplay").textContent);
+  openModal("Copied","Share ID copied");
+};
+</script>
+</body>
+</html>

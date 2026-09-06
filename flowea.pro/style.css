@@ -22,6 +22,7 @@
     /* --text-muted */
 
     --card-bg: #373737;
+    --card-bg2: #1a1a1a;
     --accent-color: #6ae25aaf;
     
     --invert-icon:100%;
@@ -32,16 +33,36 @@
     --toast-color: #fff;
   }
   body.light-mode {
-    --bg-color: oklch(97.407% 0.00726 80.57);
+    --bg-color: #ede8de;
+    /* oklch(95.3% 0.01138 84.523); */
+    --bg-color2: oklch(95.4% 0.01138 84.523);
+    --bg-color3: #ede8de;
+    /* oklch(95.5% 0.01138 84.523); */
+    
+    /* --bg-color: oklch(97.407% 0.00726 80.57); */
     /* rgb(249, 246, 241) */
     --text-color: #333;
-    --card-bg: oklch(98% 0.00726 80.57);
+    --card-bg: oklch(90% 0.00726 80.57);
+    --card-bg2: oklch(92.5% 0.00726 80.57);
+    /* --card-bg: oklch(76.187% 0.13949 69.517); orange */
     --accent-color: #0077ff;
     --box-shadow: var(--shadow-m);
+    --shadow-s: inset 0 1px 2px #ffffff30, /*top highlight*/
+    0 1px 2px #00000030, /*dark shadow*/
+    0 1px 4px #00000015; /*soft shadow*/
+
+    --shadow-m: inset 0 1px 2px #ffffff50, /*top highlight*/
+    0 1px 4px #00000030, /*dark shadow*/
+    0 1px 8px #00000015; /*soft shadow*/
+
+    --shadow-l: inset 0 1px 2px #ffffff70, /*top highlight*/
+    0 1px 6px #00000030, /*dark shadow*/
+    0 1px 10px #00000015; /*soft shadow*/
+
     --invert-icon:15%;
     --active-tab:#c2c2c2;
     --toast-bg: #f0f0f0;
-    --toast-color: #333;
+    --toast-color: oklch(90% 0.00726 80.57);;
   }
   html {
     color-scheme: dark;
@@ -61,11 +82,9 @@
 
   /* TOP NAV */
   .topnav {
-    /* display: none; */
     height:40px;
     width: 55%;
     border-radius: 5px 5px 25px 25px;
-    /* background-color: #333; */
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
     margin:0px auto 0px auto;
     /* padding:10px 0px 0px 20px; */
@@ -217,7 +236,8 @@ width: 100%;
     user-select: none;
     width: auto; /* Remove any fixed width */
     min-height: 100px;
-    background: #404040;
+    max-height: 120px;
+    /* background: #404040; */
     /* height: 35px; */
     /* background: var(--bg-color2); */
     border: 1px solid rgba(255,255,255,0.1);
@@ -232,29 +252,30 @@ width: 100%;
     z-index: 1;
     user-select: none; /* Prevents text highlighting during fast clicking */
     transition: background-color 0.4s ease, border-color 0.4s ease, transform 0.1s active;
-    user-select: none; /* Prevents text highlighting during fast clicks */
-    
 }
-
+.checkin-tile:hover {
+    transform: scale(1.01);
+    background: var(--toast-bg);
+}
 .checkin-tile:active {
     transform: scale(0.98);
     background: var(--accent-color);
 }
 /* Step 1: 1 Click - Light Reddish Grey */
 .checkin-tile[data-clicks="1"] {
-    background: #3d3535; /* Muted reddish grey */
+    background: rgba(74, 59, 59, 0.443); /* Muted reddish grey */
     border-color: #8c7a7a;
 }
 
 /* Step 2: 2 Clicks - Neutral Transition */
 .checkin-tile[data-clicks="2"] {
-    background: #4a4d40; /* Olive/Grey transition */
+    background: #66714677; /* Olive/Grey transition */
     border-color: #90947e;
 }
 
 /* Step 3: 3+ Clicks - Light Greenish */
 .checkin-tile[data-clicks="3"] {
-    background: #2d4d3b; /* Subtle forest green */
+    background: #2d4d3b8e; /* Subtle forest green */
     border-color: #4e9c71;
 }
 .checkin-text {
@@ -337,20 +358,22 @@ width: 100%;
     /* display: flex; */
     /* align-items: center; */
     /* opacity: 0.7; */
-    /* background: rgba(255, 255, 255, 0.15); */
+    background: rgba(255, 255, 255, 0.15);
     /* padding: 2px 8px; */
     border-radius: 4px;
     border: 1px solid #818181;
 }
 .goal-container:hover .goal-display {
-    color: #fff;
+    /* color: #fff; */
+    color: var(--text-color);
     text-decoration: underline;
 }
 .goal-display {
     font-family: monospace;
     font-weight: bold;
     font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
+    /* color: rgba(255, 255, 255, 0.7); */
+    color: var(--text-color);
     /* background: rgba(255, 255, 255, 0.15); */
     transition: color 0.2s;
     border-radius: 4px;
@@ -429,30 +452,11 @@ width: 100%;
    /* tabs */
   .tab-wrap {
     position: relative;
-    /* justify-self: right; */
-    /* align-items:center; */
-    width: 100%;
-/* overflow-x:hidden; */
-    /* display: flex;
-    flex-direction: column; */
-    /* margin-top: 5px; */
-    /* margin:0px auto 0px auto; */
-      /* padding:0px 20px 0px 20px; */
-      /* max-width: 600px; */
-      
-    /* background-color: rgb(245, 222, 179, 100%); */
-    /* border: 1px solid black; */
-    
+    width: 100%;    
     height:50px;
   }
   .tabs {
     display: flex;
-    /* gap: 10px; */
-    /* margin-left: 5px; */
-    /* border: 3px solid rgb(11, 10, 10); */
-    /* border-block: 1px #666 solid; */
-    /* overflow-x:scroll; */
-    /* width: 100%; */
     flex-wrap: nowrap; /* Prevent tabs from jumping to a second line */
     overflow-x: auto;  /* Enable horizontal scrolling */
     overflow-y: hidden;
@@ -481,12 +485,6 @@ width: 100%;
       /* box-shadow: var(--shadow-s); */
       /* border: 1px solid #ccc; */
       transition: all 0.3s ease-out; /* Smooth transitions for properties */
-      /* position: relative; Needed for transform origin if you scale/rotate */
-      /* overflow: hidden; To clip content if scaling down, etc. */
-    /* box-shadow: 0 0.5rem 0.8rem #00000080; */
-    /* font-size: 1em; */
-      /* border: 1px solid #ccc; */
-      /* background-color: #f4f4f4; */
   }
   .tab:hover{
       opacity: 0.6; transition: 0.1s
@@ -567,71 +565,39 @@ width: 100%;
 }
 
   .mid-container {
-    /* position: absolute; */
     width: 100%;
-    /* height: 100%; */
-
-    /* flex-shrink: 0; */
-    /* grid-area: a; */
-    /* align-self: center; */
-      background-color: var(--card-bg);
-      color: var(--text-color);
-      border-radius: 20px 25px 25px 5px;
-
-      /* overflow-y: scroll;
-   overflow-x: hidden;
-    scrollbar-width: none; */
-
-      /* border: 3px solid rgb(11, 10, 10); */
-      box-shadow: var(--shadow-s);
-      /* margin: 2px; */
-      
-      /* z-index: -99; */
-      font-size: 18px;      
-      /* opacity: 50%; */
-      /* margin-bottom: auto; */
-      
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-radius: 20px 25px 25px 5px;
+    box-shadow: var(--shadow-s);
+    font-size: 18px;      
   }
   
 
 .sort-list {
-  /* padding: 5px 10px; */
-  /* width: 100%; */
-  /* height: 250px; */
   overflow-y: auto;
   scrollbar-width: none;
-
-  /* overflow-x: auto; */
-  /* border: 3px solid rgb(11, 10, 10); */
 }
 .sortable-list {
-  border: 3px solid rgb(11, 10, 10);
-  /* width: 100%; */
-  height: 350px;
-   overflow-y: scroll;
-   overflow-x: hidden;
+    border: 3px solid rgb(11, 10, 10);
+    height: 350px;
+    overflow-y: scroll;
+    overflow-x: hidden;
     scrollbar-width: none;
     list-style: none;
-    /* padding: 0; */
     margin-left: 20px;
     margin-right: 20px;
-    /* width: 380px; */
-    /* margin: auto; */
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-    
   }
+
 ul {
-    /* width: 100%; */
     margin: 0px; /* To remove default bottom margin */ 
     padding: 0px; /* To remove default left padding */
     /* border: 3px solid rgb(11, 10, 10); */
 }
 li {
-  /* width: 100%; */
-    /* margin-left: -10px;  */
-    /* margin-right: 5px; */
     margin: 0px;
     padding: 0px; 
     /* border: 3px solid rgb(11, 10, 10); */
@@ -644,14 +610,7 @@ li {
 
 /*//////sortable css*/
 .sortable-item {
-    /* padding: 1px 25px; */
-    /* margin: 8px 0; */
-    /* background: rgba(255, 255, 255, 0.8); */
-    /* border: 3px solid rgb(11, 10, 10); */
     border-radius: 5px;
-    /* font-size: 1.1em; */
-    /* color: #333; */
-    /* font-weight: bold; */
     vertical-align: middle; 
     align-items: center;
     justify-content: center;
@@ -670,10 +629,10 @@ li {
     opacity: 0.7;
     transform: rotate(-2deg);
 }
-.over {
+/* .over { */
     /* border: 2px dashed #67a25c; */
     /* background: #77826c; */
-}
+/* } */
 a {
     color: var(--text-color);
     border-radius: 15px;
@@ -684,28 +643,16 @@ a {
 .task-ops {
   position:relative;
   margin-top: 20px;
-  /* margin-right: 0px; */
   margin-bottom: 0px;
-  padding: 0px 5px 5px 40px;
-  /* right: 0px; */
-  /* bottom: 10px; */
-  /* border: 3px solid rgb(11, 10, 10); */
-  /* display: flex; */
-  /* flex-direction: column; */
-  /* align-items: flex-end; */
-  /* justify-content: flex-end; */
-  
+  padding: 0px 5px 5px 40px; 
 }
 
 .health_bar_container {
     position: relative;
-    /* width: 100%; */
+
     height: 15px; /* Or whatever your design height is */
-/* 
-    left: 20px;
-      right: 20px; */
-      margin: 10px 20px 10px 20px;
-      padding: 0px 0px 0px 0px;
+    margin: 10px 20px 10px 20px;
+    padding: 0px 0px 0px 0px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     
@@ -721,28 +668,11 @@ a {
       width: var(--healthbar-size, 0px);
       height: 100%;
       border-radius: 10px;
-      /* border-top: 3px solid var(--accent); */
-      /* border: 3px solid rgb(11, 10, 10); */
-      /* border-bottom: 4px solid rgb(37, 117, 41); */
-/*  */
-      /* display:block;
-      top: 15px;
-      left: 20px;
-      right: 20px;
-      margin-top: 0px;
-      margin-bottom:25px;
-      padding: 0px; */
-/*  */
-      /* transition: 0.5s width; */
-      /* z-index: 1; */
-      /* background-color: var(--accent); */
       box-shadow: var(--shadow-l);
-      /* box-shadow: 0 1rem 0.7rem #00000080; */
       transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
                 background-color 0.3s ease, 
                 box-shadow 0.3s ease;
   }
-
 
   /* ICONS */
   .icon {
@@ -756,6 +686,9 @@ a {
       padding: 0px;
       border: none;
       /* border: 3px solid rgb(255, 255, 255); */
+  }
+  .save {
+  background-image:url(img/save.png);
   }
   .add {
   background-image:url(img/add_pen.png);
@@ -773,28 +706,21 @@ a {
   background-image:url(img/edit.png);
   }
   .delete {
-  background-image:url(img/delete.png);
-  position: relative;
-  /* right:0px; */
-  /* top:-2px; */
-  /* margin-left:50px; */
-  /* display: flex; */
-  /* top: -5px; */
-  /* margin-right:5px; */
-  margin-left: 5px;
-  padding-left: 5px; 
-border: 1px solid #ddd;
-border-radius: 0px 0px 5px 5px;
-  
+    background-image:url(img/delete.png);
+    position: relative;
+    margin-left: 5px;
+    padding-left: 5px; 
+    border: 1px solid #ddd;
+    border-radius: 0px 0px 5px 5px;
   }
   .purge {
-  background-image:url(img/purge.png);
+    background-image:url(img/purge.png);
   }
   .darklight_mode {
-  background-image:url(img/light_mode.png);
+    background-image:url(img/light_mode.png);
   }
   .connect {
-  background-image:url(img/sync.png);
+    background-image:url(img/sync.png);
   }
   .rss {
     background-image:url(img/rss.png);
@@ -803,11 +729,10 @@ border-radius: 0px 0px 5px 5px;
     background-image:url(img/copy.png);
   }
   .export {
-  background-image:url(img/export.png);
-  background-position-x: 200px;
-  height:35px;
-  width:240px;
-  /* margin-right:25px; */
+    background-image:url(img/export.png);
+    background-position-x: 200px;
+    height:35px;
+    width:240px;
   }
   .import {
   background-image:url(img/import.png);
@@ -819,8 +744,16 @@ border-radius: 0px 0px 5px 5px;
   /* background-image:url(img/menu.png); */
   /* background-image:url(img/timetravel.png); */
   background-image:url(img/time_rewind.png);
-
   }
+  .shelf {
+  /* background-image:url(img/menu.png); */
+  /* background-image:url(img/timetravel.png); */
+  background-image:url(img/shelf.png);
+  }
+  .matrix {
+    background-image:url(img/matrix.png);
+  }
+
   .help {
   background-image:url(img/help.png);
   }
@@ -858,6 +791,8 @@ border-radius: 0px 0px 5px 5px;
       /* font-size: 16px; */
       /* padding: 10px; */
       /* width: 90%; */
+      background-color: var(--bg-color);
+      color: var(--text-color);
       margin-bottom: 10px;
       caret-shape: block;
       caret-color: darkorange;
@@ -872,7 +807,7 @@ border-radius: 0px 0px 5px 5px;
   input[type=submit] {
           background-color: rgb(79, 79, 79, 0);
           border: none;
-          color: #fff;
+          color: var(--text-color);
           padding: 5px 8px;
           text-decoration: none;
           margin: 4px 2px;
@@ -908,7 +843,6 @@ border-radius: 0px 0px 5px 5px;
     text-align: center;
     border-radius: 8px;
     padding: 16px;
-
     z-index: 999;
     left: 50%;
     transform: translateX(-50%); /* Moves it back left by 50% of its width */
@@ -929,12 +863,10 @@ border-radius: 0px 0px 5px 5px;
     position: fixed;
     left: auto;
     top: 5px;
-    /* /* opacity: 1; */
+
     z-index: 999;
     /* box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4); */
   }
-
-  /* dashboard */
 
 /* The Dashboard Overlay */
 .left-dashboard {
@@ -945,7 +877,6 @@ border-radius: 0px 0px 5px 5px;
     height: 100vh; /* Full height */
     background: transparent; /* Remove the dim overlay */
     z-index: 9999;
-    /* display: none; Controlled by toggle */
     pointer-events: none; /* Allows clicking through the empty space */
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -953,8 +884,6 @@ border-radius: 0px 0px 5px 5px;
 
 .purge_list_container {
   position:absolute;
-  /* display: none; */
-  /* top: 0; */
   right:0;
   bottom: 0;
   width:90%;
@@ -1032,7 +961,6 @@ border-radius: 0px 0px 5px 5px;
     height: 100vh; /* Full height */
     background: transparent; /* Remove the dim overlay */
     z-index: 9999;
-    /* display: none; Controlled by toggle */
     pointer-events: none; /* Allows clicking through the empty space */
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1040,12 +968,12 @@ border-radius: 0px 0px 5px 5px;
 
 .dashboard-content {
     pointer-events: auto; /* Re-enable clicks inside the actual dashboard */
-    background: #222; /* Dark background for the panel */
+    background: var(--bg-color); /* Dark background for the panel */
     width: 100%;
-    height: 100%;
-    margin: 0;
-    border-radius: 20px;
-    border-left: 1px solid #444; /* Subtle edge line */
+    margin: 20px;
+    height: calc(100% - 40px);
+    border-radius: 12px;
+    border: 1px solid #444;
     padding: 20px;
     box-shadow: -10px 0 30px rgba(0,0,0,0.5); /* Shadow on the left edge */
     display: flex;
@@ -1054,19 +982,19 @@ border-radius: 0px 0px 5px 5px;
 }
 
 /* Make it look like a floating card if you prefer space around it */
-.dashboard-content {
-    margin: 20px;
-    height: calc(100% - 40px);
-    border-radius: 12px;
-    border: 1px solid #444;
+
+.diag-row {
+    background-color: var(--card-bg);
+      color: var(--text-color);
 }
+
 
 .sync-toggle-container { 
     display: flex; justify-content: space-between; align-items: center;
-    background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin: 20px 0;
+    background: var(--bg-color2); padding: 15px; border-radius: 12px; margin: 10px 0;
 }
 .uid-display { 
-    display: flex; background: #222; padding: 8px; border-radius: 8px; 
+    display: flex; background: var(--bg-color2); padding: 8px; border-radius: 8px; 
     margin-top: 10px; font-size: 11px; align-items: center; justify-content: space-between;
 }
 #syncQrCode img { margin: 15px auto; border: 8px solid white; border-radius: 8px; }
@@ -1116,7 +1044,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 #manualSyncInput {
     flex-grow: 1;
-    background: #1a1a1a;
+    background: var(--bg-color2);
     border: 1px solid #444;
     color: white;
     padding: 8px;
@@ -1164,40 +1092,23 @@ input:checked + .slider:before { transform: translateX(20px); }
     display: none;
 }
 
-.tab-sync-list {
-    margin-top: 10px;
-    background: #1a1a1a;
-    border-radius: 8px;
-    padding: 5px;
-}
 .tab-sync-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px;
+    padding: 4px;
     border-bottom: 1px solid #333;
 }
 .tab-sync-item:last-child { border-bottom: none; }
 .tab-sync-item button {
     font-size: 11px;
-    padding: 4px 8px;
+    padding: 4px 3px;
     border-radius: 4px;
     border: none;
     cursor: pointer;
 }
 .synced { background: #4CAF50; color: white; }
 .locked { background: #888; color: white; }
-
-.tab-sync-list {
-    margin-top: 10px;
-    background: #1a1a1a;
-    border-radius: 8px;
-    padding: 5px;
-    max-height: 150px; /* Keeps dashboard compact if you have many tabs */
-    overflow-y: auto;
-    border: 1px solid #333;
-}
-
 /* Subtle glow for synced vs local icons */
 .synced { 
     background: rgba(76, 175, 80, 0.2); 
@@ -1208,6 +1119,36 @@ input:checked + .slider:before { transform: translateX(20px); }
     background: rgba(231, 76, 60, 0.1); 
     color: #e74c3c; 
     border: 1px solid #e74c3c !important;
+}
+
+.tab-sync-list {
+    margin-top: 10px;
+    background: var(--card-bg2);
+    /* background: var(--bg-color3); */
+    border-radius: 8px;
+    padding: 5px;
+    max-height: 150px; /* Keeps dashboard compact if you have many tabs */
+    overflow-y: auto;
+    border: 1px solid #333;
+}
+
+.copy-btn {
+    background: #444;
+    color: white;
+    border: none;
+    padding: 4px 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.copy-btn:hover { background: #666; }
+
+.remote-badge {
+    font-size: 10px;
+    color: #00e5ff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 /* Contexts */
@@ -1290,8 +1231,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 .command-bar.hidden { display: hidden; }
-
-
 
 .context-icons-row {
     display: flex;
@@ -1387,12 +1326,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     border-radius: 3px;
 }
 /* Ensure the handles stick out above and below the bar */
-/* .handle {
-    width: 4px;
-    height: 50px; 
-    z-index: 50;
-    pointer-events: auto;
-} */
 
 /* Tooltip for the time */
 .handle::after {
@@ -1418,7 +1351,9 @@ input:checked + .slider:before { transform: translateX(20px); }
 .diag-item summary, .diag-tab-folder summary {
     cursor: pointer;
     padding: 8px;
-    background: #444;
+    /* background: #444; */
+    border: 1px solid #444;
+    border-radius: 25px 25px 5px 5px;
     margin-bottom: 2px;
     border-radius: 4px;
     font-family: monospace;
@@ -1433,3 +1368,92 @@ pre {
     margin: 5px 0 15px 10px;
 }
 
+/* Add this class to the tab element if tab.remoteOwnerId exists */
+.tab.is-remote {
+    border-left: 3px solid #00e5ff; /* A vertical 'sync' stripe */
+    padding-left: 10px; /* Adjust padding so text doesn't hit the bar */
+}
+
+/* Tasks created by someone else */
+.sortable-item.guest-task {
+    background: rgba(255, 255, 255, 0.05); /* Slightly lighter/darker depending on theme */
+    border-left: 2px solid rgba(0, 229, 255, 0.5); /* A subtle cyan edge */
+    font-style: italic; /* Optional: makes guest text feel slightly different */
+}
+
+/* Optional: Add a "User Stamp" on hover or in a small corner */
+.guest-task::after {
+    content: "guest";
+    font-size: 8px;
+    position: absolute;
+    right: 110px;
+    top: 6px;
+    opacity: 0.4;
+    text-transform: uppercase;
+}
+
+
+.routine-grid {
+    display: grid;
+    grid-template-columns: 80px repeat(7, 1fr);
+    gap: 2px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 5px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.grid-header, .grid-label {
+    font-size: 12px;
+    color:  #aaa;
+    text-align: center;
+    padding: 5px 0;
+}
+
+.cat-label { text-align: left; padding-left: 5px; color: #aaa; }
+
+/* Base style for all cells */
+.grid-cell {
+    padding: 0px;
+    border: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.05); /* Slight visibility */
+    color: #fff;
+    font-size: 0.8rem;
+}
+
+/* Style for cells that have a tab assigned */
+.grid-cell.assigned-cell {
+    background: rgba(84, 160, 255, 0.15); /* Soft blue tint */
+    border-color: rgba(84, 160, 255, 0.3);
+}
+
+/* Hover effect for everything */
+.grid-cell:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.02);
+}
+
+/* Optional: Subtle indicator for the cell that IS the active tab */
+.grid-cell.active-focus {
+    outline: 1px solid #54a0ff;
+    z-index: 1;
+}
+
+/* A subtle highlight for the tab the system suggests based on the matrix */
+.matrix-priority {
+    /* border-bottom: 2px solid #00e5ff !important; */
+    position: relative;
+}
+
+.matrix-priority::before {
+    content: '•';
+    position: absolute;
+    top: -2px;
+    left: 10%;
+    transform: translateX(-50%);
+    color: #00e5ff;
+    font-size: 14px;
+}

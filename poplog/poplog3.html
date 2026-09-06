@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Spiral Poplog</title>
+<style>
+  body {
+    margin: 0;
+    height: 600vh;
+    background: #000;
+    overflow-x: hidden;
+    font-family: system-ui, sans-serif;
+  }
+
+  .scene {
+    position: fixed;
+    inset: 0;
+    perspective: 1200px;
+    overflow: hidden;
+  }
+
+  .spiral {
+    position: absolute;
+    top: 40%;
+    left: 0%;
+    transform-style: preserve-3d;
+  }
+
+.item {
+  all: unset;              /* reset button defaults */
+  position: absolute;
+  width: 400px;
+  height: 240px;
+  padding: 10px;
+  margin: -120px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  will-change: transform, opacity;
+  cursor: pointer;
+}
+
+
+.item:hover {
+ background: rgba(48, 45, 45, 0.61);
+ /* outline:auto */
+ border: 1px solid #000;
+}
+.item:focus {
+  outline: none;
+}
+
+  .title {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .description {
+    font-size: 13px;
+    opacity: 0.7;
+    margin-bottom: 12px;
+  }
+
+  .meta {
+    font-size: 12px;
+    opacity: 0.5;
+    display: flex;
+    justify-content: space-between;
+  }
+  img {
+  width: 100%;
+  height:180px;
+  /* height: 140px; */
+  object-fit: cover;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+.popover {
+  width: 420px;
+  max-width: 90%;
+  padding: 30px;
+  border-radius: 12px;
+  border: none;
+  background: #111;
+  color: white;
+}
+
+.popover::backdrop {
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+}
+
+.close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+</style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="spiral" id="spiral"></div>
+</div>
+
+<div id="postPopover" popover class="popover">
+  <button popovertarget="postPopover" popovertargetaction="hide" class="close">
+    ×
+  </button>
+  <div id="popoverContent"></div>
+</div>
+
+<script>
+/* ---------------------------
+   DATA (Your Structure)
+---------------------------- */
+
+const posts = [
+  {
+    id: 14,
+    title: "Sentimental value",
+    description: "Slow burn, thin story promises of great art without showing great art, until the very end. Last scene is breathtaking culmination of all unsaid that never needed to be said. ,  ",
+    status: "active", // or "inactive"
+    category: "Roy",
+    date: "2026-02-22"
+  },
+  {
+    id: 13,
+    title: "Iloveruss",
+    description: "the life",
+    status: "active", // or "inactive"
+    category: "Capitol",
+    date: "08-02-2026"
+  },
+  {
+    id: 12,
+    title: "Rental Family",
+    description: "Endearing, about Loneliness, finiding your place and purpose, abandonment and repair, and doing it over and over again",
+    status: "active", // or "inactive"
+    category: "Roy",
+    date: "08-02-2026"
+  },
+  {
+    id: 11,
+    title: "The secret agent",
+    description: "Prazer, storytelling at it's best. Great acting, brings ",
+    status: "active", // or "inactive"
+    category: "Roy",
+    date: "08-02-2026"
+  },
+  {
+    id: 10,
+    title: "No other choice",
+    description: "Survival instinct, protecting the self",
+    status: "active", // or "inactive"
+    category: "Capitol",
+    date: "08-02-2026"
+  },
+  {
+    id: 9,
+    title: "Pillion",
+    description: "(Backseat rug) Captivating, complete submission and the unsustainable outsourcing of the self",
+    status: "active",
+    category: "Roy",
+    date: "07-02-2026"
+  },
+  {
+    id: 8,
+    title: "Bugonia",
+    description: "Remake of Save the Green Planet! (2003), priviledged omnipotence  the priviledged as well as the helplessness of the underprivileged. ",
+    status: "active",
+    category: "Capitol",
+    date: "04-02-2026"
+  },
+  {
+    id: 7,
+    title: "Marty supreme",
+    description: "big budged actors, small budget acting. There are no small roles, and yet.. unnatural movement and CGI made it challenging to suspend disbelief . underwhelming",
+    status: "inactive",
+    category: "Roy",
+    date: "03-02-2026"
+  },
+  {
+    id: 6,
+    title: "The love that remains",
+    description: `Nature and lighting, even the most mundane and everyday moments veiled in a mythical and fantastical air in fairy tale Iceland..
+      Ex- husband and wife, still artistic mother and fisherman father, trying to find personal and professional balance 
+      If this is all there is, then let's start dancing. Icelandic / Monster `,
+    status: "active",
+    category: "Draken",
+    date: "27-01-2026"
+  },
+  {
+    id: 5,
+    title: "The testament of Ann Lee",
+    description: "seeking, community and spiritual resolve in the quaker/shaker movement",
+    status: "active",
+    category: "Draken",
+    date: "25-01-2026"
+  },
+  {
+    id: 4,
+    title: "A private life",
+    description: "A psychiatrist in Paris faces her convictions (Vie privée, fr)",
+    status: "inactive",
+    category: "Draken",
+    date: "25-01-2026"
+  },
+  {
+    id: 3,
+    title: "The brutalist",
+    description: "Black out..",
+    status: "inactive",
+    category: "Draken",
+    date: "25-01-2026"
+  },
+  {
+    id: 2,
+    title: "Dune",
+    description: "ok..",
+    status: "inactive",
+    category: "Draken",
+    date: "25-01-2026"
+  },
+  {
+    id: 1,
+    title: "The creator",
+    description: "Psychiatrist faces her convictions",
+    status: "inactive",
+    category: "M harms / bio?",
+    date: "25-01-2026"
+  }
+];
+
+/* Optional: sort by date (newest first) */
+// posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+/* ---------------------------
+   SPIRAL CONFIG
+---------------------------- */
+
+// <script>
+/* ---------------------------
+   DATA
+---------------------------- */
+
+// const posts = [
+//   { id: 0, title: "Entry 01", description: "Short description here.", status: "active", category: "research", date: "2026-02-01" },
+//   { id: 1, title: "Entry 02", description: "Another short note.", status: "draft", category: "visual", date: "2026-02-10" },
+//   { id: 2, title: "Entry 03", description: "Experimental log item.", status: "active", category: "system", date: "2026-02-15" },
+//   { id: 3, title: "Entry 04", description: "Another entry.", status: "active", category: "visual", date: "2026-02-18" }
+// ];
+
+// posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+/* ---------------------------
+   CONFIG
+---------------------------- */
+
+const spiral = document.getElementById("spiral");
+
+let items = [];
+let targetScroll = 0;
+let currentScroll = 0;
+
+/* ---------------------------
+   CREATE ITEMS
+---------------------------- */
+const popoverContent = document.getElementById("popoverContent");
+posts.forEach((post) => {
+  const content = document.createElement("button");
+  content.className = "item";
+
+  content.innerHTML = `
+    <img src="movies/${post.title}.jpg" />
+    <div class="title">${post.title}</div>
+  `;
+
+  content.setAttribute("popovertarget", "postPopover");
+  content.setAttribute("popovertargetaction", "show");
+
+content.addEventListener("click", () => {
+  popoverContent.innerHTML = `
+    <h2 style="margin-top:0">${post.title}</h2>
+      <img src="movies/${post.title}.jpg" style="width:100%; border-radius:8px;" onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'"/>
+      <p style="line-height:1.6; font-size:1.1rem;">${post.description}</p>
+      <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+      <div style="opacity:0.6;">
+        Category: ${post.category} <br> 
+        Logged on: ${post.date}
+      </div>
+    `;
+});
+  spiral.appendChild(content);
+  items.push(content);
+});
+
+
+
+
+
+
+
+
+/* ---------------------------
+   ANIMATION
+---------------------------- */
+const total = posts.length;
+// depth distance
+// 240 more to the left
+// 640 more central but out of bounds on smaller screen
+// need display adaptive units
+const radius = 440;
+
+// spiral width
+// 280 good balance on small screen
+// 880, star wars fade out scroll, passing through each movie
+// immersive
+const spacing = 280;
+
+ // curvature
+//  full spiral effect
+const angleStep = 0.5;
+
+const totalDepth = total * spacing;
+// Set page height based on content
+// set based on screen size
+document.body.style.height = (total * 500) + "px";
+
+function animate() {
+  //  * 1.97; cool haze, latency, display effect
+  currentScroll += (targetScroll - currentScroll) * 0.07; 
+  update(currentScroll);
+  requestAnimationFrame(animate);
+}
+
+function update(scroll) {
+  items.forEach((item, i) => {
+
+    // const angle = i * angleStep;
+    const depthIndex = (-i * spacing + scroll) / spacing;
+    const angle = depthIndex * angleStep;
+
+    const x = -radius * Math.cos(angle);
+    const y = radius * Math.sin(angle);
+
+    // infinite depth wrapping
+    let z = (-i * spacing + scroll);
+    z = ((z % totalDepth) + totalDepth) % totalDepth;
+
+    // center spiral around camera
+    z -= totalDepth / 2;
+
+    /* Depth window fade */
+    const visibleRange = totalDepth / 2;
+    let normalized = 1 - Math.abs(z) / visibleRange;
+    normalized = Math.max(0, normalized);
+
+    // 11 opacity for greater immersion
+    const opacity = Math.pow(normalized, 1.6);
+    // 11 scale really cool macro immersion
+    const scale = 0.6 + normalized * 0.6;
+
+    item.style.transform = `translate3d(${x}px, ${y}px, ${z}px) scale(${scale})`;
+      // rotation..
+  // item.style.transform =
+  // `translate3d(${x}px, ${y}px, ${z}px)
+  //  rotateZ(${angle * 0.01}rad)
+  //  scale(${scale})`;
+
+  const blur = (1 - normalized) * 8;
+  item.style.filter = `blur(${blur}px)`;
+
+  item.style.opacity = opacity;
+    // item.style.backgroundrgba(255,255,255,0.05);
+  });
+}
+
+/* ---------------------------
+   SCROLL HANDLING
+---------------------------- */
+
+window.addEventListener("scroll", () => {
+  targetScroll = window.scrollY;
+});
+
+/* Optional: extend scroll range infinitely */
+// document.body.style.height = "12000px";
+// document.body.style.height = totalDepth + window.innerHeight + "px";
+
+animate();
+</script>
+
+</body>
+</html>
+
+
+<!-- 
+
+-->
+

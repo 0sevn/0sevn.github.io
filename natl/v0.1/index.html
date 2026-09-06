@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+<title>FloWea</title>
+<link rel="stylesheet" href="w3.css">
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#454545">
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./serviceWorker.js')
+          .then(() => console.log('✅ Service Worker registered!'))
+          .catch(err => console.error('⚠️ Service Worker registration failed:', err));
+      }
+    </script>
+
+<style>
+</style>
+</head>
+<!-- <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script> -->
+<script src="jquery-4.0.0.slim.min.js"></script>
+
+<body>
+    <!-- Mid navigation -->
+    <div class="wrap-container">
+        <div class="week-header">
+            <div id="week_header" class="status-text"></div>
+            <span id="active_context_label" class="status-text context-label" onclick="openCommandbar()" style="cursor: pointer;">NATL</span>
+            <div id="active_sync" class="flex space-x-2 status-hud panel-trigger-btn" data-panel="sync_panel">
+                <div id="syncStatusDot" class="status-dot"></div>
+                <span id="syncStatusText" class="status-text">Local Only</span>
+            </div>
+        </div>
+        <div class="mid-container">
+            <div id="sync_status" style="font-size: 10px; font-weight: bold;"></div>
+            <div class="health_bar_container">
+                    <div id="health_bar" class="healthbar" title="Flowea = Flow + Fovea, the small depression within the retina where visual acuity is the highest.">   
+                    </div>
+            </div>
+                <div id="sort_list" class="sort_list">
+                    <ul id="todo_list" class="sortable-list">
+                        <!-- list elements -->
+                    </ul>
+                </div>
+                <div class="task-ops">
+                    <input type="text" id="enter_task" placeholder="Enter Task">
+                    <input type="submit" id="add" value=" " class="icon add" title="Add task">
+                    <input type="submit" id="purge" value=" " class="icon purge" title="Purge checked tasks to History" disabled>
+                </div>
+        </div>
+        <div class="tab-wrap">   
+            <div class="tabs">
+                <div class="tabs" id="tabsContainer"></div>
+                    <input type="submit" id="add_tab" value=" " class="icon add_tab w3-animate-left" title="Add tab" onclick="openNewTabCreator()">
+                    <input type="submit" value=" " class="icon history w3-animate-right" title="History" onclick="showHistory()">
+            </div>   
+        </div> 
+    </div>
+
+    <!-- Purged list -->
+    <nav id="historyCard" class="purge_list_container hidden w3-animate-bottom" style="height: 220px;">
+        <label>Purged tasks</label>
+            <div id="tabSyncList1" class="tab-sync-list" style="margin: 10px; height: 400px; display: block;">
+
+                <!-- Purge history list -->
+                <div style="color: var(--text-color);">
+                    <ul id="purge_list" style="list-style: none;padding-left: 5%;">
+                    </ul>
+                </div>
+            </div>    
+    </nav>
+
+    <!-- JS vanilla script -->
+
+    <script src="script.js"></script>
+    <script src="tab_script.js"></script>
+    <!-- SORTABLE SCRIPT -->
+    <script>
+        // sortable list
+            const list = document.querySelector('.sortable-list');
+            let draggingItem = null;
+            list.addEventListener('dragstart', (e) => {
+                draggingItem = e.target;
+                e.target.classList.add('dragging');
+            });
+            list.addEventListener('dragend', (e) => {
+                e.target.classList.remove('dragging');
+                document.querySelectorAll('.sortable-item')
+                    .forEach(item => item.classList.remove('over'));
+                draggingItem = null;
+                
+                if (window.saveNewOrder) window.saveNewOrder();
+            });
+            list.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const draggingOverItem = getDragAfterElement(list, e.clientY);
+                document.querySelectorAll('.sortable-item').forEach
+                    (item => item.classList.remove('over'));
+                if (draggingOverItem) {
+                    draggingOverItem.classList.add('over');
+                    list.insertBefore(draggingItem, draggingOverItem);
+                } else {
+                    list.appendChild(draggingItem); 
+                }
+            });
+            function getDragAfterElement(container, y) {
+                const draggableElements = [...container.querySelectorAll
+                    ('.sortable-item:not(.dragging)')];
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = y - box.top - box.height / 2;
+                    if (offset < 0 && offset > closest.offset) {
+                        return { offset: offset, element: child };
+                    } else {
+                        return closest;
+                    }
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
+        </script>
+
+    <!-- Toast notifications -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Command bar -->
+    <div id="commandBar" class="command-bar hidden w3-animate-bottom">
+        <div class="command-bar-header" style="display:flex; align-items:center; justify-content:space-between; padding: 12px 16px;">
+            <span style="font-size: 0.95rem; color: #eee;">App Preferences</span>
+            <!-- openCommandSettings not needed  onclick="openCommandsettings()" -->
+            <span id="edit_active_tab_btn" class="edit-icon-btn w3-animate-bottom" style="cursor: pointer;">⚙️</span>
+        </div>
+        <div class="settings-panel" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+                <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <span>Show healthbar</span>
+                    <label class="switch">
+                        <input type="checkbox" id="healthbarToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <span>Healthbar charge state / Resource depletion</span>
+                    <label class="switch">
+                        <input type="checkbox" id="healthbarToggle2" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <span>Add predefined tabs and routines</span>
+                    <label class="switch">
+                        <input type="checkbox" id="healthbarToggle3" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <span>Theme (Light/Dark)</span>
+                    <label class="switch">
+                        <input type="checkbox" id="themeToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <!-- <div style="font-size: 0.85rem; color: #aaa; line-height: 1.4;">
+                    Use the gear icon to access app preferences for theme and healthbar visibility.
+                </div> -->
+                <!-- <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <span>show detailed icons</span>
+                    <label class="switch">
+                        <input type="checkbox" id="healthbarToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div> -->
+                <!-- <div style="font-size: 0.85rem; color: #aaa; line-height: 1.4;">
+                    Use the gear icon to access app preferences for theme and healthbar visibility.
+                </div> -->
+            </div>
+
+        <div id="commandsettings" class="routine-dashboard hidden">
+            
+        </div>
+    </div>
+
+    <!-- context settings -->
+    <div id="tab_settings_card" class="bottom-sheet">
+        <div class="week-header">
+            <!-- Edit Tab -->
+            <div id="sheet_title"></div>
+            <button onclick="closeTabSettings()" >✕</button>
+        </div>
+        
+        <div class="sheet-body">
+            <input type="text" id="tab_name_input" placeholder="Tab name">
+
+            <label>Tab Mode</label>
+            <select id="tab_mode_select">
+                <option value="list"> Standard List</option>
+                <option value="checkin">Check-in Grid</option>
+            </select>
+
+            <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <span>Tab Visualization Standard List/ Tile Grid</span>
+                <label class="switch">
+                    <input type="checkbox" id="displayStyleToggle" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <span>Tab Mode Singular/Recurring</span>
+                <label class="switch">
+                    <input type="checkbox" id="recurringToggle" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <input type="submit" id="save_tab_btn" value=" " class="icon save" title="Save Changes">
+            <input type="submit" id="delete_tab_btn" value=" " class="icon delete" title="Delete Tab">
+        </div>
+    </div>
+
+
+    <div id="universal_panel_wrapper" data-active-panel="" class="">
+        <div class="panel-header">
+            <h3 class="panel-header-title">Panel Title</h3>
+            <button class="panel-close-btn" onclick="$('#universal_panel_wrapper').removeClass('open')">×</button>
+        </div>
+        
+        <div class="panel-body-content"></div>
+    </div>
+</body>
+</html>

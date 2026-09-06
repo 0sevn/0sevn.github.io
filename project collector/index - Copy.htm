@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"><title>Project collector</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" type="text/css" href="glass.css">
+<style>
+
+</style>
+</head>
+<body>
+    <!-- Background -->
+<!-- <svg style="position: absolute; width: 100%; height: 100%; z-index: 0;" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="dottedGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="rgba(0,0,0,0.15)" />
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#dottedGrid)" />
+</svg> -->
+
+<!-- <div class="terminal-container"> -->
+    <div id="project-container" class="main-container">
+    
+    </div>
+<!-- </div> -->
+
+
+<script>
+const items1 = [
+  {
+    id: 1,
+    title: "floWea",
+    description: "todo-list + retrospective",
+    status: "active", // or "inactive"
+    category: "html, css, js"
+  },
+  {
+    id: 2,
+    title: "poplog",
+    description: "media consumption",
+    status: "active",
+    category: "html, css, js"
+  },
+  {
+    id: 2,
+    title: "t'a't",
+    description: "mindful mediation is the massage",
+    status: "active",
+    category: "html, css, js"
+  },
+  {
+    id: 2,
+    title: "under 50",
+    description: "no nonsense workouts",
+    status: "inactive",
+    category: "html, css, js, blender"
+  },
+  {
+    id: 3,
+    title: "studio tamalpais",
+    description: "splash page",
+    status: "active",
+    category: "html, css, js"
+  },
+  {
+    id: 4,
+    title: "portfolio",
+    description: "showcase + experience",
+    status: "active",
+    category: "html, css"
+  },
+  {
+    id: 5,
+    title: "flying cloud isle",
+    description: "online presence / short form blog",
+    status: "inactive",
+    category: "html, css, js"
+  }
+];
+
+
+function createItemHTML(item) {
+console.log("createHTML1")
+    return `
+    <div class="project-item">
+        <div class="button-wrap">
+            <a href="../" target="_blank" rel="noopener noreferrer">
+            <button>
+            <span>
+                <div class="project-description-container">
+                    <div class="project-header">${item.title} 
+                        <div class="status-dot ${item.status}" alt="${item.status}"></div>
+                    </div>
+                    <div class="project-value">${item.description}</div>
+                    <!--div class="project-value">${item.category}</div-->
+                </div>
+            </span>
+            </button>
+            <div class="button-shadow"></div>
+            </a>
+        </div>
+    </div>
+    `;
+}
+
+// Render
+const container = document.getElementById("project-container");
+
+function render(data) {
+  container.innerHTML = data.map(createItemHTML).join("");
+  console.log("render")
+}
+
+
+render(items1);
+
+const items = Array.from(document.querySelectorAll('.project-item')).reverse(); // Reverse to start with last item
+console.log('array',items.length);
+let currentIndex = 0;
+
+function showNextItem() {
+	if (currentIndex < items.length) {
+		const currentItem = items[currentIndex];
+		currentItem.classList.add('visible'); // Make the item visible
+
+		// Shift all previously visible items down
+		for (let i = 0; i < currentIndex; i++) {
+			items[i].style.transform = `translateY(${(currentIndex - i) * 180}px)`; // Adjust based on your item height
+		}
+
+		currentIndex++; // Move to the next item
+console.log('Animation ended:',currentIndex);
+		// Schedule the next item to appear
+		setTimeout(showNextItem, 1000); // Adjust delay as needed
+	}
+}
+showNextItem();
+</script>
+</body>
+</html>

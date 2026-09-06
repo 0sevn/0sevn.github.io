@@ -1,0 +1,375 @@
+/* ---- Terminal container ---- */
+.terminal-container {
+	position: relative;
+	width: 81.166rem;
+	height: 47.5rem;
+	flex-shrink: 0;
+	border-radius: 1.833rem;
+	/* background: var(--terminal-bg); */
+	background-color: rgba(215, 215, 215, 1);
+	overflow-y: hidden;
+color: var(--gray-text);
+	grid-area: a;
+	align-self: center;
+	justify-self: center;
+	/* z-index: -5; */
+}
+a {
+	color: var(--gray-text);
+}
+a:hover{
+	color:white
+}
+
+/* .btn-container {
+	width: 100%;
+	height: 5em;
+	padding: 0 2em;
+	display: flex;
+	align-items: center;
+	gap: 1em;
+}
+
+.terminal-btn {
+	width: 1.5rem;
+	height: 1.5rem;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+.close-btn {
+	background-color: var(--red);
+}
+
+.minimize-btn {
+	background-color: var(--yellow);
+}
+
+.expand-btn {
+	background-color: var(--green);
+} */
+
+/* ---- logo ---- */
+.header-container {
+	width: 100%;
+	height: 5em;
+	padding: 0 2em;
+	display: flex;
+	align-items: center;
+}
+
+/* .header-pill {
+	width: 143px;
+	height: 30px;
+	flex-shrink: 0;
+	border-radius: 12px;
+	background: var(--logo-pill);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.8em;
+}
+
+.logo {
+	color: var(--white);
+	text-decoration: none;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+} */
+
+.yellow-highlight {
+	color: var(--yellow);
+}
+
+/* ---- content container ---- */
+.main-container {
+	width: 100%;
+	height: calc(100% - 100px);
+	padding: 0 0em;
+	display: flex;
+	/* border: 1px solid var(--dark-gary); */
+}
+
+.ascii-container {
+	width: 40%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: top;
+	padding: 1em 1em;
+	margin-top: 0em;
+	/* border: 1px solid var(--dark-gary); */
+}
+
+.content-container {
+	width: 100%;
+	height: 100%;
+	padding: 0 0em;
+	line-height: 1.5;
+	/* border: 1px solid var(--dark-gary); */
+}
+
+/* ==== Main ==== */
+/*  */
+/* ---- top content ---- */
+/* .content-top-container {
+	width: 100%;
+	height: calc(50% - 50px);
+	border-bottom: 2px dashed rgba(245, 245, 245, 0.5);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+} */
+
+.top-header {
+	width: 100%;
+	height: 50%;
+	font-size: 1rem;
+}
+
+.name {
+	font-weight: 700;
+	font-size: 1.5em;
+	margin: 1.5em 0;
+}
+
+.top-terminal {
+	position: relative;
+	bottom: -16px;
+	width: 100%;
+	height: 40%;
+	overflow-y: scroll;
+	display: flex;
+	flex-direction: column-reverse;
+	justify-content: end;
+	align-items: flex-start;
+	text-align: left;
+	padding-bottom: 14px;
+	scrollbar-width: none;
+}
+
+.terminal-cursor {
+	color: var(--yellow);
+	font-weight: 700;
+	/* animation: blinker 1s step-start infinite; */
+}
+
+.typewriter {
+	text-align: left;
+	overflow: hidden; /* Ensures the content is not revealed until the animation */
+	border-right: 0.15em solid var(--yellow); /* The typ writer cursor */
+	white-space: nowrap; /* Keeps the content on a single line */
+	margin: 0; /* Gives that scrolling effect as the typing happens */
+	letter-spacing: 0.15em; /* Adjust as needed */
+	animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+.typewriter-fast {
+	text-align: left;
+	overflow: hidden; /* Ensures the content is not revealed until the animation */
+	border-right: 0.15em solid var(--yellow); /* The typ writer cursor */
+	white-space: nowrap; /* Keeps the content on a single line */
+	margin: 0; /* Gives that scrolling effect as the typing happens */
+	letter-spacing: 0.15em; /* Adjust as needed */
+	animation: typing 0.3s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes blinker {
+	50% {
+		opacity: 0;
+	}
+}
+
+/* The typing effect */
+@keyframes typing {
+	from {
+		width: 0;
+	}
+	to {
+		width: 100%;
+	}
+}
+
+/* The typewriter cursor effect */
+@keyframes blink-caret {
+	from,
+	to {
+		border-color: transparent;
+	}
+	50% {
+		border-color: var(--yellow);
+	}
+}
+
+/* ---- bottom content ---- */
+.content-bottom-container {
+	width: 100%;
+	height: 50%;
+}
+
+.content-bottom-container a {
+	color: var(--white);
+	text-decoration: none;
+	letter-spacing: 0.05em;
+	transition: all 0.3s;
+}
+
+.content-bottom-container a li {
+	padding: 1em;
+}
+
+.content-bottom-container a:hover {
+	background-color: var(--black);
+}
+
+.highlight-menu {
+	background-color: var(--black);
+}
+
+.links-container {
+	display: flex;
+	flex-direction: column;
+	gap: 0.05em;
+}
+
+.selected::before {
+	content: '> ';
+	font-weight: 700;
+	list-style: none;
+	padding-left: 0;
+}
+
+.page-list.selected {
+	padding-left: 0;
+}
+
+.page-list {
+	padding-left: 1.2em;
+	list-style: none;
+}
+
+/* ---- projects ----- */
+.projects-title {
+	display: flex;
+	gap: 1em;
+	width: 100%;
+	justify-content: center;
+	text-align: center;
+	padding: 5px;
+	margin: 5px;
+}
+
+.projects-container {
+	width: 100%;
+	height: calc(100% - 50px);
+	overflow-y: scroll;
+	scrollbar-width: none;
+	position: relative;
+	flex-direction: column-reverse; /* Stack elements in reverse order */
+}
+
+.project-item {
+	margin-top: 2em;
+	position: absolute; /* Position items to move them */
+	opacity: 0;
+	transform: translateY(-20px); /* Start slightly above */
+	transition: all 1s ease-in-out;
+	
+	/* border: 1px solid var(--dark-gary); */
+}
+
+.project-item.visible {
+	opacity: 1;
+	transform: translateY(0px); /* Move to the visible position */
+	/* z-index: -1; */
+}
+
+.project-name {
+	display: flex;
+	gap: 1em;
+	font-weight: 700;
+	width: 180px;
+	border-width: 0px;
+	border-style: solid;
+	border-color: var(--dark-gary);
+	/* border: 1px 0px 0px 0px solid var(--dark-gary); */
+}
+
+.green-mark {
+	color: var(--green);
+}
+
+.orange-mark {
+	color: var(--orange);
+}
+
+.project-description-container {
+	margin-top: 0em;
+	/* border: 1px solid var(--dark-gary); */
+	padding: 0.5em 1em;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5em;
+	width: 540px;
+}
+
+.project-row {
+	display: flex;
+	flex-basis: 1;
+	gap: 1em;
+}
+
+.project-header {
+	flex: 1;
+	color: var(--gray-text);
+}
+
+.project-value {
+	flex: 2;
+}
+
+/* ---- contact ----- */
+.contact-title {
+	display: flex;
+	gap: 1em;
+	width: 100%;
+}
+
+.contact-container {
+	width: 100%;
+	height: 90%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 3em;
+	animation: fadeIn 1s ease-in-out forwards;
+	display: none;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(100px);
+	}
+}
+
+.contact-message p {
+	margin-bottom: 2em;
+	padding-left: 2em;
+}
+
+.contact-links {
+	display: flex;
+	gap: 2em;
+	justify-content: center;
+	align-items: center;
+}
+
+.socials {
+	fill: var(--white);
+}

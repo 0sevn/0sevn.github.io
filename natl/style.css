@@ -613,6 +613,7 @@ width: 100%;
 .sort-list {
   overflow-y: auto;
   scrollbar-width: none;
+  margin-top: 10px;
 }
 .sortable-list {
     border: 3px solid rgb(11, 10, 10);
@@ -687,9 +688,8 @@ a {
 
 .health_bar_container {
     position: relative;
-
     height: 15px; /* Or whatever your design height is */
-    margin: 10px 20px 10px 20px;
+    margin: 20px 20px -10px 20px;
     padding: 0px 0px 0px 0px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
@@ -707,7 +707,7 @@ a {
       height: 100%;
       border-radius: 10px;
       box-shadow: var(--shadow-l);
-      transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+      transition: width 0.5s cubic-bezier(0.175, 0.585, 0.32, 1.275), 
                 background-color 0.3s ease, 
                 box-shadow 0.3s ease;
   }
@@ -719,7 +719,7 @@ a {
       background-size: contain;
       background-repeat: no-repeat;
       filter: invert(var(--invert-icon));
-      width: 40px;
+      width: 36px;
       margin: 1px;
       padding: 0px;
       border: none;
@@ -1263,7 +1263,8 @@ input:checked + .slider:before { transform: translateX(20px); }
     justify-content: space-around;
     padding: 10px 0;
     z-index: 1000;
-    background: rgba(20, 20, 20, 0.95);
+    /* background: rgba(20, 20, 20, 0.95); */
+    background-color: var(--card-bg);
     backdrop-filter: blur(10px); /* Modern glass effect */
 }
 
@@ -1557,6 +1558,7 @@ pre {
     overflow-x: hidden;
     position: relative;
     width: 100%;
+    padding: 8px;
 }
 
 /* ==========================================================================
@@ -1809,7 +1811,7 @@ pre {
 }
 
 .btn-action {
-    padding: 10px 16px;
+    padding: 1px 6px;
     border: none;
     border-radius: 6px;
     font-weight: 600;
@@ -1825,3 +1827,13 @@ pre {
     background-color: #ffebee;
     color: #c62828;
 }
+
+.ruler-slider { user-select: none; -webkit-user-select: none; margin-bottom: 16px; }
+.ruler-slider-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; font-size: 0.85rem; color: #555; }
+.ruler-slider-value { font-size: 1.1rem; font-weight: 600; color: #222; }
+.ruler-slider-viewport { position: relative; height: 56px; overflow: hidden; touch-action: pan-y; background: #f4f4f5; border-radius: 8px; }
+.ruler-slider-track { position: absolute; top: 0; left: 0; height: 100%; will-change: transform; }
+.ruler-tick { position: absolute; bottom: 8px; width: 1px; height: 14px; background: #bbb; }
+.ruler-tick-major { height: 22px; background: #888; }
+.ruler-tick-num { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; color: #888; white-space: nowrap; }
+.ruler-slider-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #3498db; pointer-events: none; }

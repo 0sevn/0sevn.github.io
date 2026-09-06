@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pure HTML Cross-Device Text Sharer</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define Inter font family for aesthetic consistency */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        /* Hide the default scrollbar but allow scrolling */
+        pre {
+            overflow: auto;
+        }
+    </style>
+    <!-- Load Firebase libraries -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, collection, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ====================================================================
+        // 🚨 DEPLOYMENT CONFIGURATION (REQUIRED STEP)
+        // 🚨 REPLACE THIS PLACEHOLDER OBJECT with your actual Firebase config.
+        // ====================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1-ZWhRAhOh4JzzmLpqxnHPEXmcRgRDms",
+            authDomain: "binpaste-8fd73.firebaseapp.com",
+            projectId: "binpaste-8fd73",
+            storageBucket: "binpaste-8fd73.firebasestorage.app",
+            messagingSenderId: "14978874051",
+            appId: "1:14978874051:web:a7dbba61595e0a6c2e8076"
+        };
+        
+        // Firestore Collection Name for External Deployment
+        const COLLECTION_NAME = 'shared_texts_external'; 
+
+        // Global state and utility functions
+        let db;
+        let auth;
+        let userId = 'loading...';
+        let unsubscribe = null; // For the real-time listener
+
+        // --- DOM Elements ---
+        const $root = document.getElementById('root');
+        
+        const $textInput = document.getElementById('textInput');
+        const $saveButton = document.getElementById('saveButton');
+        const $saveStatus = document.getElementById('saveStatus');
+        const $shareIdDisplay = document.getElementById('shareIdDisplay');
+        const $copyButton = document.getElementById('copyButton');
+        const $qrCodeContainer = document.getElementById('qrCodeContainer');
+        
+        const $readInput = document.getElementById('readInput');
+        const $readButton = document.getElementById('readButton');
+        const $sharedTextOutput = document.getElementById('sharedTextOutput');
+        const $clearButton = document.getElementById('clearButton');
+        const $userIdDisplay = document.getElementById('userIdDisplay');
+        
+        // --- Modal Implementation (Replaces React Modal Component) ---
+        const $modal = document.getElementById('customModal');
+        const $modalTitle = document.getElementById('modalTitle');
+        const $modalMessage = document.getElementById('modalMessage');
+        const $modalIcon = document.getElementById('modalIcon');
+
+        function openModal(title, message, type = 'info') {
+            let bgColor = 'bg-blue-500';
+            let iconSvg = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>'; // Pencil/Message
+
+            if (type === 'error') {
+                bgColor = 'bg-red-500';
+                iconSvg = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'; // Alert
+            } else if (type === 'success') {
+                bgColor = 'bg-green-500';
+                iconSvg = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'; // Check
+            }
+
+            $modalIcon.className = `p-2 rounded-full text-white ${bgColor}`;
+            $modalIcon.innerHTML = iconSvg;
+            $modalTitle.textContent = title;
+            $modalMessage.textContent = message;
+            $modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            $modal.classList.add('hidden');
+        }
+
+        document.getElementById('modalCloseButton').addEventListener('click', closeModal);
+        $modal.addEventListener('click', (e) => {
+            if (e.target.id === 'customModal') {
+                closeModal();
+            }
+        });
+        
+        // --- Core Firestore Path Helpers ---
+        function getPublicCollectionRef(firestore) {
+            return collection(firestore, COLLECTION_NAME);
+        }
+        function getPublicDocRef(firestore, docId) {    
+            return doc(firestore, COLLECTION_NAME, docId);
+        }
+
+        // --- Authentication and Initialization ---
+        async function initializeFirebase() {
+            try {
+                if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+                    console.error("CRITICAL: Please update firebaseConfig with your actual project keys.");
+                    openModal("Configuration Error", "Please update the 'firebaseConfig' in the HTML file with your project keys.", "error");
+                    return;
+                }
+                
+                setLogLevel('error');
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // Sign in anonymously for a persistent userId
+                const userCredential = await signInAnonymously(auth);
+                userId = userCredential.user.uid;
+                
+                $userIdDisplay.textContent = userId;
+                console.log("Firebase initialized and signed in anonymously. User ID:", userId);
+
+                // Check for initial deep-link ID from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const initialReadId = urlParams.get('readId');
+                if (initialReadId) {
+                    $readInput.value = initialReadId;
+                    subscribeToDocument(initialReadId);
+                }
+
+            } catch (e) {
+                console.error("Initialization failed:", e);
+                openModal("Initialization Failed", "Could not connect to Firebase. Check your configuration and network. Details in console.", "error");
+            }
+        }
+
+        // --- Text Creator (Save) Logic ---
+        $saveButton.addEventListener('click', async () => {
+            const text = $textInput.value.trim();
+            if (!text) {
+                openModal('Validation Error', 'Please paste some text to share.', 'error');
+                return;
+            }
+            if (!db) return;
+
+            $saveButton.disabled = true;
+            $saveStatus.classList.remove('hidden');
+
+            try {
+                const docRef = await addDoc(getPublicCollectionRef(db), {
+                    content: text,
+                    createdAt: new Date(),
+                    ownerId: userId,
+                });
+                
+                const shareId = docRef.id;
+                $shareIdDisplay.textContent = shareId;
+                
+                // Show success container
+                document.getElementById('shareContainer').classList.remove('hidden');
+                
+                // Generate QR Code
+                generateQrCode(shareId);
+
+                openModal(
+                    'Success!',
+                    'Your text has been saved. Share the ID or scan the QR code to read it on another device.',
+                    'success'
+                );
+            } catch (e) {
+                console.error("Error saving document: ", e);
+                openModal('Save Failed', 'Could not save the text. Check console for details.', 'error');
+            } finally {
+                $saveButton.disabled = false;
+                $saveStatus.classList.add('hidden');
+            }
+        });
+
+        // --- Copy ID Logic ---
+        $copyButton.addEventListener('click', () => {
+            const shareId = $shareIdDisplay.textContent;
+            if (shareId) {
+                // Fallback for document.execCommand('copy')
+                const el = document.createElement('textarea');
+                el.value = shareId;
+                el.setAttribute('readonly', '');
+                el.style.position = 'absolute';
+                el.style.left = '-9999px';
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                openModal('Copied!', 'The Share ID has been copied to your clipboard.', 'info');
+            }
+        });
+
+        // --- QR Code Generation ---
+        function generateQrCode(id) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('readId', id); 
+            const dataToEncode = url.toString();
+
+            const size = '120x120';
+            const encodedData = encodeURIComponent(dataToEncode);
+            const apiUrl = `https://chart.googleapis.com/chart?cht=qr&chs=${size}&chl=${encodedData}`;
+
+            $qrCodeContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-center p-3 bg-white rounded-lg border border-gray-200 shadow-inner">
+                    <img 
+                        src="${apiUrl}" 
+                        alt="QR Code" 
+                        class="w-28 h-28" 
+                        onerror="document.getElementById('qrCodeContainer').innerHTML = \`
+                            <div class='flex flex-col items-center justify-center p-3 bg-red-50 border-2 border-dashed border-red-300 rounded-lg w-32 h-32'>
+                                <svg class='w-6 h-6 text-red-500 mb-1' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z'></path></svg>
+                                <p class='text-xs text-red-700 text-center font-medium'>QR Blocked. Share ID still works!</p>
+                            </div>
+                        \`"
+                    />
+                    <p class="mt-2 text-xs text-gray-500 text-center font-medium">Scan to instantly load</p>
+                </div>
+            `;
+        }
+
+
+        // --- Text Reader (Read) Logic ---
+        function subscribeToDocument(docId) {
+            if (unsubscribe) {
+                unsubscribe(); // Unsubscribe from previous listener
+                unsubscribe = null;
+            }
+            if (!docId || !db) return;
+
+            $readButton.disabled = true;
+            $sharedTextOutput.textContent = 'Loading...';
+
+            const docRef = getPublicDocRef(db, docId);
+            
+            unsubscribe = onSnapshot(docRef, (docSnap) => {
+                $readButton.disabled = false;
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    $sharedTextOutput.textContent = data.content || '';
+                } else {
+                    $sharedTextOutput.textContent = 'Error: Shared ID not found. Please double-check the ID.';
+                }
+            }, (error) => {
+                console.error("Firestore subscription error:", error);
+                $sharedTextOutput.textContent = `Error: Could not subscribe to data. Check network connection.`;
+                $readButton.disabled = false;
+            });
+        }
+
+        $readButton.addEventListener('click', () => {
+            const id = $readInput.value.trim();
+            if (!id) {
+                openModal('Input Required', 'Please enter a valid Share ID.', 'error');
+                return;
+            }
+            subscribeToDocument(id);
+        });
+        
+        $clearButton.addEventListener('click', () => {
+            if (unsubscribe) {
+                unsubscribe();
+                unsubscribe = null;
+            }
+            $readInput.value = '';
+            $sharedTextOutput.textContent = 'Enter an ID above and click \'Read\' to see the shared content in real-time.';
+        });
+
+
+        // Initialize Firebase when the script loads
+        initializeFirebase();
+
+    </script>
+</head>
+<body>
+    <!-- Modal Structure -->
+    <div id="customModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 transition-all duration-300 transform scale-100" onclick="event.stopPropagation()">
+            <div class="flex items-center space-x-3 mb-4">
+                <div id="modalIcon" class="p-2 rounded-full text-white bg-blue-500">
+                    <!-- Icon SVG inserted by JS -->
+                </div>
+                <h3 id="modalTitle" class="text-xl font-semibold text-gray-800">Title</h3>
+            </div>
+            <p id="modalMessage" class="text-gray-600 mb-6">Message</p>
+            <div class="flex justify-end">
+                <button id="modalCloseButton" class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition duration-150">
+                    Got It
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="root" class="min-h-screen font-sans p-4 sm:p-8">
+        <div class="max-w-4xl mx-auto">
+            <header class="text-center mb-10 pt-4">
+                <h1 class="text-4xl font-extrabold text-gray-900 mb-2">
+                    Zero-Config Text Sharer
+                </h1>
+                <p class="text-gray-600 text-lg">
+                    Paste text once, scan the QR code to read it instantly on any device.
+                </p>
+                <p class="mt-4 text-sm text-gray-500">
+                    <span class="font-semibold text-gray-700">Your User ID:</span> <span id="userIdDisplay">loading...</span>
+                </p>
+            </header>
+
+            <main class="space-y-12">
+                <!-- Text Creator Section -->
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-gray-100">
+                    <h2 class="text-2xl font-bold text-gray-800 flex items-center mb-6">
+                        <svg class="w-6 h-6 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        1. Create Text to Share
+                    </h2>
+                    <textarea
+                        id="textInput"
+                        class="w-full p-4 border border-gray-300 rounded-xl shadow-inner focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 h-64 resize-none font-mono text-sm"
+                        placeholder="Paste or type your text here. This will be visible to anyone with the Share ID."
+                    ></textarea>
+                    <button
+                        id="saveButton"
+                        class="w-full mt-4 py-3 px-4 bg-indigo-600 text-white font-semibold rounded-xl shadow-md hover:bg-indigo-700 transition duration-150 disabled:opacity-50 flex items-center justify-center"
+                    >
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                        Save & Get Share ID
+                        <div id="saveStatus" class="hidden ml-3">
+                            <svg class="w-5 h-5 animate-spin text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        </div>
+                    </button>
+
+                    <!-- Share ID/QR Code Output -->
+                    <div id="shareContainer" class="hidden mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-center p-4 bg-indigo-50 border-l-4 border-indigo-500 rounded-lg shadow-md">
+                        <div class="col-span-2 space-y-2">
+                            <span class="text-sm font-medium text-indigo-700">Share ID:</span>
+                            <code id="shareIdDisplay" class="text-xl font-mono text-indigo-900 break-all">ID_GOES_HERE</code>
+                            <button
+                                id="copyButton"
+                                class="w-full py-2 px-3 text-indigo-600 bg-white rounded-lg hover:bg-indigo-100 transition duration-150 flex items-center justify-center border border-indigo-200"
+                                title="Copy ID"
+                            >
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                Copy ID to Clipboard
+                            </button>
+                        </div>
+                        <div id="qrCodeContainer" class="flex justify-center md:justify-end">
+                            <!-- QR Code injected here -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Text Reader Section -->
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-gray-100">
+                    <h2 class="text-2xl font-bold text-gray-800 flex items-center mb-6">
+                        <svg class="w-6 h-6 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.879a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                        2. Read Shared Text
+                    </h2>
+                    <div class="flex space-x-2">
+                        <input
+                            id="readInput"
+                            type="text"
+                            class="flex-grow p-3 border border-gray-300 rounded-xl shadow-inner font-mono text-base focus:ring-green-500 focus:border-green-500"
+                            placeholder="Enter Share ID here (e.g., 7Q4xYt9)"
+                        />
+                        <button
+                            id="readButton"
+                            class="flex-shrink-0 py-3 px-4 bg-green-600 text-white font-semibold rounded-xl shadow-md hover:bg-green-700 transition duration-150 disabled:opacity-50 flex items-center justify-center"
+                        >
+                            Read
+                        </button>
+                        <button
+                            id="clearButton"
+                            class="flex-shrink-0 py-3 px-4 bg-red-500 text-white font-semibold rounded-xl shadow-md hover:bg-red-600 transition duration-150"
+                            title="Clear current text"
+                        >
+                            Clear
+                        </button>
+                    </div>
+
+                    <div class="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-xl min-h-[16rem] shadow-inner overflow-auto">
+                        <pre id="sharedTextOutput" class="whitespace-pre-wrap font-sans text-gray-700 text-sm">
+                            Enter an ID above and click 'Read' to see the shared content in real-time.
+                        </pre>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="text-center mt-12 text-gray-400 text-sm">
+                Powered by Firebase Firestore for real-time synchronization.
+            </footer>
+        </div>
+    </div>
+</body>
+</html>

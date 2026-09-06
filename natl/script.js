@@ -34,6 +34,7 @@ document.querySelectorAll(".tab").forEach(tab => {
 });
 
 
+
 /**
  * UNIFIED SMART COMPATIBILITY STORAGE ENGINE (The Bridge)
  * Solves duplicate key initializations by funnelling all 
@@ -96,6 +97,8 @@ window.renderTaskList = function() {
     // Remove legacy classes to clean canvas state
     container.removeClass('checkin-grid');
 
+
+
     switch (tabData.type) {          
         case 'checkin':
             renderGridView(container, tabData);
@@ -110,6 +113,61 @@ window.renderTaskList = function() {
     togglePurgeButton();
 }
 
+// ==========================================
+// 🎨 PRESET TABS control
+// ==========================================
+const PRESET_LIBRARY = {
+    gym: {
+        label: 'Gym',
+        defaults: ["Lat Pull 40/97", "Row 45/97", "Chest Press 45/97", "Shoulder Press 45/97", "Leg Extension 45/97", "Leg Curl 45/97", "Hip Add, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Zercher 10/30", "Leg raise/Crunches 45/97"]
+    },
+    rehab: {
+        label: 'Rehab',
+        defaults: ["Ankle mobility", "Hip thrusts", "Tummy tucks", "Spinal torsion", "Neck mobility", "Wrist lubrication", "Tendon activation"]
+    },
+    yoga: {
+        label: 'Yoga',
+        defaults: ["Sun salutation"]
+    },
+    meditation: {
+        label: 'Meditation',
+        defaults: ["Body scan2"]
+    }
+    // add new ones here: strength, endurance, recovery, mobility, acceptance...
+};
+
+// Fallback for tabs created before presetId existed
+const LEGACY_NAME_TO_PRESET = {
+    'Gym': 'gym',
+    'Rehab': 'rehab',
+    'Yoga': 'yoga',
+    'Meditation': 'meditation'
+};
+
+function resolvePresetId(tab) {
+    if (!tab) return null;
+    if (tab.presetId && PRESET_LIBRARY[tab.presetId]) return tab.presetId;
+    return LEGACY_NAME_TO_PRESET[tab.name] || null;
+}
+
+function buildTasksFromPreset(presetId) {
+    const preset = PRESET_LIBRARY[presetId];
+    if (!preset) return [];
+
+    return preset.defaults.map((text, i) => {
+        // Stagger timestamps slightly so each task gets a unique id,
+        // matching enterTask's isoTime-as-id pattern.
+        const isoTime = new Date(Date.now() + i).toISOString();
+        return {
+            id: isoTime,
+            text: text,
+            checked: false,
+            clicks: 0,
+            createdBy: window.userId,
+            createdAt: isoTime
+        };
+    });
+}
 // ==========================================
 // 📊 BRANCH A: CHECK-IN MODE (TRACKING GRID)
 // ==========================================
@@ -150,28 +208,30 @@ function renderGridView(container, tabData) {
     // };
 
         // console.log("tabData.name", tabData.name)
-        // presets
+        // presets / set tab type and settings too
         if (todoList.length === 0) {
             let defaults = [""];
-            switch (tabData.name) {
-                case 'Gym':
-                    // console.log("tabData.name", tabData.name)
-                    defaults = ["Lat Pull 40/97", "Row 45/97", "Chest Press 45/97", "Shoulder Press 45/97", "Leg Extension 45/97", "Leg Curl 45/97", "Hip Add, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Zercher 45/97", "Leg raise/Crunches 45/97" ];
-                    break;
-                case 'Rehab':
-                    // console.log("tabData.name", tabData.name)
-                    defaults = ["Ankle mobility","Hip thrusts", "Tummy tucks", "Spinal torsion", "Neck mobility", "Wrist lubrication", "Tendon activation"];
-                    break;
-                case 'Yoga':
-                    // console.log("tabData.nam", tabData.name)
-                    defaults = ["Sun salutation"];
-                    break;
-                case 'Meditation':
-                default:
-                    // console.log("tabData.nam", tabData.name)
-                    defaults = ["Body scan"];
-                    break;
-            }
+            // switch (tabData.name) {
+            //     case 'Gym':
+            //         // console.log("tabData.name", tabData.name)
+            //         defaults = ["Lat Pull 40/97", "Row 45/97", "Chest Press 45/97", "Shoulder Press 45/97", "Leg Extension 45/97", "Leg Curl 45/97", "Hip Add, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Zercher 45/97", "Leg raise/Crunches 45/97" ];
+            //         break;
+            //     case 'Rehab':
+            //         // console.log("tabData.name", tabData.name)
+            //         defaults = ["Ankle mobility","Hip thrusts", "Tummy tucks", "Spinal torsion", "Neck mobility", "Wrist lubrication", "Tendon activation"];
+            //         break;
+            //     case 'Yoga':
+            //         // console.log("tabData.nam", tabData.name)
+            //         defaults = ["Sun salutation"];
+            //         break;
+            //     case 'Meditation':
+            //     default:
+            //         // console.log("tabData.nam", tabData.name)
+            //         defaults = ["Body scan1"];
+            //         break;
+            // }
+// next 
+// rehab, strength, endurance, recovery, mobility, acceptance
 
             const seeded = defaults.map(name => ({
                 id: new Date().toISOString() + Math.random(),
@@ -189,9 +249,10 @@ function renderGridView(container, tabData) {
         }
 
         todoList.forEach((item) => {
-            const bb = 100; // Fixed Goal, change to dynamic slider <300kg?
+            // const bb = 100; // Fixed Goal, change to dynamic slider <300kg?
             const goalMatch = item.text.match(/(\d+)\/(\d+)/);
             let aa = goalMatch ? goalMatch[1] : "0";
+            let bb = goalMatch ? goalMatch[2] : "3";;
             const displayName = item.text.replace(/\d+\/\d+/, "").trim();
 
             const tile = $(`
@@ -245,6 +306,7 @@ function renderGridView(container, tabData) {
                 const goalDisplay = tile.find('.goal-display');
 
                 textElement.html(`
+            Current <br>
                     <div class="goal-slider">
                         <input type="range" class="s-aa" min="0" max="${bb}" value="${aa}">
                     </div>
@@ -923,10 +985,10 @@ function updateHealthBar() {
 
     // calculatedWidth is "load" (0-100, grows with unfinished tasks).
     // Option 2 shows load directly; option 1 shows the inverse (remaining "health").
-    const displayWidth = healthBarDirection === 1 ? calculatedWidth : (100 - calculatedWidth);
+    const displayWidth = healthBarDirection === 1 ? (100 - calculatedWidth) : calculatedWidth;
 
     let healthPercent = totalItems === 0
-        ? (healthBarDirection === 1 ? 3 : 100)
+        ? (healthBarDirection === 1 ? 100 : 3)
         : Math.max(3, displayWidth);
 
     healthBar.style.width = `${healthPercent}%`;
@@ -1053,14 +1115,9 @@ $(function () {
     }
 
 initBooleanToggle('healthbarToggle', 'showHealthbar', true, setHealthbarVisibility);
-initBooleanToggle('healthbarDirectionToggle', 'healthbarDirection', false, function(checked) {
+initBooleanToggle('healthbarDirectionToggle', 'healthbarDirection', true, function(checked) {
     setHealthbarDirection(checked ? 1 : 0);
 });
-
-
-
-
-
 
     // text edit on dbl clk
     $('#todo_list').on('dblclick', '.task-text', function () {
@@ -1233,7 +1290,9 @@ async function getYoutubeTitle(url) {
         const endpoint =
             "https://www.youtube.com/oembed?format=json&url=" +
             encodeURIComponent(url);
-        const response = await fetch(endpoint);        if (!response.ok) return null;        const data = await response.json();
+        const response = await fetch(endpoint);        
+        if (!response.ok) return null;        
+        const data = await response.json();
         return data.title || null;
 
     } catch {
@@ -1242,7 +1301,7 @@ async function getYoutubeTitle(url) {
 }
 
 async function getLinkTitle(url) {
-    if (titleCache.has(url))        return titleCache.get(url);
+    if (titleCache.has(url)) return titleCache.get(url);
     let title = null;
     try {
         const host = new URL(url).hostname.replace(/^www\./, "");
@@ -1252,18 +1311,41 @@ async function getLinkTitle(url) {
             case "m.youtube.com":
                 title = await getYoutubeTitle(url);
                 break;
+            case "instagram.com":
+                title = getInstagramFallbackTitle(url);
+                break;
             default:
                 title = host;
         }
-        if (!title)
-            title = host;
+        if (!title) title = host;
     } catch {
         title = url;
     }
-
     titleCache.set(url, title);
-
     return title;
+}
+
+function getInstagramFallbackTitle(url) {
+try {
+        const parsedUrl = new URL(url);
+        const segments = parsedUrl.pathname.split('/').filter(Boolean);
+        
+        // Handle different Instagram URL patterns:
+        // /p/SHORTCODE/ -> Post
+        // /reel/SHORTCODE/ -> Reel
+        // /username/ -> Profile
+        if (segments.length >= 2) {
+            const type = segments[0];
+            if (type === 'p') return `Instagram Post (${segments[1].slice(0, 6)}...)`;
+            if (type === 'reel') return `Instagram Reel (${segments[1].slice(0, 6)}...)`;
+        } else if (segments.length === 1) {
+            return `Instagram Profile (@${segments[0]})`;
+        }
+        
+        return "Instagram Link";
+    } catch {
+        return "Instagram Link";
+    }
 }
 
 function renderTaskText(container, text) {

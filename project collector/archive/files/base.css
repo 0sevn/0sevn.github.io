@@ -1,0 +1,52 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+:root {
+	--bg: #222;
+	--terminal-bg: #474747;
+	--logo-pill: #333;
+	--white: #fff;
+	--yellow: #f4be4f;
+	--green: #63c856;
+	--red: #ed6b5f;
+	--dark-gary: #646464;
+	--gray-text: #8b8b8b;
+	--orange: #fead06;
+	--black: #111;
+}
+
+html {
+	width: 100vw;
+	height: 100vh;
+	font-size: 14px;
+	font-family: monospace;
+}
+
+body {
+	height: 100%;
+	background-color: var(--bg);
+	margin: 0;
+	color: var(--white);
+
+	display: grid;
+	place-items: center;
+	gap: 0;
+	height: 100vh;
+	padding: 0;
+	align-content: center;
+	justify-content: center;
+	align-items: center;
+}
+
+a {
+	text-decoration: none;
+	color: var(--white);
+	transition: all 0.3s;
+}
+
+a:hover {
+	color: var(--gray-text);
+}

@@ -39,7 +39,7 @@
                     <div id="health_bar" class="healthbar" title="Flowea = Flow + Fovea, the small depression within the retina where visual acuity is the highest.">   
                     </div>
             </div>
-                <div id="sort_list" class="sort_list">
+                <div id="sort_list" class="sort-list">
                     <ul id="todo_list" class="sortable-list">
                         <!-- list elements -->
                     </ul>
@@ -149,21 +149,22 @@
                     </label>
                 </div>
                 <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                    <span>Tab management</span>
-                
-                    <br>
-                    <div class="settings-actions">
-        <button id="btn-reset-defaults" class="btn-action secondary">Load Predefined Tabs</button>
-        <button id="btn-clear-storage" class="btn-action danger">Clear All Data</button>
-    </div>
-                </div>
-                <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
                     <span>Theme (Light/Dark)</span>
                     <label class="switch">
                         <input type="checkbox" id="themeToggle">
                         <span class="slider round"></span>
                     </label>
                 </div>
+                <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <span>Tab management</span>
+                
+                    <br>
+                    <div class="settings-actions">
+                        <button id="btn-reset-defaults" class="btn-action secondary">Load Predefined Tabs</button>
+                        <button id="btn-clear-storage" class="btn-action danger">Clear All Data</button>
+                    </div>
+                </div>
+                
                 <!-- <div style="font-size: 0.85rem; color: #aaa; line-height: 1.4;">
                     Use the gear icon to access app preferences for theme and healthbar visibility.
                 </div> -->
@@ -179,9 +180,9 @@
                 </div> -->
             </div>
 
-        <div id="commandsettings" class="routine-dashboard hidden">
+        <!-- <div id="commandsettings" class="routine-dashboard hidden">
             
-        </div>
+        </div> -->
     </div>
 
     <!-- context settings -->
@@ -195,19 +196,32 @@
         <div class="sheet-body">
             <input type="text" id="tab_name_input" placeholder="Tab name">
 
-            <label>Tab Mode</label>
-            <select id="tab_mode_select">
-                <option value="list"> Standard List</option>
-                <option value="checkin">Check-in Grid</option>
-            </select>
-
+                    <!-- <label>Tab Mode</label>
+                    <select id="tab_mode_select">
+                        <option value="list"> Standard List</option>
+                        <option value="checkin">Check-in Grid</option>
+                    </select> -->
+            <div class="form-group">
+                <label>Preset</label>
+                <select id="tab_preset_select" class="form-control">
+                    <option value="">None / Custom</option>
+                    <!-- options are injected by JS in openTabSettings -->
+                </select>
+            </div>
             <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <span>Tab Mode Standard List/Check-in Grid</span>
+                <label class="switch">
+                    <input type="checkbox" id="tabModeSelect" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <!-- <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
                 <span>Tab Visualization Standard List/ Tile Grid</span>
                 <label class="switch">
                     <input type="checkbox" id="displayStyleToggle" checked>
                     <span class="slider round"></span>
                 </label>
-            </div>
+            </div> -->
             <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
                 <span>Tab Mode Singular/Recurring</span>
                 <label class="switch">

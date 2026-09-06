@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"><title>Project collector</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" type="text/css" href="glass.css">
+<style>
+
+</style>
+</head>
+<body>
+    <!-- Background -->
+<!-- <svg style="position: absolute; width: 100%; height: 100%; z-index: 0;" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="dottedGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="rgba(0,0,0,0.15)" />
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#dottedGrid)" />
+</svg> -->
+Planting a digital garden / bathing in pop culture
+<div class="terminal-container">Movies
+    <div id="movie-container" class="main-container">
+    
+    </div>
+Books
+ <div id="book-container" class="main-container">
+    
+    </div>
+</div>
+
+<script>
+const movies = [
+  {
+    id: 10,
+    title: "Iloveruss",
+    description: "the life",
+    status: "active", // or "inactive"
+    category: "Capitol",
+    date: "08-02-2026"
+  },
+  {
+    id: 10,
+    title: "Sentimental value",
+    description: "Survival instinct, protecting the self",
+    status: "active", // or "inactive"
+    category: "Roy",
+    date: "08-02-2026"
+  },
+  {
+    id: 9,
+    title: "Rental Family",
+    description: "Survival instinct, protecting the self",
+    status: "active", // or "inactive"
+    category: "Roy",
+    date: "08-02-2026"
+  },
+  {
+    id: 8,
+    title: "The secret agent",
+    description: "Prazer, storytelling at it's best. Great acting, brings ",
+    status: "active", // or "inactive"
+    category: "Roy",
+    date: "08-02-2026"
+  },
+  {
+    id: 7,
+    title: "No other choice",
+    description: "Survival instinct, protecting the self",
+    status: "active", // or "inactive"
+    category: "Capitol",
+    date: "08-02-2026"
+  },
+  {
+    id: 6,
+    title: "Pillion",
+    description: "Captivating, what's valued ranks higher, complete submission and the unsustainable",
+    status: "active",
+    category: "Roy",
+    date: "07-02-2026"
+  },
+  {
+    id: 5,
+    title: "Bugionia",
+    description: "Remake of Save the Green Planet! (2003), manages to convey a sense of both grandure and omnipotence of the priviledged as well as the helplessness of the underprivileged. ",
+    status: "active",
+    category: "Capitol",
+    date: "04-02-2026"
+  },
+  {
+    id: 4,
+    title: "Marty supreme",
+    description: "big budged actors, small budget acting. CGI took me completely out of it. underwhelming",
+    status: "inactive",
+    category: "Roy",
+    date: "03-02-2026"
+  },
+  {
+    id: 3,
+    title: "The love that remains / Monster",
+    description: "Icelandic ",
+    status: "active",
+    category: "Draken",
+    date: "27-01-2026"
+  },
+  {
+    id: 2,
+    title: "The testament of Ann Lee",
+    description: "seeking, community and spiritual resolve quaker/shaker movement",
+    status: "active",
+    category: "Draken",
+    date: "25-01-2026"
+  },
+  {
+    id: 1,
+    title: "Vie privée",
+    description: "Psychiatrist faces her convictions",
+    status: "inactive",
+    category: "Draken",
+    date: "25-01-2026"
+  },
+  {
+    id: 0,
+    title: "The Brutalist",
+    description: "Black out..",
+    status: "inactive",
+    category: "Draken",
+    date: "25-01-2026"
+  },
+  {
+    id: 0,
+    title: "Dune",
+    description: "ok..",
+    status: "inactive",
+    category: "Draken",
+    date: "25-01-2026"
+  },
+  {
+    id: 0,
+    title: "The creator",
+    description: "Psychiatrist faces her convictions",
+    status: "inactive",
+    category: "M harms / bio?",
+    date: "25-01-2026"
+  }
+];
+
+const books = [
+  {
+    id: 16,
+    title: "Steal like an artist",
+    author: "Austin Kleon",
+    description: "Anything and everything around the Thought provoking, meta",
+    status: "active",
+    category: "28-01-2026"
+  },
+  {
+    id: 15,
+    title: "How to be well",
+    author: "Amy Larocca",
+    description: "Anything and everything around the drive to be fit and well. About our vulnerability, a desire to outsource the one thing in our control, how we feel. And our simultaneous willingness to exploit the vulnerability of the realities we contend with ",
+    status: "active",
+    category: "28-01-2026"
+  },
+  {
+    id: 15,
+    title: "I know why the caged bird sings",
+    author: "Maya Angelou",
+    description: "Thought provoking, meta",
+    status: "active",
+    category: "16-01-2026"
+  },
+  {
+    id: 14,
+    title: "Stranger in a strange land",
+    author: "Robert A. Heinlein",
+    description: "Thought provoking, meta",
+    status: "active",
+    category: "16-01-2026"
+  },
+  {
+    id: 13,
+    title: "The worlds I see",
+    author: "Fei-Fei Li",
+    description: "Thought provoking, meta",
+    status: "active",
+    category: "14-12-2025"
+  },
+  {
+    id: 12,
+    title: "The body keeps the score",
+    author: "Bessel van der Kolk, M.D.",
+    description: "Thought provoking, meta",
+    status: "active",
+    category: "27-09-2025"
+  },
+  {
+    id: 11,
+    title: "Meditations for mortals",
+    author: "Oliver Burkeman",
+    description: "Thought provoking, at the edge of consciousness",
+    status: "active",
+    category: "27-09-2025"
+  },
+  {
+    id: 11,
+    title: "Twelve angry men",
+    author: "Reginald Rose",
+    description: "Thought provoking, at the edge of consciousness",
+    status: "active",
+    category: "24-09-2025"
+  },
+  {
+    id: 10,
+    title: "The denial of death",
+    author: "Ernest Becker",
+    description: "Thought provoking, at the edge of consciousness, meta ideas",
+    status: "active",
+    category: "05-09-2025"
+  },
+  {
+    id: 9,
+    title: "Revenge of the tipping point",
+    author: "Malcolm Gladwell",
+    description: "Following up on",
+    status: "active",
+    category: "31-08-2025"
+  },
+  {
+    id: 8,
+    title: "Little brother",
+    author: "Cory Doctorow",
+    description: "Well researched, industry, corporate interest technology push, no pull",
+    status: "active",
+    category: "27-08-2025"
+  },
+  {
+    id: 7,
+    title: "Death of a Salesman",
+    author: "Arthur Miller",
+    description: "Brief time, avoiding the inescapable truth",
+    status: "active",
+    category: "05-04-2025"
+  },
+  {
+    id: 6,
+    title: "Mood Machine",
+    author: "Liz Pelly",
+    description: "Well researched, historical record of industry interests, and the basic human needs for stimulation driving them",
+    status: "active",
+    category: "02-04-2025"
+  },
+  {
+    id: 5,
+    title: "To the temple of tranquility.. and step on it!",
+    author: "Ed Begley Jr.",
+    description: "US/California life",
+    status: "active",
+    category: "21-03-2025"
+  },
+  {
+    id: 4,
+    title: "McTeague",
+    author: "Frank Norris",
+    description: "Seminal works, life in and around SF, ",
+    status: "inactive",
+    category: "14-03-2025"
+  },
+  {
+    id: 3,
+    title: "Range",
+    author: "David Epstein",
+    description: "Promising title, ultimately disappointing cliche, striving for atomic habits",
+    status: "inactive",
+    category: "17-02-2025"
+  },
+  {
+    id: 2,
+    title: "The subtle art of not giving a f**k",
+    author: "Mark Manson",
+    description: "Bro privilege, chose your pain, system (truth vs manipulation)",
+    status: "inactive",
+    category: "06-02-2025"
+  },
+  {
+    id: 1,
+    title: "Elon Musk",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2025"
+  },
+  {
+    id: 0,
+    title: "8 ruels of love",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "kinesiska boken om k'rlek",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "atomic habits",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "space adventure..arnie??",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "ultra runner",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },
+  {
+    id: 0,
+    title: "thinking fast and slows",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  },{
+    id: 0,
+    title: "thinking fast and slows",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2024"
+  }
+];
+
+const tv = [
+  {
+    id: 16,
+    title: "salt of the earth indiska filmer",
+    author: "Austin Kleon",
+    description: "Anything and everything around the Thought provoking, meta",
+    status: "active",
+    category: "28-01-2026"
+  },
+  {
+    id: 15,
+    title: "electric dreams",
+    author: "Amy Larocca",
+    description: "Anything and everything around the drive to be fit and well. ",
+    status: "active",
+    category: "28-01-2026"
+  },
+  {
+    id: 15,
+    title: "japansk serie om ninjor <3",
+    author: "Maya Angelou",
+    description: "Thought provoking, meta",
+    status: "active",
+    category: "16-01-2026"
+  },
+  {
+    id: 14,
+    title: "severance",
+    author: "Robert A. Heinlein",
+    description: "Thought provoking, meta",
+    status: "active",
+    category: "16-01-2026"
+  },
+  {
+    id: 13,
+    title: "monkey  vaughn",
+    author: "Fei-Fei Li",
+    description: "Thought provoking, meta",
+    status: "active",
+    category: "14-12-2025"
+  },
+  {
+    id: 12,
+    title: "",
+    author: "Bessel van der Kolk, M.D.",
+    description: "Thought provoking, meta",
+    status: "active",
+    category: "27-09-2025"
+  },
+  {
+    id: 11,
+    title: "Meditations for mortals",
+    author: "Oliver Burkeman",
+    description: "Thought provoking, at the edge of consciousness",
+    status: "active",
+    category: "27-09-2025"
+  },
+  {
+    id: 11,
+    title: "Twelve angry men",
+    author: "Reginald Rose",
+    description: "Thought provoking, at the edge of consciousness",
+    status: "active",
+    category: "24-09-2025"
+  },
+  {
+    id: 10,
+    title: "The denial of death",
+    author: "Ernest Becker",
+    description: "Thought provoking, at the edge of consciousness, meta ideas",
+    status: "active",
+    category: "05-09-2025"
+  },
+  {
+    id: 9,
+    title: "Revenge of the tipping point",
+    author: "Malcolm Gladwell",
+    description: "Following up on",
+    status: "active",
+    category: "31-08-2025"
+  },
+  {
+    id: 8,
+    title: "Little brother",
+    author: "Cory Doctorow",
+    description: "Well researched, industry, corporate interest technology push, no pull",
+    status: "active",
+    category: "27-08-2025"
+  },
+  {
+    id: 7,
+    title: "Death of a Salesman",
+    author: "Arthur Miller",
+    description: "Brief time, avoiding the inescapable truth",
+    status: "active",
+    category: "05-04-2025"
+  },
+  {
+    id: 6,
+    title: "Mood Machine",
+    author: "Liz Pelly",
+    description: "Well researched, historical record of industry interests, and the basic human needs for stimulation driving them",
+    status: "active",
+    category: "02-04-2025"
+  },
+  {
+    id: 5,
+    title: "To the temple of tranquility.. and step on it!",
+    author: "Ed Begley Jr.",
+    description: "US/California life",
+    status: "active",
+    category: "21-03-2025"
+  },
+  {
+    id: 4,
+    title: "McTeague",
+    author: "Frank Norris",
+    description: "Seminal works, life in and around SF, ",
+    status: "inactive",
+    category: "14-03-2025"
+  },
+  {
+    id: 3,
+    title: "Range",
+    author: "David Epstein",
+    description: "Promising title, ultimately disappointing cliche, striving for atomic habits",
+    status: "inactive",
+    category: "17-02-2025"
+  },
+  {
+    id: 2,
+    title: "The subtle art of not giving a f**k",
+    author: "Mark Manson",
+    description: "Bro privilege, chose your pain, system (truth vs manipulation)",
+    status: "inactive",
+    category: "06-02-2025"
+  },
+  {
+    id: 1,
+    title: "Elon Musk",
+    author: "Walter Isaacson",
+    description: "The Algorithm, First principles, ",
+    status: "inactive",
+    category: "22-01-2025"
+  }
+];
+
+
+function createItemHTML(item) {
+console.log("createHTML1")
+    return `
+    <div class="project-item">
+        <!--div class="button-wrap">
+            <a href="../" target="_blank" rel="noopener noreferrer">
+            <button-->
+            <span>
+                <div class="project-description-container">
+                    <div class="project-header">${item.title} 
+                        <div class="status-dot ${item.status}" alt="${item.status}"></div>
+                    </div>
+                    <div class="project-value">${item.description}</div>
+                    <div class="project-value">${item.category}</div>
+                </div>
+            </span>
+            <!--/button>
+            <div class="button-shadow"></div-->
+            </a>
+        </div>
+    </div>
+    `;
+}
+
+// Render
+
+
+function render(movies, books) {
+  
+  const movie_container = document.getElementById("movie-container");
+const book_container = document.getElementById("book-container");
+
+  movie_container.innerHTML = movies.map(createItemHTML).join("");
+  console.log("render")
+  book_container.innerHTML = books.map(createItemHTML).join("");
+  console.log("render")
+}
+
+
+render(movies, books);
+
+const items = Array.from(document.querySelectorAll('.project-item')).reverse(); // Reverse to start with last item
+console.log('array',items.length);
+let currentIndex = 0;
+
+function showNextItem() {
+	if (currentIndex < items.length) {
+		const currentItem = items[currentIndex];
+		currentItem.classList.add('visible'); // Make the item visible
+
+		// Shift all previously visible items down
+		for (let i = 0; i < currentIndex; i++) {
+			items[i].style.transform = `translateY(${(currentIndex - i) * 180}px)`; // Adjust based on your item height
+		}
+
+		currentIndex++; // Move to the next item
+console.log('Animation ended:',currentIndex);
+		// Schedule the next item to appear
+		setTimeout(showNextItem, 1000); // Adjust delay as needed
+	}
+}
+// showNextItem();
+</script>
+</body>
+</html>
