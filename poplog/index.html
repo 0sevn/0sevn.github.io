@@ -38,7 +38,7 @@
     all: unset;
     position: absolute;
     width: 400px; /* Slightly smaller for better spiral density */
-    height: 180px;
+    height: 240px;
     padding: 5px;
     margin: 20px; /* Center alignment */
     background: rgba(255, 255, 255, 0.03);
@@ -58,7 +58,7 @@
 
   .item img {
     width: 100%;
-    height: 140px;
+    height: 200px;
     object-fit: cover;
     border-radius: 6px;
     margin-bottom: 8px;
@@ -66,18 +66,7 @@
 
   .title { font-size: 16px; font-weight: bold; }
 
-  /* List Mode Styles */
-  .list-mode-container {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    padding: 100px 20px;
-  }
-
-  .list-mode .list-mode-container { display: flex; }
-  .list-mode .scene { display: none; }
-
-  .list-item {
+    .list-item {
     width: 100%;
     max-width: 600px;
     background: #111;
@@ -86,16 +75,7 @@
     border-radius: 12px;
     border: 1px solid #333;
   }
-    .list-item2 {
-    width: 100%;
-    font-size: 16px;
-    max-width: 800px;
-    background: #111;
-    margin-bottom: 20px;
-    padding: 15px;
-    border-radius: 12px;
-    border: 1px solid #333;
-  }
+
 
   /* UI Elements */
   .menu {
@@ -145,6 +125,63 @@
 
 
 
+/* .list-item2 {
+    border-bottom: 1px solid #ddd;
+    padding: 1rem 0;
+} */
+
+/* .list-item2 { border-bottom: 1px solid #ddd; padding: 1rem 0; }  */
+/* -------------------------------------------------- 
+LIST MODE 
+-------------------------------------------------- */
+  .list-mode-container {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 100px 20px;
+  }
+
+  .list-mode .list-mode-container { display: flex; }
+  .list-mode .scene { display: none; }
+
+    .list-item2 {
+      box-sizing: border-box;
+    width: 100%;
+    font-size: 16px;
+    max-width: 800px;
+    
+    margin-bottom: 20px;
+    padding: 15px;
+
+    border-radius: 12px;
+    background: #111;
+    border: 1px solid #333;
+    font-size: 16px;
+  }
+.list-item2 summary { cursor: pointer; list-style: none; } 
+.list-item2 summary::-webkit-details-marker { display: none; } 
+.list-item2 summary h3 { margin: 0 0 0.4rem; } 
+
+/* Show only two lines in the collapsed view */ 
+.description {
+  margin: 0; line-height: 1.5;
+  /* Collapsed state: show one lines */ 
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; line-clamp: 1; overflow: hidden;
+} 
+  /* Expanded state: show the complete description */
+.list-item2[open] .description { 
+  display: block; overflow: visible; 
+}
+.post-details { padding: 1rem 0 0.5rem; } 
+.post-meta { display: flex; gap: 1rem; margin-top: 15px; font-size: 0.9rem; opacity: 0.7; }
+.rating { margin-top: 0.75rem; font-size: 1.2rem; letter-spacing: 2px;} 
+.star { color: #ccc; } 
+.star.filled { color: #f5b301; } 
+/* Optional styling for inactive posts */ 
+.list-item2.inactive { opacity: 0.65; } 
+.visibility-toggle { display: inline-flex; align-items: center; gap: 0.5rem; margin-left: 10px; cursor: pointer; }
+
+
 </style>
 </head>
 <body class="list-mode">
@@ -152,16 +189,22 @@
 <header class="menu">
     <button onclick="switchList('movies')">Movies</button>
     <button onclick="switchList('books')">Books</button>
-    <button onclick="switchList('misc')">Misc</button>
+    <!-- <button onclick="switchList('misc')">Misc</button> -->
     <button id="toggleBtn" onclick="toggleLayout()">Switch to Spiral View</button>
+    <label class="visibility-toggle"> 
+      <input type="checkbox" id="visibilityToggle"> Show inactive posts </label> 
+
 </header>
+<!-- Spiral view -->
 <div class="scene">
     <div class="spiral" id="spiral"></div>
 </div>
 <!-- <main id="timeline_container"> -->
-
-  <div id="listContainer" class="list-mode-container"></div>
 <!-- </main> -->
+
+<!-- List view -->
+  <div id="listContainer" class="list-mode-container"></div>
+
 <div id="postPopover" popover class="popover">
     <button popovertarget="postPopover" popovertargetaction="hide" style="float:right">×</button>
     <div id="popoverContent"></div>
@@ -170,9 +213,36 @@
 <button id="scrollTopBtn" onclick="scrollToTop()">↑ Top</button>
 
 <script>
+// digital garden
+// main poplog container, movies, books, misc?, tv etc
 const dataSets = {
     movies: [
         {
+          id: 0,
+          title: "The Shadows Edge",
+          description: `
+          Young cast give it their best in a series of heists and setups, but it's not until 
+          long time multi talent Jackie (still going strong at 72) and his co-star show up, that the movie becomes interesting.
+          Nicely tied together after the false ending. Post credit bloopers are a must!
+          `,
+          status: "active",
+          category: "Capitol",
+          date: "2026-08-19",
+          rating: 3.5
+        },
+        {
+          id: 0,
+          title: "Arco",
+          description: `
+          Whimsical french time travel sci-fi, beautifully animated.
+          `,
+          status: "active",
+          category: "Roy",
+          date: "2026-08-16",
+          rating: 3.5
+        },
+        {
+          
           id: 0,
           title: "The Odyssey",
           description: `
@@ -198,13 +268,15 @@ Not only would home not be the same, but would his loved ones still accept him a
           <br><br>
           The story bears close resemblence to the Kalevala saga (a poor mans Odyssey if you will), The story of the maladapted protagonist, searching for what's his yet can't seem to get anything right.
           Historical accuracy aside, the sincerity of the tragic journeyman, experience of loss, unjust setbacks and perseverence on the smallest grains of hope to keep following your path, are why these stories stand the test of time.
+          
           <br><br>// To answer the question if the ends truly justify the means? The most steadfast and cunning man can be humbled, and will need mental flexibility to learn from mistakes and adapt to the world around him, to accept that he can be accepted the way he is.
           
           At times, sequnces of static actor, moving background character with slightly 
           `,
-          status: "inactive", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-07-18"
+          date: "2026-07-18",
+          rating: 3.5
         },
         {
           id: 0,
@@ -215,9 +287,10 @@ Not only would home not be the same, but would his loved ones still accept him a
           No character is a pure specialist in any one form, although some of the performers are visibly more proficient in some styles. They mostly seamlessly flow from one to the other as the situation requires. 
           From empty hand, close combat styles to bladed and non-bladed weapons/implemetns, equal parts entertainment and effective and devastating techniques.<br><br>
           Towards the end an attempted moral justification overshadows the original story and the action becomes slightly repetitive and dull taking away from what's otherwise very well choreographed and executed inal fight. `,
-          status: "inactive", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-06-17"
+          date: "2026-06-23",
+          rating: 3.5
         },
         {
           id: 0,
@@ -225,9 +298,10 @@ Not only would home not be the same, but would his loved ones still accept him a
           description: `Kullervo, son of Kallervo embarks on an odyssey to discover the truth. What lies beyond teloneva (gyllene viggens ägg)?<br>
           A true anti-hero story, the 12th-century poems and legends collected by Elias Lönnrot, a finish national epic exploring the generational toils and turmoils set in magical Finnish landscapes.
           Atheticity aside, it's a story that defines the history, spirit and identity of a nation. Work that deserves a spot on the same stage as the greek tragedies or the shakespearean legends.`,
-          status: "inactive", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-05-17"
+          date: "2026-06-12",
+          rating: 3.5
         },
         {
           id: 0,
@@ -235,25 +309,28 @@ Not only would home not be the same, but would his loved ones still accept him a
           description: `Last installment of Rene Laroux's Sci-fi trilogy. Metal men and mirror birds.the deformed hate the present, but find  
           Themes of: man vs machine; beauty vs caducity; now vs eternity;
           Folly denies peace, hate, happiness, difference unity.. control by conformity`,
-          status: "inactive", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-05-17"
+          date: "2026-05-27",
+          rating: 3.5
         },
         {
           id: 0,
           title: "Time masters",
           description: "Back to back french Sci-Fi. Moebius scenic illustations<br><br><i>Close your minds (..it stinks!)</i> ",
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-05-12/14"
+          date: "2026-05-12/14",
+          rating: 3.5
         },
                 {
           id: 0,
           title: "Fantastic planet",
           description: "Back to back french Sci-Fi.  <i>Close your minds.</i> ",
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-05-12/14"
+          date: "2026-05-12/14",
+          rating: 3.5
         },
         {
           id: 0,
@@ -262,49 +339,55 @@ Not only would home not be the same, but would his loved ones still accept him a
           At the height of martial arts driven movie plots, set in a future where prisons are run by private corporations with conflicting interests, a martial artist is sentenced to serve time for the death of drug dealing criminals.
           Filled with hilariously inexplicable moments, incredibly detailed and completely unrealistc and gratuitous violence. 
           `,
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-05-06"
+          date: "2026-05-06",
+          rating: 3.5
         },
         {
           id: 22,
           title: "Left-handed girl",
           description: "At the Taipei night market, money is tight, family drama abundant and the little left handed girl walks the line between good and evil to finds her way straight into your heart",
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-04-28"
+          date: "2026-04-28",
+          rating: 3.5
         },
         {
           id: 21,
           title: "Franz K",
           description: "TBD",
-          status: "inactive", // or "inactive"
+          status: "inactive",
           category: "Capitol",
-          date: "2026-04-20"
+          date: "2026-04-20",
+          rating: 3.5
         },{
           id: 20,
           title: "Peak everything",
           description: "TBD ",
-          status: "inactive", // or "inactive"
+          status: "inactive",
           category: "Capitol",
-          date: "2026-04-20"
+          date: "2026-04-20",
+          rating: 3.5
         },
         {
           id: 19,
           title: "The master and margarita",
           description: "",
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-04-12"
+          date: "2026-04-12",
+          rating: 3.5
         },
         {
           id: 18,
           title: "Project hail mary",
           description: `Pretty and pleasant, buy End of days has looked better in similar genre films.
           Strange choice to include forced volunteering into saving civilization.. `,
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-04-09"
+          date: "2026-04-09",
+          rating: 3.5
         },
         {
           id: 17,
@@ -314,25 +397,28 @@ Not only would home not be the same, but would his loved ones still accept him a
           With the knowledge that every step might be your last, it becomes clear that the journey is the <u> final </u> destination. 
           The plot unravels into all sorts of absurdity that is life.
           `,
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-03-22"
+          date: "2026-03-22",
+          rating: 3.5
         },
         {
           id: 16,
           title: "Hamnet",
           description: "William shakespear the father, anne/agnes hathaway the mother, hamlet the son all  , sisters? ",
-          status: "active", // or "inactive"
+          status: "active",
           category: "Roy",
-          date: "2026-03-15"
+          date: "2026-03-15",
+          rating: 3.5
         },
         {
           id: 15,
           title: "Is this thing on",
           description: `Charming Will Arnett and Laura Dern, great chemistry. Dad finding his voice, when love prevails!`,
-          status: "active", // or "inactive"
+          status: "active",
           category: "Roy",
-          date: "2026-03-07"
+          date: "2026-03-07",
+          rating: 3.5
         },
         {
           id: 14,
@@ -344,34 +430,38 @@ Not only would home not be the same, but would his loved ones still accept him a
           <br> <br>
           The very last scene is a breathtaking culmination of everything unsaid, that never needed to be said. 
           Entire theater was left reeling, end credits accompanied by quiet sobs, clinging to the feeling of resolve for just a moment longer.`,
-          status: "active", // or "inactive"
+          status: "active",
           category: "Roy",
-          date: "2026-02-22"
+          date: "2026-02-22",
+          rating: 3.5
         },
         {
           id: 13,
           title: "Iloveruss",
           description: "the LA life, silver screens, performing, identity, social ineptitude",
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "20-02-2026"
+          date: "20-02-2026",
+          rating: 3.5
         },
         {
           id: 12,
           title: "Rental family",
           description: `Endearing, about loneliness, finiding your place and purpose, abandonment and repair.
           And doing it all over and over again against the backdrop of modern Japan`,
-          status: "active", // or "inactive"
+          status: "active",
           category: "Roy",
-          date: "14-02-2026"
+          date: "14-02-2026",
+          rating: 3.5
         },
         {
           id: 11,
           title: "The secret agent",
           description: "Prazer - Fantastic lead, visually compelling storytelling at its best",
-          status: "active", // or "inactive"
+          status: "active",
           category: "Roy",
-          date: "10-02-2026"
+          date: "10-02-2026",
+          rating: 3.5
         },
         {
           id: 10,
@@ -383,9 +473,10 @@ Not only would home not be the same, but would his loved ones still accept him a
           --<br> <br>
           Interesting cinema, photography, and a glimpse into a future where AI is coming for all of our jobs, cost reduction driven mergers and acquisitions, dark/lights-out factories (24/7 automation).
           When plans fold and your success depends on your ability to adapt, its a fumbling, imperfect journey where luck, and happenstance more than certainty keeps you going`,
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "08-02-2026"
+          date: "08-02-2026",
+          rating: 3.5
         },
         {
           id: 9,
@@ -400,7 +491,8 @@ Not only would home not be the same, but would his loved ones still accept him a
           `,
           status: "active",
           category: "Roy",
-          date: "07-02-2026"
+          date: "07-02-2026",
+          rating: 3.5
         },
         {
           id: 8,
@@ -414,7 +506,8 @@ Not only would home not be the same, but would his loved ones still accept him a
           `,
           status: "active",
           category: "Capitol",
-          date: "04-02-2026"
+          date: "04-02-2026",
+          rating: 3.5
         },
         {
           id: 7,
@@ -423,9 +516,10 @@ Not only would home not be the same, but would his loved ones still accept him a
           Big budget actors, no small roles, and yet.. Difficult to suspend disbelief and take certain cast members seriously.
           Deals and relationships make little sense and seem as unnatural as the CGI pingpong balls. (paltrow better in two lovers..) 
           Overall underwhelming`,
-          status: "inactive",
+          status: "active",
           category: "Roy",
-          date: "03-02-2026"
+          date: "03-02-2026",
+          rating: 3.5
         },
         {
           id: 6,
@@ -438,7 +532,8 @@ Not only would home not be the same, but would his loved ones still accept him a
           (If this is all there is, then let's start dancing).  `,
           status: "active",
           category: "Draken",
-          date: "27-01-2026"
+          date: "27-01-2026",
+          rating: 3.5
         },
         {
           id: 5,
@@ -446,46 +541,51 @@ Not only would home not be the same, but would his loved ones still accept him a
           description: "seeking, community and spiritual awakening in the quaker/shaker movement",
           status: "active",
           category: "Draken",
-          date: "25-01-2026"
+          date: "25-01-2026",
+          rating: 3.5
         },
         {
           id: 4,
           title: "A private life",
           description: "A psychiatrist in Paris faces her convictions (Vie privée, fr). Jodie Foster knocks it out of the park",
-          status: "inactive",
+          status: "active",
           category: "Draken",
-          date: "25-01-2026"
+          date: "25-01-2026",
+          rating: 3.5
         },
         {
           id: 3,
           title: "One battle after another",
           description: " ",
-          status: "active", // or "inactive"
+          status: "active",
           category: "Roy",
           date: "2025-10-24"},
         {
           id: 2,
           title: "The brutalist",
           description: "Black out..",
-          status: "inactive",
+          status: "active",
           category: "Draken",
-          date: "25-01-2026"
+          date: "25-01-2026",
+          rating: 3.5
         },
         {
           id: 1,
           title: "Dune",
           description: "Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
-          status: "inactive",
+          status: "active",
           category: "Draken",
-          date: "25-01-2026"
+          date: "25-01-2026",
+          rating: 3.5
         },
         {
           id: 0,
           title: "The creator",
           description: "Pretty dystopia, Ai has greater heart than humans, it's evolution? ",
-          status: "inactive",
+          status: "active",
           category: "M harms / bio?",
-          date: "25-01-2026"
+          date: "25-01-2026",
+          rating: 3.5
         },
         {
           id: 0,
@@ -494,7 +594,7 @@ Not only would home not be the same, but would his loved ones still accept him a
           `Typical thought provoking and at times surreal and unsettling Lynch tropes. 
           What is reality, are senses and perception to be trusted? Symbolic representations of the desire to know when there is nothing to learn, but the subconscious fear and guilt of the unmet promises of the ego.. 
           <br>When the dream and romantic expectations turn out to be a 'corrupt' reality. Non-linear storyline is momentarily jumpy and disjointed but the effect lingers and still holds up 25 years later `,
-          status: "active", // or "inactive"
+          status: "active",
           category: "Roy",
           date: "2026-02-23"},
 
@@ -503,81 +603,78 @@ Not only would home not be the same, but would his loved ones still accept him a
           id: 0,
           title: "Miami connection",
           description: "Excellent B-movie",
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-04-28"
+          date: "2026-04-28",
+          rating: 3.5
         },
         {
           id: 0,
           title: "Gymkata",
           description: "Not worth the price of admission, but some laughs to be had",
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-04-28"
+          date: "2026-04-28",
+          rating: 3.5
         },
         {
           id: 0,
           title: "Riki-Oh",
           description: "Some bad movies are actually entertaining,  ",
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-04-28"
+          date: "2026-04-28",
+          rating: 3.5
         },
         {
           id: 0,
           title: "Gymkata",
           description: "",
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-04-28"
+          date: "2026-04-28",
+          rating: 3.5
         },
         {
           id: 0,
           title: "Riki-Oh",
           description: "",
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
-          date: "2026-04-28"
+          date: "2026-04-28",
+          rating: 3.5
         },
         {
           id: 0,
           title: "Riki-Oh",
           description: "",
-          status: "active", // or "inactive"
+          status: "active",
           category: "Capitol",
           date: "2026-04-28"
         }
     ],
     books: [
-              {
+  {
     id: 17,
-    title: "The Urge",
-    author: "Austin Kleon",
-    description: "Anything and everything around the Thought provoking, meta",
+    title: "The urge",
+    author: "Carl Erik Fisher",
+    description: "History of addiction, phenomenal chronicle on a topic that will be getting more attention.",
     status: "active",
-    category: "28-01-2026"
+    category: "28-03-2026"
   },
-        {
-    id: 16,
-    title: "Steal like an artist",
-    author: "Austin Kleon",
-    description: "Anything and everything around the Thought provoking, meta",
-    status: "active",
-    category: "28-01-2026"
-  },
+  //       {
+  //   id: 16,
+  //   title: "Steal like an artist",
+  //   author: "Austin Kleon",
+  //   description: "Anything and everything around the Thought provoking, meta",
+  //   status: "active",
+  //   category: "28-01-2026"
+  // },
   {
     id: 16,
     title: "When everyone knows that everyone knows",
     author: "Steven Pinker",
     description: "Anything and everything around the Thought provoking, meta",
-    status: "active",
-    category: "28-01-2026"
-  },
-  {
-    id: 16,
-    title: "The urge",
-    author: "Carl Erik Fisher",
-    description: "History of addiction, phenomenal book on a topic that will be getting more attention if it isn't already.",
     status: "active",
     category: "28-01-2026"
   },
@@ -633,7 +730,7 @@ Not only would home not be the same, but would his loved ones still accept him a
     id: 11,
     title: "Twelve angry men",
     author: "Reginald Rose",
-    description: "Thought provoking, at the edge of consciousness",
+    description: "",
     status: "active",
     category: "24-09-2025"
   },
@@ -649,7 +746,7 @@ Not only would home not be the same, but would his loved ones still accept him a
     id: 9,
     title: "Revenge of the tipping point",
     author: "Malcolm Gladwell",
-    description: "Following up on",
+    description: "Following ",
     status: "active",
     category: "31-08-2025"
   },
@@ -673,7 +770,7 @@ Not only would home not be the same, but would his loved ones still accept him a
     id: 6,
     title: "Mood Machine",
     author: "Liz Pelly",
-    description: "Well researched, historical record of industry interests, and the basic human needs for stimulation driving them",
+    description: "Well researched, historical record of industry interests and the basic human needs for stimulation driving them",
     status: "active",
     category: "02-04-2025"
   },
@@ -690,7 +787,7 @@ Not only would home not be the same, but would his loved ones still accept him a
     title: "McTeague",
     author: "Frank Norris",
     description: "Seminal works, life in and around SF, ",
-    status: "inactive",
+    status: "active",
     category: "14-03-2025"
   },
   {
@@ -723,38 +820,30 @@ Not only would home not be the same, but would his loved ones still accept him a
     <br>5. automate last
     <br><br><b>"Surge"</b>, intentionally set impossible deadlines or goals, disrupt smoothly running operation, maintain high-stakes environment
     behind thinly veiled altruistic ideals`,
-    status: "inactive",
+    status: "active",
     category: "22-01-2025"
   },
   {
     id: 0,
-    title: "Cannery road",
-    author: "G.. ",
+    title: "Cannery row",
+    author: "John Steinbeck",
     description: "The Algorithm, First principles, ",
-    status: "inactive",
+    status: "active",
     category: "22-01-2024"
   },
   {
     id: 0,
-    title: "Cannery road",
-    author: "G.. ",
-    description: "The Algorithm, First principles, ",
-    status: "inactive",
-    category: "22-01-2024"
-  },
-  {
-    id: 0,
-    title: "8 ruels of love",
-    author: "Walter Isaacson",
-    description: "The Algorithm, First principles, ",
+    title: "8 rules of love",
+    author: "sheddy",
+    description: " ",
     status: "inactive",
     category: "22-01-2024"
   },
   {
     id: 0,
     title: "kinesiska boken om k'rlek",
-    author: "Walter Isaacson",
-    description: "The Algorithm, First principles, ",
+    author: "",
+    description: " ",
     status: "inactive",
     category: "22-01-2024"
   },
@@ -763,14 +852,14 @@ Not only would home not be the same, but would his loved ones still accept him a
     title: "Ambient findability",
     author: "Walter Isaacson",
     description: "Ambient occlusion ",
-    status: "inactive",
+    status: "active",
     category: "22-01-2024"
   },
   {
     id: 0,
     title: "You are the one you are looking for",
-    author: "Walter Isaacson",
-    description: "The Algorithm, First principles, ",
+    author: "",
+    description: " ",
     status: "inactive",
     category: "22-01-2024"
   },
@@ -778,8 +867,8 @@ Not only would home not be the same, but would his loved ones still accept him a
     id: 0,
     title: "Misbehaving",
     author: "Richard H. Thaler",
-    description: "Econs, predictably irrational behaviors and decision making, limited information-processing capabilities, heuristics, framing, loss aversion.. exploit nudging and choice architecture ",
-    status: "inactive",
+    description: "Econs, predictably irrational behavior and decision making, limited information-processing capabilities, heuristics, framing, loss aversion.. exploit nudging and choice architecture ",
+    status: "active",
     category: "22-01-2024"
   },
   {
@@ -787,37 +876,37 @@ Not only would home not be the same, but would his loved ones still accept him a
     title: "Hypercapitalism",
     author: "Richard H. Thaler",
     description: "Sociological impact of exploiting for the sake of exploits, /cant leave money on the table ",
-    status: "inactive",
+    status: "active",
     category: "22-01-2022"
   },
    {
     id: 0,
     title: "The tipping point",
-    author: "Walter Isaacson",
-    description: "The Algorithm, First principles, ",
-    status: "inactive",
+    author: "",
+    description: "\ ",
+    status: "active",
     category: "22-01-2024"
   },
     {
     id: 0,
     title: "Mind in Motion",
     author: "Walter Isaacson",
-    description: "The Algorithm, First principles, ",
-    status: "inactive",
+    description: "Barbara  ",
+    status: "active",
     category: "22-01-2024"
   },  {
     id: 0,
     title: "Atomic habits",
-    author: "Walter Isaacson",
+    author: "W",
     description: "The Algorithm, First principles, ",
-    status: "inactive",
+    status: "active",
     category: "22-01-2024"
   },
   {
     id: 0,
-    title: "space adventure..arnie??.. ",
+    title: "Enders game ",
     author: "??",
-    description: "?? ",
+    description: "space adventure, ",
     status: "inactive",
     category: "22-01-2024"
   },
@@ -842,14 +931,14 @@ Not only would home not be the same, but would his loved ones still accept him a
     title: "Thinking fast and slows",
     author: "Khaneman",
     description: "The Algorithm, First principles, ",
-    status: "inactive",
+    status: "active",
     category: "22-01-2024"
   },{
     id: 0,
     title: "A confederacy of dunces",
     author: "JJ",
     description: "The Algorithm, First principles, ",
-    status: "inactive",
+    status: "active",
     category: "22-01-2024"
   },
   {
@@ -857,22 +946,22 @@ Not only would home not be the same, but would his loved ones still accept him a
     title: "Dubliners",
     author: "JJ",
     description: "The Algorithm, First principles, ",
-    status: "inactive",
+    status: "active",
     category: "22-01-2024"
   },
     {
     id: 0,
     title: "Färjenäs, hyperventil, ..",
     author: "P&P",
-    description: "The Algorithm, First principles, ",
+    description: "",
     status: "inactive",
     category: "22-01-2024"
   },
   {
     id: 0,
     title: "Sherlock holmes",
-    author: "JJ",
-    description: "The Algorithm, First principles, ",
+    author: "ACD",
+    description: " ",
     status: "inactive",
     category: "22-01-2024"
   }
@@ -888,7 +977,8 @@ Not only would home not be the same, but would his loved ones still accept him a
           description: "makrill.. poly /aha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
           status: "inactive",
           category: "Draken",
-          date: "25-01-2026"
+          date: "25-01-2026",
+          rating: 3.5
         },
       {
           id: 2,
@@ -896,7 +986,8 @@ Not only would home not be the same, but would his loved ones still accept him a
           description: "makrill.. poly /aha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
           status: "inactive",
           category: "Draken",
-          date: "25-01-2026"
+          date: "25-01-2026",
+          rating: 3.5
         },
       {
           id: 2,
@@ -904,7 +995,8 @@ Not only would home not be the same, but would his loved ones still accept him a
           description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
           status: "inactive",
           category: "Draken",
-          date: "25-01-2026"
+          date: "25-01-2026",
+          rating: 3.5
         },
         {
           id: 2,
@@ -912,7 +1004,8 @@ Not only would home not be the same, but would his loved ones still accept him a
           description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
           status: "inactive",
           category: "Draken",
-          date: "25-01-2026"
+          date: "25-01-2026",
+          rating: 3.5
         },
         {
           id: 2,
@@ -920,7 +1013,8 @@ Not only would home not be the same, but would his loved ones still accept him a
           description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
           status: "inactive",
           category: "Draken",
-          date: "25-01-2026"
+          date: "25-01-2026",
+          rating: 3.5
         },
         {
           id: 2,
@@ -928,7 +1022,8 @@ Not only would home not be the same, but would his loved ones still accept him a
           description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
           status: "inactive",
           category: "Draken",
-          date: "25-01-2026"
+          date: "25-01-2026",
+          rating: 3.5
         },
         {
           id: 2,
@@ -936,7 +1031,8 @@ Not only would home not be the same, but would his loved ones still accept him a
           description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
           status: "inactive",
           category: "Draken",
-          date: "25-01-2026"
+          date: "25-01-2026",
+          rating: 3.5
         },
         {
           id: 2,
@@ -944,7 +1040,8 @@ Not only would home not be the same, but would his loved ones still accept him a
           description: "haha, harry potter.. mmmyees Melange spice - unobtainium. Arrakis, Atreides vs Harkonnen.. timeless literals <br> more subtle Bennet Gesserit politics, language and prana-bindu training ..",
           status: "inactive",
           category: "Draken",
-          date: "25-01-2026"
+          date: "25-01-2026",
+          rating: 3.5
         },
         {
           id: 1,
@@ -952,8 +1049,9 @@ Not only would home not be the same, but would his loved ones still accept him a
           description: "Relax your triangle of sadness,",
           status: "inactive",
           category: "M harms / bio?",
-          date: "25-01-2026"
-        },
+          date: "25-01-2026",
+          rating: 3.5
+        }
     ]  
 
   };
@@ -964,67 +1062,108 @@ let targetScroll = 0;
 let currentScroll = 0;
 let itemElements = [];
 let isLoopRunning = false; // Prevents the infinite update loop when not in spiral mode
+let showInactive = false;
 
+// -------------------------------------------------- // DOM REFERENCES // -------------------------------------------------- 
+const spiral = document.getElementById("spiral"); 
+const listContainer = document.getElementById("listContainer"); 
+const visibilityToggle = document.getElementById("visibilityToggle"); 
+const toggleBtn = document.getElementById("toggleBtn");
 
 function render() {
-    const spiral = document.getElementById("spiral");
-    const listContainer = document.getElementById("listContainer");
-    
+    const items = dataSets[currentData];
+
+    // Clear both views
     spiral.innerHTML = '';
     listContainer.innerHTML = '';
     itemElements = [];
-
-    const items = dataSets[currentData];
     
     // Adjust scroll height dynamically based on layout
     if (currentLayout === 'spiral') {
-        const spacing = 500;
-        document.body.style.height = (items.length * spacing + window.innerHeight) + "px";
-    
-        // Generate placeholder/wrapper elements for the spiral to manage calculations efficiently
-        // We only fill/render the visible 5-10 items during the update() loop.
-       items.forEach((post, i) => {
-        // Create Spiral Element
-
-        const el = document.createElement("button");
-        el.className = "item";
-        el.setAttribute("popovertarget", "postPopover");
-        el.innerHTML = `
-            <img src="${currentData}/${post.title}.jpg" onerror="this.src='https://via.placeholder.com/400x140?text=${encodeURIComponent(post.title)}'"/>
-            <div class="title">${post.title}</div>
-        `;
-        el.onclick = () => showDetails(post);
-        el.style.display = 'none'; // Hidden by default until in viewport range
-        spiral.appendChild(el);
-        itemElements.push({ element: el, data: post });
-
-        // Create List Element
-        const listEl = document.createElement("div");
-        listEl.className = "list-item";
-        listEl.innerHTML = `<h3>${post.title}</h3><p>${post.description}</p><small>${post.date}</small>`;
-        listContainer.appendChild(listEl);
-    });
-    // Fire up the animation loop only when entering spiral mode
-        if (!isLoopRunning) {
-            isLoopRunning = true;
-            requestAnimationFrame(update);
-        }
-      } else {
-        // --- LIST MODE --- 
-        // No spiral elements calculated or rendered. Standard efficient DOM printing.
-        document.body.style.height = 'auto';
-        isLoopRunning = false; // Halts the update() loop execution
-
-        items.forEach((post) => {
-            const listEl = document.createElement("div");
-            listEl.className = "list-item2";
-            listEl.innerHTML = `<h3>${post.title}</h3><p>${post.description}</p><small>${post.date}</small>`;
-            listContainer.appendChild(listEl);
-        });
+      renderSpiral(items);
+    } else {
+      renderList(items);
     }
+  }
+// LIST VIEW
+  // items .filter(post => showInactive || post.status === "active") .forEach(post => { const detailsEl = document.createElement("details"); 
 
-   
+function renderList(items) {
+  const visibleItems = items.filter(post => { 
+    return showInactive || post.status === "active"; 
+  });
+visibleItems.forEach(post => {
+const detailsEl = document.createElement("details");
+detailsEl.className = "list-item2";
+// Accordion behavior: // opening one closes the others. 
+detailsEl.setAttribute("name", "posts");
+  detailsEl.innerHTML = ` 
+  <summary> <h3>${post.title}</h3> 
+    <p class="description"> ${post.description} </p> 
+  </summary> 
+  <div class="post-meta"> 
+    <span class="category">${post.category}</span> 
+    <small>${post.date}</small> 
+  </div> 
+  <div class="rating" aria-label="Rating: ${post.rating} out of 5"> ${createStars(post.rating)} </div> 
+  </div> `; 
+  // Optional visual indication for inactive posts 
+  if (post.status === "inactive") { detailsEl.classList.add("inactive"); } 
+  listContainer.appendChild(detailsEl); 
+}); 
 }
+function createStars(rating) { 
+  const maxRating = 5; 
+  let stars = ""; 
+  for (let i = 1; i <= maxRating; i++) { 
+    if (rating >= i) { stars += `<span class="star filled">★</span>`; } 
+    else if (rating >= i - 0.5) { stars += `<span class="star half">★</span>`; } 
+    else { stars += `<span class="star">★</span>`; } 
+  } 
+return stars; 
+}
+
+// SPIRAL VIEW
+function renderSpiral(items) {
+    const spacing = 500;
+    document.body.style.height = (items.length * spacing + window.innerHeight) + "px";
+
+    // Generate placeholder/wrapper elements for the spiral to manage calculations efficiently
+    // We only fill/render the visible 5-10 items during the update() loop.
+    items.forEach((post, i) => {
+    // Create Spiral Element
+
+    const el = document.createElement("button");
+    el.className = "item";
+    el.setAttribute("popovertarget", "postPopover");
+    el.innerHTML = `
+        <img src="${currentData}/${post.title}.jpg" onerror="this.src='https://via.placeholder.com/400x140?text=${encodeURIComponent(post.title)}'"/>
+        <div class="title">${post.title}</div>
+    `;
+    el.onclick = () => showDetails(post);
+    el.style.display = 'none'; // Hidden by default until in viewport range
+    spiral.appendChild(el);
+
+    itemElements.push({ element: el, data: post });
+
+});
+// Fire up the animation loop only when entering spiral mode
+    if (!isLoopRunning) {
+        isLoopRunning = true;
+        requestAnimationFrame(update);
+    }   
+}
+
+// Show/hide inactive posts 
+visibilityToggle.addEventListener("change", () => { 
+  showInactive = visibilityToggle.checked; 
+    if (currentLayout === "list") {
+      renderList(dataSets[currentData] || []);
+    }
+}); 
+
+
+
 
 function showDetails(post) {
     const content = document.getElementById("popoverContent");
@@ -1037,6 +1176,7 @@ function showDetails(post) {
         Space: ${post.category} <br> 
         Logged: ${post.date}
       </div>
+      <div class="rating" aria-label="Rating: ${post.rating} out of 5"> ${createStars(post.rating)} </div> 
     `;
 }
 
@@ -1128,14 +1268,20 @@ function toggleLayout() {
     
     // Clear out alternate view DOM immediately on layout change
     if (currentLayout === 'list') {
-        document.getElementById("spiral").innerHTML = '';
+        isLoopRunning = false;
+        innerHTML = '';
         itemElements = [];
+        document.body.style.height = "auto";
     }
     
     render();
 }
 
 function switchList(key) {
+  if (!dataSets[key]) { 
+    console.warn(`Dataset "${key}" does not exist.`);
+   return; 
+  }
     currentData = key;
     render();
     window.scrollTo(0, 0);
