@@ -22,14 +22,12 @@
 
     --card-bg: #373737;
     --card-bg2: #1a1a1a;
-    --accent-color: #6ae25aaf;
-    
+    --accent-color: #6ae25aaf;   
     --invert-icon:100%;
-
 
     --active-tab:#2d2d2d;
     --toast-bg: #333;
-    --toast-color: #fff;
+    --toast-color: oklch(100% 0.00011 271.152);
   }
   body.light-mode {
     --bg-color: #ede8de;
@@ -90,52 +88,6 @@
     /* border: solid 2px #3e6a8e; */
     /* z-index: 22; */
 }
-.topnav.hidden { display: none; }
-
-    .dropbtn {
-    background-color: #22312c;
-    width: 100px;   
-    text-transform: uppercase;
-    padding: 4px 0 4px 0;
-    color: white;
-    border: 5px;
-    border-color: coral;
-    border-radius: 5px 5px 0 0;
-    margin-left:15px;
-}
-a {
-    color: white;
-    border-radius: 15px;
-    font-size: 14px;
-}
-.dropdown {
-    display: inline-block;
-    color: #b75f5f;
-    white-space: nowrap;  
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #fb8686;
-    border-radius: 5px 5px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    padding: 2px; 
-}
-.dropdown-content a {
-    color: black;
-    padding: 8px 26px;
-    display: block;
-}
-.dropdown-content a:hover {
-    background-color: coral;
-}
-.dropdown:hover .dropdown-content {display: block;}
-.dropdown:hover .dropup-content {display: block;}
-.dropdown:hover .dropbtn {background-color: #3e6a8e;}
-  /* TOP NAV END */
-
   .week-header {
     position: relative;
     display: flex;
@@ -147,8 +99,6 @@ a {
     color: var(--text-color);
     width: 100%;
     /* border: 1px solid black; */
-
-    
   }
 
 .status-hud { 

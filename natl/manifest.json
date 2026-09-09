@@ -23,7 +23,7 @@
         "src": "Screenshot_morning.jpg",
         "sizes": "720x1129",
         "type": "image/jpeg",
-        "platform": "wide"
+        "platform": "narrow"
       },
       {
         "src": "Screenshot_gym track.jpg",
@@ -52,6 +52,8 @@
     ],
     "prefer_related_applications": false,
     "lang": "en",
-    "dir": "ltr"
+    "dir": "ltr",
+    "id": "https://0sevn.github.io/natl/",
+    "scope": "https://0sevn.github.io/natl/"
   }
   
