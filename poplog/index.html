@@ -152,7 +152,7 @@ LIST MODE
     
     margin-bottom: 20px;
     padding: 15px;
-
+scroll-margin-top: 80px;
     border-radius: 12px;
     background: #111;
     border: 1px solid #333;
@@ -186,10 +186,15 @@ LIST MODE
 
 
 </style>
+<link rel="stylesheet" href="/_next/static/css/36c583caa4f1f751.css" data-precedence="next">
+<link rel="stylesheet" href="/_next/static/css/15d150d1e00d3480.css" data-precedence="next">
 </head>
 <body class="list-mode">
 
 <header class="menu">
+    
+
+
     <button onclick="switchList('movies')">Movies</button>
     <button onclick="switchList('books')">Books</button>
     <!-- <button onclick="switchList('misc')">Misc</button> -->
@@ -198,6 +203,7 @@ LIST MODE
       <!-- <input type="checkbox" id="visibilityToggle"> Show inactive posts </label>  -->
 
 </header>
+
 <!-- Spiral view -->
 <div class="scene">
     <div class="spiral" id="spiral"></div>
@@ -220,6 +226,17 @@ LIST MODE
 // main poplog container, movies, books, misc?, tv etc
 const dataSets = {
     movies: [
+        {
+          id: 0,
+          title: "L'etranger",
+          description: `
+
+          `,
+          status: "active",
+          category: "Capitol",
+          date: "2026-09-07",
+          rating: 3.5
+        },
         {
           id: 0,
           title: "The Shadows Edge",
@@ -1101,18 +1118,33 @@ const detailsEl = document.createElement("details");
 detailsEl.className = "list-item2";
 // Accordion behavior: // opening one closes the others. 
 detailsEl.setAttribute("name", "posts");
+// Simple shareable ID 
+const postId = post.title .toLowerCase() .replace(/[^a-z0-9]+/g, "-") .replace(/^-|-$/g, "");
+detailsEl.id = postId;
   detailsEl.innerHTML = ` 
   <summary> <h3>${post.title}</h3> 
     <p class="description"> ${post.description} </p> 
   </summary> 
-  <div class="post-meta"> 
+  <div class="post-meta"> <button class="copy-link" type="button" title="Copy link" >
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" height="14" width="14" class="absolute transition-all duration-300 scale-100 opacity-100">
+      <path fill="currentColor" d="M7.5 19c-0.4 0 -0.75 -0.15 -1.05 -0.45 -0.3 -0.3 -0.45 -0.65 -0.45 -1.05V3.5c0 -0.4 0.15 -0.75 0.45 -1.05 0.3 -0.3 0.65 -0.45 1.05 -0.45h11c0.4 0 0.75 0.15 1.05 0.45 0.3 0.3 0.45 0.65 0.45 1.05v14c0 0.4 -0.15 0.75 -0.45 1.05 -0.3 0.3 -0.65 0.45 -1.05 0.45H7.5Zm0 -1.5h11V3.5H7.5v14Zm-3 4.5c-0.4 0 -0.75 -0.15 -1.05 -0.45 -0.3 -0.3 -0.45 -0.65 -0.45 -1.05V5h1.5v15.5h12.5v1.5H4.5Z" stroke-width="0.5"></path>
+    </svg>
+      </button>
     <span class="category">${post.category}</span> 
     <small>${post.date}</small> 
+    
   </div> 
   <div class="rating" aria-label="Rating: ${post.rating} out of 5"> ${createStars(post.rating)} </div> 
   </div> `; 
   // Optional visual indication for inactive posts 
   if (post.status === "inactive") { detailsEl.classList.add("inactive"); } 
+  // Copy link 
+  detailsEl.querySelector(".copy-link").onclick = async (event) => { 
+    event.preventDefault(); event.stopPropagation(); 
+    const url = window.location.href.split("#")[0] + "#" + postId; await navigator.clipboard.writeText(url); 
+    event.target.textContent = "✓"; 
+  setTimeout(() => { event.target.textContent = "🔗"; }, 1000);
+  };
   listContainer.appendChild(detailsEl); 
 }); 
 }
@@ -1129,6 +1161,7 @@ function createStars(rating) {
   } 
 return stars; 
 }
+
 
 // SPIRAL VIEW
 function renderSpiral(items) {
@@ -1305,8 +1338,34 @@ function scrollToTop() {
 }
 
 // Start
+
+// Open a post from its #id
+function openPostFromUrl() {
+
+    if (!window.location.hash) return;
+
+    const postId = window.location.hash.substring(1);
+
+
+
+    const post = document.getElementById(postId);
+
+    if (!post) return;
+
+    post.open = true;
+
+    setTimeout(() => {
+        post.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }, 220);
+}
+
+
+// Run AFTER the posts have been rendered
 render();
-// update();
+openPostFromUrl();
 </script>
 
 </body>

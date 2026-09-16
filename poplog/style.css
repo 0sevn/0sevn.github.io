@@ -10,6 +10,12 @@
     --line-color: rgba(255, 255, 255, 0.2);
     --font-main: 'Inter', sans-serif;
     --transition-speed: 0.4s;
+/* state colors 
+primary, secondary- shadow/highlight/*/
+    --green-color:green;
+    --yellow-color:yellow;
+    --red-color:red;
+
 }
 
 * {
