@@ -13,6 +13,16 @@
     font-family: system-ui, sans-serif;
     color: white;
   }
+  .panel-close-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 5px 10px;
+}
+.panel-close-btn:hover { color: #fff; }
 
   /* Fixed background scene for Spiral Mode */
   .scene {
@@ -186,22 +196,17 @@ scroll-margin-top: 80px;
 
 
 </style>
-<link rel="stylesheet" href="/_next/static/css/36c583caa4f1f751.css" data-precedence="next">
-<link rel="stylesheet" href="/_next/static/css/15d150d1e00d3480.css" data-precedence="next">
+
 </head>
 <body class="list-mode">
 
 <header class="menu">
-    
-
-
     <button onclick="switchList('movies')">Movies</button>
     <button onclick="switchList('books')">Books</button>
     <!-- <button onclick="switchList('misc')">Misc</button> -->
     <button id="toggleBtn" onclick="toggleLayout()">Switch to Spiral View</button>
     <label class="visibility-toggle"> 
       <!-- <input type="checkbox" id="visibilityToggle"> Show inactive posts </label>  -->
-
 </header>
 
 <!-- Spiral view -->
@@ -215,7 +220,7 @@ scroll-margin-top: 80px;
   <div id="listContainer" class="list-mode-container"></div>
 
 <div id="postPopover" popover class="popover">
-    <button popovertarget="postPopover" popovertargetaction="hide" style="float:right">×</button>
+    <button class="panel-close-btn" popovertarget="postPopover" popovertargetaction="hide" style="float:right">×</button>
     <div id="popoverContent"></div>
 </div>
 
