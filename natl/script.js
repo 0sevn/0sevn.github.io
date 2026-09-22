@@ -16,6 +16,69 @@ window.displayData = function() {
     renderPurgeList();
     updateHealthBar();
 };
+// #################################
+// #################################
+// Array of available themes and their friendly display labels
+const THEMES = ['dark', 'light', 'ocean', 'sunset'];
+const THEME_LABELS = {
+    'dark': 'Midnight Dark',
+    'light': 'Morning Light',
+    'ocean': 'Ocean Deep',
+    'sunset': 'Sunset Warm'
+};
+
+/**
+ * Applies a specific theme to the document root.
+ * @param {string} themeName 
+ */
+function applyTheme(themeName) {
+    document.documentElement.setAttribute('data-theme', themeName);
+    updateThemeButtonText(themeName);
+}
+
+/**
+ * Updates the text/icon of the theme toggle button dynamically.
+ * @param {string} themeName 
+ */
+function updateThemeButtonText(themeName) {
+    const btn = document.getElementById('btn-theme-toggle');
+    if (btn) {
+        btn.textContent = ` ${THEME_LABELS[themeName] || 'Default'}`;
+    }
+}
+
+/**
+ * Cycles to the next theme in the array, saves it, and notifies the user.
+ */
+function cycleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const currentIndex = THEMES.indexOf(currentTheme);
+    
+    // Loop back to index 0 if at the end of the array
+    const nextIndex = (currentIndex + 1) % THEMES.length;
+    const nextTheme = THEMES[nextIndex];
+
+    applyTheme(nextTheme);
+    localStorage.setItem('app-theme', nextTheme);
+    
+    // Uses the showToast function we built previously for data management
+    if (typeof showToast === 'function') {
+        showToast(`Switched to ${THEME_LABELS[nextTheme]}`);
+    }
+}
+
+// Initialize theme on app startup
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('app-theme') || 'dark';
+    applyTheme(savedTheme);
+
+    const themeBtn = document.getElementById('btn-theme-toggle');
+    if (themeBtn) {
+        themeBtn.addEventListener('click', cycleTheme);
+    }
+});
+
+
 
 // Ensure activeTab is never null and matches current system data
 window.activeTab = localStorage.getItem('activeTab') || (window.masterTabs && window.masterTabs[0] ? window.masterTabs[0].id : null);
@@ -176,60 +239,11 @@ function renderGridView(container, tabData) {
     let todoList = window.getTabStorageData(tabData.id, tabData.type);
     container.addClass('checkin-grid');
     
-    // const WORKOUTS = {
-    //     gym: {
-    //         title: "Command Bar",
-    //         shortcut: "x",
-    //         width: "80%", height: "auto",
-    //         position: "bottom-center",
-    //         animateDirection: "w3-animate-left"
-    //     },
-    //     rehab: {
-    //         title: "Edit Panel",
-    //         shortcut: "dblclck", // Triggered via your unified schema routing
-    //         width: "70%", height: "40%",
-    //         position: "bottom-center",
-    //         animateDirection: "w3-animate-left"
-    //     },
-    //     yoga: {
-    //         title: "Edit Panel",
-    //         shortcut: "dblclck", // Triggered via your unified schema routing
-    //         width: "70%", height: "40%",
-    //         position: "bottom-center",
-    //         animateDirection: "w3-animate-left"
-    //     },
-    //     meditation: {
-    //         title: "Edit Panel",
-    //         shortcut: "dblclck", // Triggered via your unified schema routing
-    //         width: "70%", height: "40%",
-    //         position: "bottom-center",
-    //         animateDirection: "w3-animate-left"
-    //     }
-    // };
 
         // console.log("tabData.name", tabData.name)
         // presets / set tab type and settings too
         if (todoList.length === 0) {
             let defaults = [""];
-            // switch (tabData.name) {
-            //     case 'Gym':
-            //         // console.log("tabData.name", tabData.name)
-            //         defaults = ["Lat Pull 40/97", "Row 45/97", "Chest Press 45/97", "Shoulder Press 45/97", "Leg Extension 45/97", "Leg Curl 45/97", "Hip Add, Ab 45/97", "Chest fly 45/97", "Leg Press 45/97", "Incline back 45/97", "Zercher 45/97", "Leg raise/Crunches 45/97" ];
-            //         break;
-            //     case 'Rehab':
-            //         // console.log("tabData.name", tabData.name)
-            //         defaults = ["Ankle mobility","Hip thrusts", "Tummy tucks", "Spinal torsion", "Neck mobility", "Wrist lubrication", "Tendon activation"];
-            //         break;
-            //     case 'Yoga':
-            //         // console.log("tabData.nam", tabData.name)
-            //         defaults = ["Sun salutation"];
-            //         break;
-            //     case 'Meditation':
-            //     default:
-            //         // console.log("tabData.nam", tabData.name)
-            //         defaults = ["Body scan1"];
-            //         break;
-            // }
 // next 
 // rehab, strength, endurance, recovery, mobility, acceptance
 
@@ -492,11 +506,9 @@ window.renderPurgeListPanel = function() {
 
     // 3. Construct an isolated dynamic layout wrapper with a distinct identity class
     const fragment = $(`
-        <div class="history-panel-scroller" style="padding: 20px; overflow-y: auto; height: 100%; box-sizing: border-box;">
-            <p style="margin-top: 0; margin-bottom: 20px; font-size: 0.85rem; color: #aaa;">
-                
-            </p>
-            <ul id="purge_list" class="purge-history-list" style="list-style: none; padding: 0; margin: 0;"></ul>
+        <div class="tab-sync-list" style="padding-left: 50px; overflow-y: auto; height: 100%; box-sizing: border-box;">
+               <ul id="purge_list" class="purge-history-list">
+               </ul>
         </div>
     `);
 
@@ -533,7 +545,7 @@ window.renderPurgeListPanel = function() {
             
             // Append weekly group partitioning boundary line
             plistElement.append(`
-                <li class="week-header" style="font-weight: bold; color: #2196f3; margin-top: 15px; margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 3px;">
+                <li class="week-header" style="font-weight: bold; color: var(--accent-color); margin-top: 15px; margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 3px;">
                     Week ${group.weekNum} - ${group.year}
                 </li>
             `);
@@ -544,7 +556,7 @@ window.renderPurgeListPanel = function() {
                 const countInfo = item.count ? `<span style="font-size: 11px; color: #7bed9f;">${item.count}×</span>` : '';
                 const newPurgeItem = $(`
                     <li style="margin-bottom: 6px; padding-left: 5px; list-style: none;">
-                        <span style="font-size: 13px; color: #bbb; display: flex; justify-content: space-between; align-items: baseline; gap: 10px;">
+                        <span style="font-size: 13px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px;">
                             <span class="history-item-text" style="word-break: break-all;">${item.text} ${countInfo}</span>
                             <span class="time" style="font-size: 11px; color: #666; white-space: nowrap;">${displayTime}</span>
                         </span>
@@ -1103,16 +1115,6 @@ $(function () {
     $('#purge').on('click', purgeList);
     $('#enter_task').on('keypress', e => { if (e.which === 13) enterTask(); });
 
-    const themeToggleInput = document.getElementById('themeToggle');
-    if (themeToggleInput) {
-        const savedTheme = localStorage.getItem('theme') === 'light';
-        themeToggleInput.checked = savedTheme;
-        themeToggleInput.addEventListener('change', function(e) {
-            if (e.target.checked !== document.body.classList.contains('light-mode')) {
-                toggleTheme();
-            }
-        });
-    }
 
 initBooleanToggle('healthbarToggle', 'showHealthbar', true, setHealthbarVisibility);
 initBooleanToggle('healthbarDirectionToggle', 'healthbarDirection', true, function(checked) {
@@ -1151,40 +1153,13 @@ initBooleanToggle('healthbarDirectionToggle', 'healthbarDirection', true, functi
     updateHealthBar();
 });
 
-    // ----------- OTHER -------------
-    function showHistory() {
-        // console.log('show history');
-        const dash = document.getElementById("historyCard");
-        if (!dash) return;
-        dash.classList.toggle("hidden");
-    }
 
-    function showCommandbar() {
-        const togglePanel = document.getElementById("commandBar");
-        // console.log('toggle commandbar');
-        if (!togglePanel) return;
-        togglePanel.classList.toggle("hidden");
-    }
-
+// new listener for z
     window.addEventListener('keydown', (e) => {
         if (e.key.toLowerCase() === 'z' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-            toggleTheme();
+            cycleTheme();
         }
     });
-
-// Toggle light/dark mode
-function toggleTheme() {
-    document.body.classList.toggle('light-mode');
-    const isLight = document.body.classList.contains('light-mode');
-    localStorage.setItem('theme', isLight ? 'light' : 'dark');
-    // Change icon image
-    const themeToggleIcon = document.querySelector('.darklight_mode');
-    if (themeToggleIcon) {
-        themeToggleIcon.style.backgroundImage = isLight
-            ? 'url(img/dark_mode.png)'
-            : 'url(img/light_mode.png)';
-    }
-}
 
 // Sync specific functions
 window.updateDashboardUI = function() {
@@ -1460,7 +1435,7 @@ $(document).on('change', '#jsonFileInput', function (event) {
 
             // 1. Preserve user settings (don't nuke theme/healthbar prefs)
             const preserved = {
-                theme: localStorage.getItem('theme'),
+                theme: localStorage.getItem('app-theme'),
                 showHealthbar: localStorage.getItem('showHealthbar')
             };
 

@@ -3,28 +3,36 @@
 const UI_PANEL_CONFIG = {
     edit_panel: {
         title: "Edit Panel",
-        shortcut: "dblclck", // Triggered via your unified schema routing
-        width: "75%", height: "40%",
+        shortcut: "dblclck",
+        width: "100%", height: "30%",
         position: "bottom-center",
-        animateDirection: "w3-animate-left",
+        // animateDirection: "w3-animate-bottom",
         renderSource: (itemData, type) => renderUnifiedForm(itemData, type)
     },
     history_panel: {
         title: "History Panel",
         shortcut: "f",
-        width: "90%", height: "30%",
-        position: "bottom-right",
+        width: "100%", height: "30%",
+        position: "bottom-center",
         animateDirection: "w3-animate-bottom",
         renderSource: () => renderPurgeListPanel()
     },
     sync_panel: {
         title: "Cross device syncing ",
         shortcut: "d",
-        width: "70%", height: "30%",
-        position: "bottom-right",
+        width: "100%", height: "30%",
+        position: "bottom-center",
         animateDirection: "w3-animate-bottom",
         renderSource: () => renderSyncPanel()
-    }
+    },
+    // command_bar: {
+    //     title: "Preferences",
+    //     shortcut: "s",
+    //     width: "100%", height: "30%",
+    //     position: "bottom-center",
+    //     animateDirection: "w3-animate-bottom",
+    //     renderSource: () => renderCommandbar()
+    // }
 };
 
 /** * Master Controller to dynamically present any panel
@@ -68,7 +76,7 @@ window.togglePanelDisplay = function(panelKey, ...injectionData) {
 function renderSyncPanel() {
     const shelfView = $(`
         <div class="shelf-panel-view">
-(Local storage only)
+
         </div>`);
     const tileGrid = $(
         `
@@ -76,6 +84,7 @@ function renderSyncPanel() {
         <div style="border: 0px solid #ddd; border-radius: 10px;">
             <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; padding: 5px;">
                 <span>Backup & Restore</span>
+                <i>(Local storage only)</i>
                 <div style="display: flex; gap: 8px;">
                     <button onclick="exportHistory()" style="padding: 6px 12px; border-radius: 6px; border: none; background: #2196f3; color: #fff; font-size: 0.8rem; cursor: pointer;">Export</button>
                     <button onclick="triggerImport()" style="padding: 6px 12px; border-radius: 6px; border: none; background: #444; color: #fff; font-size: 0.8rem; cursor: pointer;">Import</button>
@@ -98,6 +107,88 @@ function renderSyncPanel() {
     // 3. CRITICAL: Return the completed fragment straight back to togglePanelDisplay
     return shelfView;
 }
+// function renderNewTabPanel() {
+//     const shelfView = $(`
+//         <div class="shelf-panel-view">
+// (Local storage only)
+//         </div>`);
+//     const tileGrid = $(
+//         `
+//         <div id="shelf_tiles_container" class="">
+//         <div style="border: 0px solid #ddd; border-radius: 10px;">
+//             <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; padding: 5px;">
+//                 <span>Backup & Restore</span>
+//                 <div style="display: flex; gap: 8px;">
+//                     <button onclick="exportHistory()" style="padding: 6px 12px; border-radius: 6px; border: none; background: #2196f3; color: #fff; font-size: 0.8rem; cursor: pointer;">Export</button>
+//                     <button onclick="triggerImport()" style="padding: 6px 12px; border-radius: 6px; border: none; background: #444; color: #fff; font-size: 0.8rem; cursor: pointer;">Import</button>
+//                 </div>
+//             </div>
+            
+//                 <!--button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
+//                 <a id="exportHistoryLink" style="display: none;">Export</a>
+                
+//                 < <label for="FileInputLabel"><b>Import</b></label> >
+//                 <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input-->
+//           </div>
+//         </div>
+
+//         `
+//     );
+    
+//     shelfView.append(tileGrid);
+    
+//     // 3. CRITICAL: Return the completed fragment straight back to togglePanelDisplay
+//     return shelfView;
+// }
+
+// function renderCommandbar() {
+//     const shelfView = $(`
+//         <div class="shelf-panel-view">
+
+//         </div>`);
+//     const tileGrid = $(
+//         `
+//         <div class="settings-panel" style="padding-left: 20px; display: flex; flex-direction: column; gap: 16px;">
+//             <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+//                 <span>Show healthbar</span>
+//                 <label class="switch">
+//                     <input type="checkbox" id="healthbarToggle" checked>
+//                     <span class="slider"></span>
+//                 </label>
+//             </div>
+//             <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+//                 <span>Healthbar direction</span>
+//                 <label class="switch">
+//                     <input type="checkbox" id="healthbarDirectionToggle" checked>
+//                     <span class="slider"></span>
+//                 </label>
+//             </div>
+
+//             <div class="settings-group">
+//                 <div class="settings-actions">
+//                     <button id="btn-theme-toggle" class="btn-action secondary">Theme: Light Mode</button>
+//                 </div>
+//                 </div>
+//             <div class="setting-row">
+//                 <!-- <span>Tab management</span> -->
+//                 <div style:"align-items: center;">
+//                     <button id="btn-reset-defaults" class="btn-action secondary">Load Predefined Tabs</button>
+//                     <button id="btn-clear-storage" class="btn-action danger">Clear All Data</button>
+                
+//             </div>
+//         </div>
+                
+//         </div>
+
+//         `
+//     );
+    
+//     shelfView.append(tileGrid);
+    
+//     // 3. CRITICAL: Return the completed fragment straight back to togglePanelDisplay
+//     return shelfView;
+// }
+
 /** * Master Keydown shortcut listener
  * @param {string} panelKey - The key from UI_PANEL_CONFIG
  * @param {...args} injectionData - Optional context variables (like task details for editing) */
@@ -113,10 +204,9 @@ $(document).ready(function() {
             if (typeof openCommandbar === 'function') openCommandbar();
             return;
         }
-
-        if (pressedKey === 'h') {
+        if (pressedKey === 'c') {
             e.preventDefault();
-            if (typeof showHistory === 'function') showHistory();
+            if (typeof openNewTabCreator === 'function') openNewTabCreator();
             return;
         }
 
@@ -311,18 +401,20 @@ function setTabData(tabId, updates) {
 // Global Bridges
 window.openNewTabCreator = () => openTabSettings(null);
 function openTabSettings(tabId = null) {
+    
     window.editingTabId = tabId;
     const tab = getTabData(tabId);
     const card = $('#tab_settings_card');
 
     const presetSelect = $('#tab_preset_select');
-    presetSelect.html('<option value="">None / Custom</option>' +
+    presetSelect.html('<option value="">None </option>' +
         Object.entries(PRESET_LIBRARY).map(([id, preset]) =>
             `<option value="${id}">${preset.label}</option>`
         ).join('')
     );
 
     if (tabId) {
+        
         $('#tab_name_input').val(tab.name);
         // $('#tab_mode_select').val(tab.type || 'list');
         $('#tabModeSelect').prop('checked', (tab.type || 'list') === 'checkin');
@@ -349,15 +441,23 @@ function openTabSettings(tabId = null) {
             nameInput.val(PRESET_LIBRARY[selectedId].label);
         }
     });
+    // console.log('edit tab');
 
     $('#sheet_title').text(tabId ? 'Edit Tab' : 'New Tab');
     $('#save_tab_btn').show();
-    card.addClass('active');
+    $('#tab_settings_card').toggleClass('hidden');
+    // console.log($('#tab_settings_card').toggleClass('hidden'));
 }
 function closeTabSettings() {
-    $('#tab_settings_card').removeClass('active');
+    $('#tab_settings_card').toggleClass('hidden');
     window.editingTabId = null;
+    console.log("close tab");
 }
+function openCommandbar() {
+    console.log("toggleComandbar");
+    $('#commandBar').toggleClass('hidden');
+}
+
 function handleSaveTab() {
     const name = $('#tab_name_input').val().trim();
     // const type = $('#tab_mode_select').val();
@@ -574,6 +674,7 @@ function createRulerSlider({
 
 /** * Global single function to handle shelving and unshelving tabs
  * @param {string} tabId - Target tab identifier */
+// 
 function renderUnifiedForm(itemData, mode) {
     // 1. Build the form structure template shell
     const formFragment = $(`
@@ -589,17 +690,18 @@ function renderUnifiedForm(itemData, mode) {
                 <div id="ruler_goal_mount"></div>
             </div>
             </div>
-            <div class="meta-group" style="margin-top: 15px; font-size: 0.75rem; color: #666;">
-                <div id="edit_meta_created"></div>
-                <div id="edit_meta_updated"></div>
-            </div>
+            
             <div class="form-group">
                 <label>Description</label>
                 <textarea id="edit_field_desc" class="form-control"></textarea>
             </div>
             <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px;">
-                <button id="btn_save_edit" class="btn btn-primary">Save Changes</button>
-                <button id="btn_delete_edit" class="btn btn-danger">Delete</button>
+                <input type="submit" id="btn_save_edit" value=" " class="icon save" title="Save Changes">
+                <input type="submit" id="btn_delete_edit" value=" " class="icon delete" title="Delete Tab">
+            </div>
+            <div class="meta-group" style="margin-top: 15px; font-size: 0.75rem; color: #666;">
+                <div id="edit_meta_created"></div>
+                <div id="edit_meta_updated"></div>
             </div>
         </div>
     `);
@@ -870,10 +972,7 @@ function switchTab(tabId) {
     }
 }
 
-function openCommandbar() {
-    const combar = $('#commandBar');
-    combar.toggleClass('hidden');
-}
+
 
 function refreshApplication() {
     $("#universal_panel_wrapper").removeClass("open");

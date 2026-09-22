@@ -22,20 +22,23 @@
 <script src="jquery-4.0.0.slim.min.js"></script>
 
 <body>
-    <!-- Mid navigation -->
+    <!-- CONTAINER -->
     <div class="wrap-container">
         <div class="week-header">
             <div id="week_header" class="status-text"></div>
-            <span id="active_context_label" class="status-text context-label" onclick="openCommandbar()" style="cursor: pointer;">NATL</span>
+            <span id="active_context_label" class="status-text context-label" title="Not Another Task List" onclick="openCommandbar()"  style="cursor: pointer;">NATL</span>
+            <!-- panel-trigger-btn" data-panel="command_bar" -->
             <div id="active_sync" class="flex space-x-2 status-hud panel-trigger-btn" data-panel="sync_panel">
                 <div id="syncStatusDot" class="status-dot"></div>
                 <span id="syncStatusText" class="status-text">Local Only</span>
             </div>
         </div>
+        <!-- CONTENT LISTS -->
         <div class="mid-container">
             <div id="sync_status" style="font-size: 10px; font-weight: bold;"></div>
             <div id="health_bar_container" class="health_bar_container">
-                    <div id="health_bar" class="healthbar" title="Flowea = Flow + Fovea, the small depression within the retina where visual acuity is the highest.">   
+                    <div id="health_bar" class="healthbar" >
+                        <!-- title="Flowea = Flow + Fovea, the small depression within the retina where visual acuity is the highest."    -->
                     </div>
                     <!-- <meter min="0" value="50" max="100" low="20" high="80" optimum="90"></meter> -->
             </div>
@@ -50,28 +53,32 @@
                     <input type="submit" id="purge" value=" " class="icon purge" title="Purge checked tasks to History" disabled>
                 </div>
         </div>
+        <!-- TABS -->
         <div class="tab-wrap">   
             <div class="tabs">
                 <div class="tabs" id="tabsContainer"></div>
-                    <input type="submit" id="add_tab" value=" " class="icon add_tab w3-animate-left" title="Add tab" onclick="openNewTabCreator()">
-                    <input type="submit" value=" " class="icon history w3-animate-right" title="History" onclick="showHistory()">
+                    <input type="submit" id="add_tab" value=" " class="icon add_tab w3-animate-left" onclick="openNewTabCreator()" title="Add tab">
+                    <!-- panel-trigger-btn" data-panel="editTab_panel" -->
+                    <input type="submit" value=" " class="icon history w3-animate-right panel-trigger-btn" data-panel="history_panel" title="History">
             </div>   
         </div> 
     </div>
 
-    <!-- Purged list -->
-    <nav id="historyCard" class="purge_list_container hidden w3-animate-bottom" style="height: 220px;">
-        <label>Purged tasks</label>
-            <div id="tabSyncList1" class="tab-sync-list" style="margin: 10px; height: 400px; display: block;">
+    <!-- Universal panel -->
+    <div id="universal_panel_wrapper" data-active-panel="" class="">
+        <div class="panel-header">
+            <h3 class="panel-header-title">Panel Title</h3>
+            <button class="panel-close-btn" onclick="$('#universal_panel_wrapper').removeClass('open')">✕</button>
+        </div>
+        
+        <div class="panel-body-content"></div>
+    </div>
 
-                <!-- Purge history list -->
-                <div style="color: var(--text-color);">
-                    <ul id="purge_list" style="list-style: none;padding-left: 5%;">
-                    </ul>
-                </div>
-            </div>    
-    </nav>
+    <!-- Toast notifications -->
+    <div id="toast" class="toast"></div>
 
+
+    
     <!-- JS vanilla script -->
 
     <script src="script.js"></script>
@@ -120,99 +127,91 @@
             }
         </script>
 
-    <!-- Toast notifications -->
-    <div id="toast" class="toast"></div>
+
 
     <!-- Command bar -->
     <div id="commandBar" class="command-bar hidden w3-animate-bottom">
-        <div class="command-bar-header" style="display:flex; align-items:center; justify-content:space-between; padding: 12px 16px;">
-            
-            <span>App Preferences</span>
-            
-            <!-- openCommandSettings not needed  onclick="openCommandsettings()" -->
-            <span id="edit_active_tab_btn" class="edit-icon-btn w3-animate-bottom" style="cursor: pointer;">⚙️ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span>
-            <button onclick="openCommandbar()" style="text-align: right;">✕</button>
+        
+        <div class="panel-header" style="width: 100%;">       
+            <h3 class="panel-header-title">App Preferences</h3>
+            <button class="panel-close-btn" onclick="$('#commandBar').toggleClass('hidden')">✕</button>
         </div>
+                    
+        
         <div class="settings-panel" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
                 <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
                     <span>Show healthbar</span>
                     <label class="switch">
                         <input type="checkbox" id="healthbarToggle" checked>
-                        <span class="slider round"></span>
+                        <span class="slider"></span>
                     </label>
                 </div>
-                <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <!-- health direction switch -->
+                <!-- <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
                     <span>Healthbar direction</span>
                     <label class="switch">
                         <input type="checkbox" id="healthbarDirectionToggle" checked>
-                        <span class="slider round"></span>
+                        <span class="slider"></span>
                     </label>
-                </div>
-                <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                    <span>Theme (Light/Dark)</span>
-                    <label class="switch">
-                        <input type="checkbox" id="themeToggle">
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-                <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                    <span>Tab management</span>
-                
-                    <br>
-                    <div class="settings-actions">
-                        <button id="btn-reset-defaults" class="btn-action secondary">Load Predefined Tabs</button>
-                        <button id="btn-clear-storage" class="btn-action danger">Clear All Data</button>
-                    </div>
-                </div>
-                
-            </div>
+                </div> -->
 
+            <div class="settings-group">
+                <div class="settings-actions">
+                    <button id="btn-theme-toggle" class="btn-action secondary">Theme: Light Mode</button>
+                </div>
+                </div>
+            <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 0px;">
+                <!-- <span>Tab management</span> -->
+                <br>
+                <div>
+                    <button id="btn-reset-defaults" class="btn-action secondary">Load Predefined Tabs</button>
+                    <button id="btn-clear-storage" class="btn-action danger">Clear All Data</button>
+                
+                </div>
+            </div>
+                
+        </div>
     </div>
 
-    <!-- context settings -->
-    <div id="tab_settings_card" class="bottom-sheet">
-        <div class="week-header">
-            <!-- Edit Tab -->
-            <div id="sheet_title"></div>
-            <button onclick="closeTabSettings()" >✕</button>
+<!-- TAB Settings panel -->
+    <div id="tab_settings_card" class="command-bar hidden w3-animate-bottom">
+        <div class="panel-header" style="width: 100%;">       
+            <h3 id="sheet_title" class="panel-header-title">App Preferences</h3>
+            <button class="panel-close-btn" onclick="$('#tab_settings_card').toggleClass('hidden')">✕</button>
         </div>
+<!-- <button class="panel-close-btn" onclick="closeTabSettings()" >✕</button> -->
+
         
-        <div class="sheet-body">
+        <div class="panel-body-content">
             <input type="text" id="tab_name_input" placeholder="Tab name">
             <div class="form-group">
                 <label>Preset</label>
                 <select id="tab_preset_select" class="form-control">
-                    <option value="">None / Custom</option>
+                    <option value="">None</option>
                     <!-- options are injected by JS in openTabSettings -->
                 </select>
             </div>
-            <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <span>Tab Mode Standard List/Check-in Grid</span>
-                <label class="switch">
-                    <input type="checkbox" id="tabModeSelect" checked>
-                    <span class="slider round"></span>
-                </label>
-            </div>
-            <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <span>Tab Mode Singular/Recurring</span>
-                <label class="switch">
-                    <input type="checkbox" id="recurringToggle" checked>
-                    <span class="slider round"></span>
-                </label>
+            <div class="settings-panel" style="width: 350px; display: flex; flex-direction: column; gap: 16px;">
+                <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <span>Standard List / Grid Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="tabModeSelect" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <!-- tab mode recurring -->
+                <!-- <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <span>Tab Mode Singular/Recurring</span>
+                    <label class="switch">
+                        <input type="checkbox" id="recurringToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div> -->
             </div>
             <input type="submit" id="save_tab_btn" value=" " class="icon save" title="Save Changes">
             <input type="submit" id="delete_tab_btn" value=" " class="icon delete" title="Delete Tab">
         </div>
     </div>
 
-
-    <div id="universal_panel_wrapper" data-active-panel="" class="">
-        <div class="panel-header">
-            <h3 class="panel-header-title">Panel Title</h3>
-            <button class="panel-close-btn" onclick="$('#universal_panel_wrapper').removeClass('open')">×</button>
-        </div>
-        
-        <div class="panel-body-content"></div>
-    </div>
 </body>
 </html>
