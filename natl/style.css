@@ -525,7 +525,7 @@ vertical-align: middle;
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: gray; display: inline-block;
     transition: transform 0.4s ease; }
 .status-text { 
-    font-size: 10px; text-transform: uppercase; font-weight: bold; color: var(--text-color); opacity: 0.7; 
+    font-size: 12px; text-transform: uppercase; font-weight: bold; color: var(--text-color); opacity: 0.7; 
     align-items: right; text-align: right; right:0px;
 }
 
