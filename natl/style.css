@@ -312,7 +312,8 @@ input:checked + .slider:before {
     align-items: center;
     gap: 10px; /* Space between icons and bar */
     justify-content: space-around;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    /* border: 1px solid rgba(255, 255, 255, 0.15); */
+    border: 0.5px solid var(--text-color);
     border-radius: 20px 20px 0 0;
     /* padding: 10px 0; */
     z-index: 1000;
@@ -322,6 +323,7 @@ input:checked + .slider:before {
     /* box-shadow: 0 -5px 20px rgba(0,0,0,0.5); */
     /* border-top: 1px solid #444; */
     /* border-radius: 25px 25px 5px 5px; */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 .command-bar.hidden { display: none; }
@@ -341,6 +343,7 @@ input:checked + .slider:before {
     z-index: 2000;
     /* padding: 20px; */
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    
 }
 
 .bottom-sheet.active { bottom: 0; }
@@ -358,7 +361,7 @@ input:checked + .slider:before {
     max-width: 920px;
 /* bottom: -100%; */
     background: var(--card-bg); /* Dark sleek base theme match */
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 0.5px solid var(--text-color);
     border-radius: 20px 20px 0 0;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         left: 50%;
@@ -396,7 +399,7 @@ input:checked + .slider:before {
     align-items: center;
     justify-content: space-between;
     padding: 6px 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 0.5px solid var(--text-color);
     background: rgba(255, 255, 255, 0.02);
 }
 
@@ -424,6 +427,7 @@ input:checked + .slider:before {
     overflow-x: hidden;
     position: relative;
     width: 100%;
+    padding: 8px;
     padding: 8px;
 }
 
@@ -1840,7 +1844,7 @@ pre {
     color: #c62828;
 }
 
-.ruler-slider { user-select: none; -webkit-user-select: none; margin-bottom: 16px; }
+/* .ruler-slider { user-select: none; -webkit-user-select: none; margin-bottom: 16px; }
 .ruler-slider-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; font-size: 0.85rem; color: #555; }
 .ruler-slider-value { font-size: 1.1rem; font-weight: 600; color: #222; }
 .ruler-slider-viewport { position: relative; height: 56px; overflow: hidden; touch-action: pan-y; background: #f4f4f5; border-radius: 8px; }
@@ -1849,3 +1853,17 @@ pre {
 .ruler-tick-major { height: 22px; background: #888; }
 .ruler-tick-num { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; color: #888; white-space: nowrap; }
 .ruler-slider-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #3498db; pointer-events: none; }
+
+
+.w3-card,.w3-card-2{box-shadow:0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12)}
+.w3-card-4,.w3-hover-shadow:hover{box-shadow:0 4px 10px 0 rgba(0,0,0,0.2),0 4px 20px 0 rgba(0,0,0,0.19)}
+.w3-spin{animation:w3-spin 2s infinite linear}@keyframes w3-spin{0%{transform:rotate(0deg)}100%{transform:rotate(359deg)}}
+.w3-animate-fading{animation:fading 10s infinite}@keyframes fading{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
+.w3-animate-opacity{animation:opac 0.8s}@keyframes opac{from{opacity:0} to{opacity:1}}
+.w3-animate-top{position:relative;animation:animatetop 0.4s}@keyframes animatetop{from{top:-300px;opacity:0} to{top:0;opacity:1}}
+.w3-animate-left{position:relative;animation:animateleft 0.4s}@keyframes animateleft{from{left:-300px;opacity:0} to{left:0;opacity:1}}
+.w3-animate-right{position:relative;animation:animateright 0.4s}@keyframes animateright{from{right:-300px;opacity:0} to{right:0;opacity:1}}
+.w3-animate-bottom{position:relative;animation:animatebottom 0.4s}@keyframes animatebottom{from{bottom:-300px;opacity:0} to{bottom:0;opacity:1}}
+.w3-animate-zoom {animation:animatezoom 0.6s}@keyframes animatezoom{from{transform:scale(0)} to{transform:scale(1)}}
+.w3-animate-input{transition:width 0.4s ease-in-out}.w3-animate-input:focus{width:100%!important}
+.w3-opacity,.w3-hover-opacity:hover{opacity:0.60}.w3-opacity-off,.w3-hover-opacity-off:hover{opacity:1} */

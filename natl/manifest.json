@@ -40,12 +40,12 @@
     ],
     "orientation": "portrait-primary",
         "launch_handler": {
-        "client_mode": ["focus-existing", "auto"] 
+        "client_mode": "focus-existing" 
     },
     "categories": [
       "fitness",
       "health",
-      "health &amp; fitness",
+      "health & fitness",
       "lifestyle",
       "productivity",
       "utilities"
@@ -56,4 +56,3 @@
     "id": "https://0sevn.github.io/natl/",
     "scope": "https://0sevn.github.io/natl/"
   }
-  

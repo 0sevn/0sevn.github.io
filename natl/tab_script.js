@@ -18,9 +18,9 @@ const UI_PANEL_CONFIG = {
         renderSource: () => renderPurgeListPanel()
     },
     sync_panel: {
-        title: "Cross device syncing ",
+        title: "Backup & Restore",
         shortcut: "d",
-        width: "100%", height: "30%",
+        width: "100%", height: "20%",
         position: "bottom-center",
         animateDirection: "w3-animate-bottom",
         renderSource: () => renderSyncPanel()
@@ -83,9 +83,9 @@ function renderSyncPanel() {
         <div id="shelf_tiles_container" class="">
         <div style="border: 0px solid #ddd; border-radius: 10px;">
             <div class="setting-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; padding: 5px;">
-                <span>Backup & Restore</span>
-                <i>(Local storage only)</i>
+                
                 <div style="display: flex; gap: 8px;">
+                <i>Local storage only</i>
                     <button onclick="exportHistory()" style="padding: 6px 12px; border-radius: 6px; border: none; background: #2196f3; color: #fff; font-size: 0.8rem; cursor: pointer;">Export</button>
                     <button onclick="triggerImport()" style="padding: 6px 12px; border-radius: 6px; border: none; background: #444; color: #fff; font-size: 0.8rem; cursor: pointer;">Import</button>
                 </div>
@@ -94,8 +94,8 @@ function renderSyncPanel() {
                 <!--button class="icon export" id="exportHistory" onclick="exportHistory()">Export history</button > 
                 <a id="exportHistoryLink" style="display: none;">Export</a>
                 
-                < <label for="FileInputLabel"><b>Import</b></label> >
-                <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class="icon import"></input-->
+                < <label for="FileInputLabel"><b>Import</b></label> -->
+                <input type="file" id="jsonFileInput" name="jsonFileInput"accept=".json" class=".icon .import" style="display:none;"></input>
           </div>
         </div>
 

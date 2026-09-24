@@ -186,7 +186,7 @@ const PRESET_LIBRARY = {
     },
     rehab: {
         label: 'Rehab',
-        defaults: ["Ankle mobility", "Hip thrusts", "Tummy tucks", "Spinal torsion", "Neck mobility", "Wrist lubrication", "Tendon activation"]
+        defaults: ["Ankle mobility", "Hip thrusts", "Bulgarian split squats", "Tummy tucks", "Spinal torsion", "Neck mobility", "Wrist lubrication", "Tendon activation"]
     },
     yoga: {
         label: 'Yoga',
