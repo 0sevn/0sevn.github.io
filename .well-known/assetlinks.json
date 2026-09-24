@@ -3,6 +3,6 @@
       "target": {
         "namespace": "android_app",
         "package_name": "io.github.app_0sevn.twa",
-        "sha256_cert_fingerprints": ["53:94:45:23:2F:44:DF:17:F8:08:75:70:74:62:47:1C:72:01:23:2B:11:59:DB:0B:3D:1C:6B:4B:64:73:C2:FA"]
+        "sha256_cert_fingerprints": ["EE:1B:04:0F:E5:6C:FE:18:D2:FC:E5:B7:7B:D1:A8:8C:3D:2D:20:97:F0:6D:65:AC:CD:AE:0E:94:79:B3:2F:99"]
       }
     }]
