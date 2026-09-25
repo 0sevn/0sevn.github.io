@@ -312,8 +312,7 @@ input:checked + .slider:before {
     align-items: center;
     gap: 10px; /* Space between icons and bar */
     justify-content: space-around;
-    /* border: 1px solid rgba(255, 255, 255, 0.15); */
-    border: 0.5px solid var(--text-color);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 20px 20px 0 0;
     /* padding: 10px 0; */
     z-index: 1000;
@@ -323,7 +322,6 @@ input:checked + .slider:before {
     /* box-shadow: 0 -5px 20px rgba(0,0,0,0.5); */
     /* border-top: 1px solid #444; */
     /* border-radius: 25px 25px 5px 5px; */
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 .command-bar.hidden { display: none; }
@@ -343,7 +341,6 @@ input:checked + .slider:before {
     z-index: 2000;
     /* padding: 20px; */
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    
 }
 
 .bottom-sheet.active { bottom: 0; }
@@ -361,7 +358,7 @@ input:checked + .slider:before {
     max-width: 920px;
 /* bottom: -100%; */
     background: var(--card-bg); /* Dark sleek base theme match */
-    border: 0.5px solid var(--text-color);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 20px 20px 0 0;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         left: 50%;
@@ -399,7 +396,7 @@ input:checked + .slider:before {
     align-items: center;
     justify-content: space-between;
     padding: 6px 16px;
-    border-bottom: 0.5px solid var(--text-color);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.02);
 }
 
@@ -427,7 +424,6 @@ input:checked + .slider:before {
     overflow-x: hidden;
     position: relative;
     width: 100%;
-    padding: 8px;
     padding: 8px;
 }
 
@@ -1844,7 +1840,7 @@ pre {
     color: #c62828;
 }
 
-/* .ruler-slider { user-select: none; -webkit-user-select: none; margin-bottom: 16px; }
+.ruler-slider { user-select: none; -webkit-user-select: none; margin-bottom: 16px; }
 .ruler-slider-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; font-size: 0.85rem; color: #555; }
 .ruler-slider-value { font-size: 1.1rem; font-weight: 600; color: #222; }
 .ruler-slider-viewport { position: relative; height: 56px; overflow: hidden; touch-action: pan-y; background: #f4f4f5; border-radius: 8px; }
@@ -1855,7 +1851,7 @@ pre {
 .ruler-slider-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #3498db; pointer-events: none; }
 
 
-.w3-card,.w3-card-2{box-shadow:0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12)}
+/* .w3-card,.w3-card-2{box-shadow:0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12)}
 .w3-card-4,.w3-hover-shadow:hover{box-shadow:0 4px 10px 0 rgba(0,0,0,0.2),0 4px 20px 0 rgba(0,0,0,0.19)}
 .w3-spin{animation:w3-spin 2s infinite linear}@keyframes w3-spin{0%{transform:rotate(0deg)}100%{transform:rotate(359deg)}}
 .w3-animate-fading{animation:fading 10s infinite}@keyframes fading{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
