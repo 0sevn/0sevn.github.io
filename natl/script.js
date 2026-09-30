@@ -508,7 +508,7 @@ window.renderPurgeListPanel = function() {
 
     // 3. Construct an isolated dynamic layout wrapper with a distinct identity class
     const fragment = $(`
-        <div class="tab-sync-list" style="padding-left: 50px; overflow-y: auto; height: 100%; box-sizing: border-box;">
+        <div class="tab-sync-list">
                <ul id="purge_list" class="purge-history-list">
                </ul>
         </div>
@@ -547,7 +547,7 @@ window.renderPurgeListPanel = function() {
             
             // Append weekly group partitioning boundary line
             plistElement.append(`
-                <li class="week-header" style="font-weight: bold; color: var(--accent-color); margin-top: 15px; margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 3px;">
+                <li class="week-header" style="font-weight: bold; color: var(--accent-color); margin-top: 5px; margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 3px;">
                     Week ${group.weekNum} - ${group.year}
                 </li>
             `);
