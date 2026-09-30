@@ -391,8 +391,10 @@ function renderListView(container, tabData) {
             </div>
         ` : `
             <span>
-                <input type="checkbox" class="task-checkbox" ${task.checked ? 'checked' : ''}>
+                <input id="${task.id}" type="checkbox" class="task-checkbox" ${task.checked ? 'checked' : ''} style="display:none;">
+                <label for="${task.id}" class="task-text"></label>
                 <span class="task-text"></span>
+                
                 <p class="time">${displayDate}</p>
             </span>
         `;
@@ -710,14 +712,19 @@ window.deleteTaskById = function(taskId) {
     window.renderTaskList();
     updateHealthBar();
 
-    const undoDelete = () => {
-        let currentTodo = window.getTabStorageData(activeTabId, tabData.type);
-        currentTodo.push(deletedTask);
-        window.setTabStorageData(activeTabId, currentTodo);
-        window.renderTaskList();
-        updateHealthBar();
-        
-    };
+const undoDelete = () => {
+    let currentTodo = window.getTabStorageData(activeTabId, tabData.type);
+    currentTodo.push(deletedTask);
+
+    window.setTabStorageData(
+        activeTabId,
+        currentTodo,
+        tabData.type
+    );
+
+    window.renderTaskList();
+    updateHealthBar();
+};
 
     showToast("Task deleted", undoDelete);
     
@@ -1052,42 +1059,86 @@ function initBooleanToggle(elementId, storageKey, defaultValue, applyFn) {
 // ==========================================
 // 🔔 ALERTS, TOASTS & STATIC MESSAGE BANKS
 // ==========================================
+let toastHideTimer = null;
+let toastVisibilityTimer = null;
+
 function showToast(message, undoCallback = null) {
     const toast = document.getElementById("toast");
     if (!toast) return;
-    // Clear previous content
-    toast.innerHTML = '';
-    
-    // Add message text
-    const textSpan = document.createElement('span');
-    textSpan.textContent = message + " ";
-    toast.appendChild(textSpan);
 
-    // Add Undo link if a callback is provided
-    if (undoCallback) {
-        const undoLink = document.createElement('a');
-        undoLink.href = "#";
-        undoLink.textContent = "Undo";
-        undoLink.style.color = "#3498db";
-        undoLink.style.marginLeft = "10px";
-        undoLink.style.textDecoration = "underline";
-        undoLink.onclick = (e) => {
-            e.preventDefault();
-            undoCallback();
-            toast.style.opacity = "0"; // Hide toast immediately after undo
-        };
-        toast.appendChild(undoLink);
+    // Cancel timers belonging to the previous toast
+    if (toastHideTimer) {
+        clearTimeout(toastHideTimer);
+        toastHideTimer = null;
     }
 
+    if (toastVisibilityTimer) {
+        clearTimeout(toastVisibilityTimer);
+        toastVisibilityTimer = null;
+    }
+
+    // Clear previous toast
+    toast.innerHTML = "";
+
+    // Message
+    const messageSpan = document.createElement("span");
+    messageSpan.textContent = message;
+    toast.appendChild(messageSpan);
+
+    // Undo button
+    if (undoCallback) {
+        const undoButton = document.createElement("button");
+
+        undoButton.type = "button";
+        undoButton.className = "btn-action danger";
+        undoButton.textContent = "Undo";
+
+        let undoUsed = false;
+
+        undoButton.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (undoUsed) return;
+            undoUsed = true;
+
+            // Undo was pressed, so don't let the normal
+            // toast expiry timer fire afterwards.
+            if (toastHideTimer) {
+                clearTimeout(toastHideTimer);
+                toastHideTimer = null;
+            }
+
+            undoCallback();
+
+            toast.style.opacity = "0";
+
+            toastVisibilityTimer = setTimeout(() => {
+                toast.style.visibility = "hidden";
+                toastVisibilityTimer = null;
+            }, 300);
+        });
+
+        toast.appendChild(undoButton);
+    }
+
+    // Show the new toast
     toast.style.visibility = "visible";
     toast.style.opacity = "1";
-    toast.style.top = "20px";
+    toast.classList.add("show");
 
-    setTimeout(() => {
+    // Start ONLY this toast's timer
+    toastHideTimer = setTimeout(() => {
         toast.style.opacity = "0";
-        toast.style.bottom = "5px";
-        setTimeout(() => (toast.style.visibility = "hidden"), 500);
-    }, 5000); // Increased to 5s to give user time to click undo
+        toast.classList.remove("show");
+
+        toastVisibilityTimer = setTimeout(() => {
+            toast.style.visibility = "hidden";
+            toastVisibilityTimer = null;
+        }, 300);
+
+        toastHideTimer = null;
+    }, 5000);
 }
 
 const purgeMessages = [

@@ -2,7 +2,7 @@
 // Finite state machine..
 const UI_PANEL_CONFIG = {
     edit_panel: {
-        title: "Edit Panel",
+        title: "Edit Task",
         shortcut: "dblclck",
         width: "100%", height: "30%",
         position: "bottom-center",
@@ -443,7 +443,7 @@ function openTabSettings(tabId = null) {
     });
     // console.log('edit tab');
 
-    $('#sheet_title').text(tabId ? 'Edit Tab' : 'New Tab');
+    $('#sheet_title').text(tabId ? 'Edit tab' : 'New tab');
     $('#save_tab_btn').show();
     $('#tab_settings_card').toggleClass('hidden');
     // console.log($('#tab_settings_card').toggleClass('hidden'));
