@@ -1,6 +1,6 @@
 // serviceWorker.js
 
-const CACHE_NAME = "natl-cache-v2";
+const CACHE_NAME = "natl-cache-v3";
 
 const APP_SHELL = [
   "./",
