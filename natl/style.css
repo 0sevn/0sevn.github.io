@@ -1965,11 +1965,11 @@ pre {
 }
 
 .ruler-slider { user-select: none; -webkit-user-select: none; margin-bottom: 5px; }
-.ruler-slider-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0px; font-size: 0.85rem; color: var(--text-color); }
-.ruler-slider-value { font-size: 1.1rem; font-weight: 600; color: var(--text-color); }
-.ruler-slider-viewport { position: relative; height: 56px; overflow: hidden; touch-action: pan-y; background: #f4f4f5; border-radius: 8px; }
+.ruler-slider-label { display: flex; justify-content: center; align-items: baseline; margin-bottom: 0px; font-size: 0.85rem; color: var(--text-color); }
+.ruler-slider-value { font-size: 1.1rem; font-weight: 600; color: var(--text-color);}
+.ruler-slider-viewport { position: relative; height: 53px; overflow: hidden; touch-action: pan-y; background: #f4f4f5; border-radius: 8px; }
 .ruler-slider-track { position: absolute; top: 0; left: 0; height: 100%; will-change: transform; }
-.ruler-tick { position: absolute; bottom: 8px; width: 1px; height: 14px; background: #bbb; }
+.ruler-tick { position: absolute; bottom: 5px; width: 1px; height: 14px; background: #bbb; }
 .ruler-tick-major { height: 22px; background: #888; }
 .ruler-tick-num { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; color: #888; white-space: nowrap; }
 .ruler-slider-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #3498db; pointer-events: none; }

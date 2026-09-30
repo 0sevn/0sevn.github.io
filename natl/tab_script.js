@@ -762,7 +762,7 @@ function renderUnifiedForm(itemData, mode) {
                             max: Math.max(goalVal * 2, 100),
                             step: 1,
                             value: goalVal,
-                            label: '',
+                            label: 'Goal: ',
                             onChange: (newGoal) => {
                                 if (rulerCurrent) rulerCurrent.setMax(newGoal);
                             }
@@ -774,7 +774,7 @@ function renderUnifiedForm(itemData, mode) {
                             max: goalVal,
                             step: 1,
                             value: currentVal,
-                            label: '',
+                            label: 'Current: ',
                             onChange: () => {} // live label already updates itself
                         });
 
