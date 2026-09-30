@@ -498,7 +498,7 @@ input:checked + .slider:before {
     overflow-x: hidden;
     position: relative;
     width: 100%;
-    padding: 8px;
+    padding: 5px;
 }
 
 /* ==========================================================================
@@ -1964,9 +1964,9 @@ pre {
     color: #c62828;
 }
 
-.ruler-slider { user-select: none; -webkit-user-select: none; margin-bottom: 16px; }
-.ruler-slider-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; font-size: 0.85rem; color: #555; }
-.ruler-slider-value { font-size: 1.1rem; font-weight: 600; color: #222; }
+.ruler-slider { user-select: none; -webkit-user-select: none; margin-bottom: 5px; }
+.ruler-slider-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0px; font-size: 0.85rem; color: var(--text-color); }
+.ruler-slider-value { font-size: 1.1rem; font-weight: 600; color: var(--text-color); }
 .ruler-slider-viewport { position: relative; height: 56px; overflow: hidden; touch-action: pan-y; background: #f4f4f5; border-radius: 8px; }
 .ruler-slider-track { position: absolute; top: 0; left: 0; height: 100%; will-change: transform; }
 .ruler-tick { position: absolute; bottom: 8px; width: 1px; height: 14px; background: #bbb; }

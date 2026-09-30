@@ -585,7 +585,7 @@ function createRulerSlider({
         <div class="ruler-slider-label">
             <span class="ruler-slider-name">${label}</span>
             <span class="ruler-slider-value">${currentValue}</span>
-            <span class="ruler-slider-value">as</span>
+            <span class="ruler-slider-value"></span>
         </div>
         <div class="ruler-slider-viewport">
             <div class="ruler-slider-track"></div>
@@ -695,7 +695,7 @@ function createRulerSlider({
 
 /** * Global single function to handle shelving and unshelving tabs
  * @param {string} tabId - Target tab identifier */
-// 
+// <div class="metric-display">Current / Goal: <span id="lbl_current">0</span> / <span id="lbl_goal">0</span></div>
 function renderUnifiedForm(itemData, mode) {
     // 1. Build the form structure template shell
     const formFragment = $(`
@@ -706,7 +706,7 @@ function renderUnifiedForm(itemData, mode) {
             </div>
             
             <div class="slider-group" style="display: none;">
-                <div class="metric-display">Current / Goal: <span id="lbl_current">0</span> / <span id="lbl_goal">0</span></div>
+                
                 <div id="ruler_current_mount"></div>
                 <div id="ruler_goal_mount"></div>
             </div>
@@ -750,8 +750,8 @@ function renderUnifiedForm(itemData, mode) {
                         
             // Set slider properties
             // formFragment.find('#edit_field_slider').attr({ 'max': goalVal, 'value': currentVal });
-            formFragment.find('#lbl_current').text(currentVal);
-            formFragment.find('#lbl_goal').text(goalVal);
+            // formFragment.find('#lbl_current').text(currentVal);
+            // formFragment.find('#lbl_goal').text(goalVal);
 
             formFragment.find('.slider-group').show();
                         // formFragment.find('.slider-group').show();
@@ -762,7 +762,7 @@ function renderUnifiedForm(itemData, mode) {
                             max: Math.max(goalVal * 2, 100),
                             step: 1,
                             value: goalVal,
-                            label: 'Goal',
+                            label: '',
                             onChange: (newGoal) => {
                                 if (rulerCurrent) rulerCurrent.setMax(newGoal);
                             }
