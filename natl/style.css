@@ -271,7 +271,7 @@ input:checked + .slider:before {
     left: 50%;
     transform: translateX(-50%);
     min-width: 250px;
-    max-height:50px;
+    max-height:150px;
     margin: 0 auto 0 auto;
     padding: 12px;
 
