@@ -52,8 +52,28 @@ window.togglePanelDisplay = function(panelKey, ...injectionData) {
 
     // 1. Inject content dynamically using the config's callback pointer
     const contentContainer = panelDOM.find('.panel-body-content');
+    const headerInput = panelDOM.find('.panel-header-input');
+
     contentContainer.empty();
-    contentContainer.append(config.renderSource(...injectionData));
+    headerInput.empty();
+
+    const renderedContent = config.renderSource(...injectionData);
+    contentContainer.append(renderedContent);
+
+    if (panelKey === 'edit_panel') {
+        console.log('edit task')
+        const nameInput = renderedContent.find('#edit_field_name');
+        const nameGroup = nameInput.closest('.form-group');
+        if (nameInput.length && nameGroup.length) {
+                // Keep a reference on the fragment so the save function
+                // can still access the same input after it has been moved.
+                renderedContent.data('nameInput', nameInput);
+                nameGroup.addClass('header-name-group');
+                headerInput.append(nameGroup);
+            }
+    }
+
+
 
     // 2. Map structural dimensions dynamically
     panelDOM.css({
@@ -565,6 +585,7 @@ function createRulerSlider({
         <div class="ruler-slider-label">
             <span class="ruler-slider-name">${label}</span>
             <span class="ruler-slider-value">${currentValue}</span>
+            <span class="ruler-slider-value">as</span>
         </div>
         <div class="ruler-slider-viewport">
             <div class="ruler-slider-track"></div>
@@ -680,7 +701,7 @@ function renderUnifiedForm(itemData, mode) {
     const formFragment = $(`
         <div class="unified-edit-form">
             <div class="form-group">
-                <label>Name</label>
+                
                 <input type="text" id="edit_field_name" class="form-control">
             </div>
             
@@ -753,7 +774,7 @@ function renderUnifiedForm(itemData, mode) {
                             max: goalVal,
                             step: 1,
                             value: currentVal,
-                            label: 'Current',
+                            label: '',
                             onChange: () => {} // live label already updates itself
                         });
 
@@ -783,7 +804,11 @@ function renderUnifiedForm(itemData, mode) {
 }
 
 function saveUnifiedDataModifications(id, mode, fragment, rulers = {}) {
-    const newName = fragment.find('#edit_field_name').val().trim();
+    const nameInput =
+        fragment.data('nameInput') ||
+        fragment.find('#edit_field_name');
+
+    const newName = nameInput.val().trim();
     const newDesc = fragment.find('#edit_field_desc').val().trim();
 
     if (!newName) {
